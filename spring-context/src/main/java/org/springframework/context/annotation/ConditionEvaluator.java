@@ -72,21 +72,25 @@ class ConditionEvaluator {
 	}
 
 	/**
-	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
+	 * 根据@Conditional注解确定是否应跳过某个候选配置类
 	 * @param metadata the meta data
 	 * @param phase the phase of the call
 	 * @return if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		//应该是携带了Conditional注解的后面再说
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
 
 		if (phase == null) {
+			//如果是注解元数据，并且标志了某些注解
 			if (metadata instanceof AnnotationMetadata &&
 					ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
+				//再递归调用：看是否需要跳过
 				return shouldSkip(metadata, ConfigurationPhase.PARSE_CONFIGURATION);
 			}
+			//再递归调用：REGISTER_BEAN：表示无论条件是否成立都加入
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
