@@ -158,8 +158,7 @@ final class ConfigurationClass {
 	}
 
 	/**
-	 * Return whether this configuration class was registered via @{@link Import} or
-	 * automatically registered due to being nested within another configuration class.
+	 * 返回此配置类是通过谁使用@Import导入的
 	 * @since 3.1.1
 	 * @see #getImportedBy()
 	 */

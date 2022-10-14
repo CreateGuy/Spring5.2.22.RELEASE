@@ -230,18 +230,20 @@ class ConfigurationClassParser {
 			return;
 		}
 
+		//不懂应用场景
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
 		if (existingClass != null) {
+			//返回是谁导入的当前类
 			if (configClass.isImported()) {
 				if (existingClass.isImported()) {
+					//然后都合并到existingClass的importedBy中
 					existingClass.mergeImportedBy(configClass);
 				}
-				// Otherwise ignore new imported config class; existing non-imported class overrides it.
+				// 否则忽略新导入的配置类；现有的非导入类将覆盖它。
 				return;
 			}
 			else {
-				// Explicit bean definition found, probably replacing an import.
-				// Let's remove the old one and go with the new one.
+				//到这就说明新的配置类不是被@Import导入的，那么就移除旧的，换新的
 				this.configurationClasses.remove(configClass);
 				this.knownSuperclasses.values().removeIf(configClass::equals);
 			}
@@ -249,6 +251,8 @@ class ConfigurationClassParser {
 
 		// Recursively process the configuration class and its superclass hierarchy.
 		SourceClass sourceClass = asSourceClass(configClass, filter);
+		//do while 表示递归处理类，因为一个类可能有父类
+		//如果存在父类，则需要将configClass变成sourceClass去解析，然后返回sourceClass的父类
 		do {
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
@@ -270,12 +274,13 @@ class ConfigurationClassParser {
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 
+		//判断是否标志了@Component注解
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
-			// Recursively process any member (nested) classes first
+			//首先处理任何成员（嵌套）类
 			processMemberClasses(configClass, sourceClass, filter);
 		}
 
-		// Process any @PropertySource annotations
+		// 处理标注了@PropertySource注解的配置类
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
@@ -350,31 +355,43 @@ class ConfigurationClassParser {
 	}
 
 	/**
-	 * Register member (nested) classes that happen to be configuration classes themselves.
+	 *  注册在配置类本身的成员（嵌套）类
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,
 			Predicate<String> filter) throws IOException {
 
+		//先获取当前类的内部类
 		Collection<SourceClass> memberClasses = sourceClass.getMemberClasses();
 		if (!memberClasses.isEmpty()) {
 			List<SourceClass> candidates = new ArrayList<>(memberClasses.size());
 			for (SourceClass memberClass : memberClasses) {
+				//判断内部类是否是一个候选类：
 				if (ConfigurationClassUtils.isConfigurationCandidate(memberClass.getMetadata()) &&
 						!memberClass.getMetadata().getClassName().equals(configClass.getMetadata().getClassName())) {
 					candidates.add(memberClass);
 				}
 			}
+			//由于传入的是一个list，里面是直接调用list的排序
 			OrderComparator.sort(candidates);
+
 			for (SourceClass candidate : candidates) {
+				//importStack是用于判断循环导入的,如果包含在这里就说明出现了循环导入
+				//importStack的push方法只会在这里和处理@Imports注解的时候会执行
+				//也就是说可能会出现有一个A @Imports B ，然后 B 里面又有一个 标志了@Compent的 A
 				if (this.importStack.contains(configClass)) {
+					//抛出了异常
 					this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 				}
 				else {
+					//将内部类推入importStack中
+					//importStack是一个双端队列
 					this.importStack.push(configClass);
 					try {
+						//到这就处理这个内部类
 						processConfigurationClass(candidate.asConfigClass(configClass), filter);
 					}
 					finally {
+						//推出一个内部类，是双端队列，一边出，一边进
 						this.importStack.pop();
 					}
 				}

@@ -95,20 +95,28 @@ class ConditionEvaluator {
 		}
 
 		List<Condition> conditions = new ArrayList<>();
+		//获取当前类上有关@Conditional注解的信息
+		//是一个List<String[]>，list表示可能有多个@Conditional注解
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
+			//其中String[]是某个@Conditional
 			for (String conditionClass : conditionClasses) {
+				//将当前类所标志的@Conditional类型的注解实例化，加入候选集合中
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
 				conditions.add(condition);
 			}
 		}
 
+		//是利用AnnotationAwareOrderComparator进行排序，
+		//这是一个针对Ordered接口、PriorityOrdered接口和@Order注解进行排序的
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		//遍历所有的@Conditional注解，看能否满足条件
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
 			if (condition instanceof ConfigurationCondition) {
 				requiredPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
 			}
+			//condition.matches方法进行匹配
 			if ((requiredPhase == null || requiredPhase == phase) && !condition.matches(this.context, metadata)) {
 				return true;
 			}
