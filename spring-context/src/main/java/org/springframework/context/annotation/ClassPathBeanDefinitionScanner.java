@@ -36,9 +36,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
 
 /**
- * A bean definition scanner that detects bean candidates on the classpath,
- * registering corresponding bean definitions with a given registry ({@code BeanFactory}
- * or {@code ApplicationContext}).
+ * 一个bean定义扫描器，在类路径上检测候选bean，并在给定注册在工厂中，比如工厂是DefaultListableBeanFactory
  *
  * <p>Candidate classes are detected through configurable type filters. The
  * default filters include classes that are annotated with Spring's
@@ -272,7 +270,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+		//先遍历所有的包路径
 		for (String basePackage : basePackages) {
+			//查找候选bean的集合
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);

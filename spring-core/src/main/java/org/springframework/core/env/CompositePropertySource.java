@@ -104,9 +104,13 @@ public class CompositePropertySource extends EnumerablePropertySource<Object> {
 	 * @since 4.1
 	 */
 	public void addFirstPropertySource(PropertySource<?> propertySource) {
+		//先将原来的属性源取出来保存
 		List<PropertySource<?>> existing = new ArrayList<>(this.propertySources);
+		//清空原来的
 		this.propertySources.clear();
+		//添加后来的
 		this.propertySources.add(propertySource);
+		//将原来的添加在后面
 		this.propertySources.addAll(existing);
 	}
 

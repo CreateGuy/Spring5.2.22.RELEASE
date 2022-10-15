@@ -304,15 +304,16 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 
 	/**
-	 * Scan the class path for candidate components.
-	 * @param basePackage the package to check for annotated classes
-	 * @return a corresponding Set of autodetected bean definitions
+	 *  查找候选的bean
 	 */
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
+		//componentsIndex不为空说明项目中有spring.component文件，并且includeFilters还支持@Indexed注解
+		//就直接使用spring.component文件中的bean加载到容器中，而不是用包扫描
 		if (this.componentsIndex != null && indexSupportsIncludeFilters()) {
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			//使用包扫描
 			return scanCandidateComponents(basePackage);
 		}
 	}

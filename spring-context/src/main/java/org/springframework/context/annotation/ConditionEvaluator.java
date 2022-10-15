@@ -72,7 +72,7 @@ class ConditionEvaluator {
 	}
 
 	/**
-	 * 根据@Conditional注解确定是否应跳过某个候选配置类
+	 * 根据@Conditional注解确定是否跳过某个候选配置类
 	 * @param metadata the meta data
 	 * @param phase the phase of the call
 	 * @return if the item should be skipped

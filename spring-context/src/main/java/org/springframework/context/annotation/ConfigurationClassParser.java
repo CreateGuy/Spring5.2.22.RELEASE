@@ -258,6 +258,7 @@ class ConfigurationClassParser {
 		}
 		while (sourceClass != null);
 
+		//放入已经处理的配置类集合中
 		this.configurationClasses.put(configClass, configClass);
 	}
 
@@ -280,11 +281,13 @@ class ConfigurationClassParser {
 			processMemberClasses(configClass, sourceClass, filter);
 		}
 
-		// 处理标注了@PropertySource注解的配置类
+		//处理标注了@PropertySource注解的配置类
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
 			if (this.environment instanceof ConfigurableEnvironment) {
+				//这个方法只是将当前需要加载的配置类加入到环境上下文的属性源集合中
+				//毕竟现在bean还没初始化，还只是一个ConfigurationClass，甚至还不是BeanDefinition
 				processPropertySource(propertySource);
 			}
 			else {
@@ -293,13 +296,16 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// Process any @ComponentScan annotations
+		//处理标注了@ComponentScans和@ComponentScan的配置类
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
+		//当设置对应的注解和是否需要跳过
 		if (!componentScans.isEmpty() &&
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
+			//遍历所有的componentScan注解：一个类可以使用多个ComponentScan和@ComponentScans
 			for (AnnotationAttributes componentScan : componentScans) {
-				// The config class is annotated with @ComponentScan -> perform the scan immediately
+				//通过componentScan扫描器 获取满足条件的BeanDefinitionHolder
+				//BeanDefinitionHolder是beanDefinition + beanName
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
@@ -455,7 +461,7 @@ class ConfigurationClassParser {
 
 
 	/**
-	 * Process the given <code>@PropertySource</code> annotation metadata.
+	 * 处理@PropertySource注解元数据。
 	 * @param propertySource metadata for the <code>@PropertySource</code> annotation found
 	 * @throws IOException if loading a property source failed
 	 */
@@ -464,22 +470,30 @@ class ConfigurationClassParser {
 		if (!StringUtils.hasLength(name)) {
 			name = null;
 		}
+		//获得编码格式
 		String encoding = propertySource.getString("encoding");
 		if (!StringUtils.hasLength(encoding)) {
 			encoding = null;
 		}
+		//获得需要导入的配置文件
 		String[] locations = propertySource.getStringArray("value");
 		Assert.isTrue(locations.length > 0, "At least one @PropertySource(value) location is required");
+		//获得找不到配置文件是否忽略的标志位
 		boolean ignoreResourceNotFound = propertySource.getBoolean("ignoreResourceNotFound");
 
+		//获取专门用于创建属性源的工程
 		Class<? extends PropertySourceFactory> factoryClass = propertySource.getClass("factory");
+		//如果用户没有配置就用默认的DefaultPropertySourceFactory
 		PropertySourceFactory factory = (factoryClass == PropertySourceFactory.class ?
 				DEFAULT_PROPERTY_SOURCE_FACTORY : BeanUtils.instantiateClass(factoryClass));
 
+		//如果设置了配置文件，可能有多个
 		for (String location : locations) {
 			try {
 				String resolvedLocation = this.environment.resolveRequiredPlaceholders(location);
+				//获取当前的配置文件
 				Resource resource = this.resourceLoader.getResource(resolvedLocation);
+				//添加配置文件对应的属性源到环境上线文的属性源集合中
 				addPropertySource(factory.createPropertySource(name, new EncodedResource(resource, encoding)));
 			}
 			catch (IllegalArgumentException | FileNotFoundException | UnknownHostException | SocketException ex) {
@@ -496,16 +510,24 @@ class ConfigurationClassParser {
 		}
 	}
 
+	/**
+	 * 添加配置文件对应的属性源到环境上线文的属性源集合中
+	 * @param propertySource
+	 */
 	private void addPropertySource(PropertySource<?> propertySource) {
 		String name = propertySource.getName();
+		//获取环境上下文中的所有属性源
 		MutablePropertySources propertySources = ((ConfigurableEnvironment) this.environment).getPropertySources();
 
 		if (this.propertySourceNames.contains(name)) {
-			// We've already added a version, we need to extend it
+
 			PropertySource<?> existing = propertySources.get(name);
+			//可能环境上下文中已经有了这样一个属性源
 			if (existing != null) {
+				//有可能这个新的属性源有了一些新的属性，是另外一个属性源，和原来的名称相同
 				PropertySource<?> newSource = (propertySource instanceof ResourcePropertySource ?
 						((ResourcePropertySource) propertySource).withResourceName() : propertySource);
+				//如果环境上下文中中原来的属性源就是一个混合的，那么就直接加到原来的里面的去，但是是最前面
 				if (existing instanceof CompositePropertySource) {
 					((CompositePropertySource) existing).addFirstPropertySource(newSource);
 				}
@@ -513,9 +535,11 @@ class ConfigurationClassParser {
 					if (existing instanceof ResourcePropertySource) {
 						existing = ((ResourcePropertySource) existing).withResourceName();
 					}
+					//构建一个混合的属性源
 					CompositePropertySource composite = new CompositePropertySource(name);
 					composite.addPropertySource(newSource);
 					composite.addPropertySource(existing);
+					//还替换了原来保存在环境上下文中的这个属性源
 					propertySources.replace(name, composite);
 				}
 				return;
@@ -523,12 +547,15 @@ class ConfigurationClassParser {
 		}
 
 		if (this.propertySourceNames.isEmpty()) {
+			//将当前的propertySource加入到环境上下文的propertySources中
 			propertySources.addLast(propertySource);
 		}
 		else {
 			String firstProcessed = this.propertySourceNames.get(this.propertySourceNames.size() - 1);
+			//这里是放入最后一个的前面： a，b -> a，c，b
 			propertySources.addBefore(firstProcessed, propertySource);
 		}
+		//加入已经加载的属性源的集合中，并不是环境上下文里面
 		this.propertySourceNames.add(name);
 	}
 

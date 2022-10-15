@@ -118,6 +118,14 @@ abstract class ParserStrategyUtils {
 		throw new IllegalStateException("Illegal method parameter type: " + parameterType.getName());
 	}
 
+	/**
+	 * 看bean是否实现了某些Aware接口，以进行后置处理
+	 * @param parserStrategyBean
+	 * @param environment
+	 * @param resourceLoader
+	 * @param registry
+	 * @param classLoader
+	 */
 	private static void invokeAwareMethods(Object parserStrategyBean, Environment environment,
 			ResourceLoader resourceLoader, BeanDefinitionRegistry registry, @Nullable ClassLoader classLoader) {
 
