@@ -42,8 +42,10 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//是否考虑父类匹配, 默认都是false
 	private final boolean considerInherited;
 
+	//是否考虑接口匹配, 默认都是false
 	private final boolean considerInterfaces;
 
 
@@ -57,20 +59,23 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {
 
-		// This method optimizes avoiding unnecessary creation of ClassReaders
-		// as well as visiting over those readers.
+		//默认返回false，只有AnnotationTypeFilter重写了这个方法的
 		if (matchSelf(metadataReader)) {
 			return true;
 		}
+		//获取类元数据
 		ClassMetadata metadata = metadataReader.getClassMetadata();
+		//匹配类名，默认返回false
 		if (matchClassName(metadata.getClassName())) {
 			return true;
 		}
 
+		//是否按照父类进行匹配
 		if (this.considerInherited) {
+			//获得父类
 			String superClassName = metadata.getSuperClassName();
 			if (superClassName != null) {
-				// Optimization to avoid creating ClassReader for super class.
+				//判断是否需要过滤的
 				Boolean superClassMatch = matchSuperClass(superClassName);
 				if (superClassMatch != null) {
 					if (superClassMatch.booleanValue()) {
@@ -78,7 +83,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 					}
 				}
 				else {
-					// Need to read super class to determine a match...
+					//读取父类进行匹配
 					try {
 						if (match(metadata.getSuperClassName(), metadataReaderFactory)) {
 							return true;
@@ -94,9 +99,10 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 			}
 		}
 
+		//是否按照接口进行匹配
 		if (this.considerInterfaces) {
 			for (String ifc : metadata.getInterfaceNames()) {
-				// Optimization to avoid creating ClassReader for super class
+				//避免为超类匹配
 				Boolean interfaceMatch = matchInterface(ifc);
 				if (interfaceMatch != null) {
 					if (interfaceMatch.booleanValue()) {
@@ -104,7 +110,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 					}
 				}
 				else {
-					// Need to read interface to determine a match...
+					// 读取接口，进行匹配
 					try {
 						if (match(ifc, metadataReaderFactory)) {
 							return true;
@@ -137,7 +143,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	}
 
 	/**
-	 * Override this to match on type name.
+	 * 匹配某些class不需要加载到容器中，默认为false
 	 */
 	protected boolean matchClassName(String className) {
 		return false;

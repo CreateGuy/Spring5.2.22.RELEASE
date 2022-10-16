@@ -275,8 +275,10 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 			//查找候选bean的集合
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
+				//通过范围解析器看BeanDefinition是否携带了@Scope注解，如果携带了返回
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+				//通过名称生产器获得bean名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);

@@ -75,7 +75,7 @@ class ComponentScanAnnotationParser {
 
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, String declaringClass) {
 		//创建一个类扫描器
-		//useDefaultFilters是是否使用默认的filter进行包扫描，而默认的是可以扫描@Service,@Controller和@Repository的注解
+		//useDefaultFilters是是否使用默认的filter进行包扫描，也就是会默认添加有关于@Component和@ManagedBean的包含过滤器
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 

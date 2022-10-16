@@ -26,26 +26,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * A simple {@link TypeFilter} which matches classes with a given annotation,
- * checking inherited annotations as well.
- *
- * <p>By default, the matching logic mirrors that of
- * {@link AnnotationUtils#getAnnotation(java.lang.reflect.AnnotatedElement, Class)},
- * supporting annotations that are <em>present</em> or <em>meta-present</em> for a
- * single level of meta-annotations. The search for meta-annotations my be disabled.
- * Similarly, the search for annotations on interfaces may optionally be enabled.
- * Consult the various constructors in this class for details.
- *
- * @author Mark Fisher
- * @author Ramnivas Laddad
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @since 2.5
+ * 检查某个bean是否标注了某个注解，比如@Component
  */
 public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter {
 
 	private final Class<? extends Annotation> annotationType;
 
+	//是否要检查元注解：
 	private final boolean considerMetaAnnotations;
 
 
@@ -94,6 +81,7 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 		return this.annotationType;
 	}
 
+	//看注解元数据是否包含了某个注解，或者包含了某个注解的子注解
 	@Override
 	protected boolean matchSelf(MetadataReader metadataReader) {
 		AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
@@ -113,19 +101,25 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 		return hasAnnotation(interfaceName);
 	}
 
+	//判断是否包含某种注解
 	@Nullable
 	protected Boolean hasAnnotation(String typeName) {
+		//如果是判断是否有顶级类，就无所谓
 		if (Object.class.getName().equals(typeName)) {
 			return false;
 		}
+		//必须是java开头的类
 		else if (typeName.startsWith("java")) {
+			//如果当前这个注解类型过滤器判断的注解不是以java开头的就返回false
 			if (!this.annotationType.getName().startsWith("java")) {
-				// Standard Java types do not have non-standard annotations on them ->
-				// skip any load attempt, in particular for Java language interfaces.
+				//标准Java类型上没有非标准注解
+				//应该是标准的java类型是没有包含注解的
 				return false;
 			}
 			try {
 				Class<?> clazz = ClassUtils.forName(typeName, getClass().getClassLoader());
+				//considerMetaAnnotations为true：表示检查这个class上是否包含annotationType个注解或者有包含了annotationType的子注解
+				//considerMetaAnnotations为false：表示检查这个class上是否包含annotationType个注解
 				return ((this.considerMetaAnnotations ? AnnotationUtils.getAnnotation(clazz, this.annotationType) :
 						clazz.getAnnotation(this.annotationType)) != null);
 			}

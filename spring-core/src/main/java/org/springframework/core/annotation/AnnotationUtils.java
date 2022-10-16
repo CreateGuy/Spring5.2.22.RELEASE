@@ -203,16 +203,8 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Get a single {@link Annotation} of {@code annotationType} from the supplied
-	 * {@link AnnotatedElement}, where the annotation is either <em>present</em> or
-	 * <em>meta-present</em> on the {@code AnnotatedElement}.
-	 * <p>Note that this method supports only a single level of meta-annotations.
-	 * For support for arbitrary levels of meta-annotations, use
-	 * {@link #findAnnotation(AnnotatedElement, Class)} instead.
-	 * @param annotatedElement the {@code AnnotatedElement} from which to get the annotation
-	 * @param annotationType the annotation type to look for, both locally and as a meta-annotation
-	 * @return the first matching annotation, or {@code null} if not found
-	 * @since 3.1
+	 * 从某个类获取某个注解，包含子注解
+	 * 貌似无法获取自定义的和java的注解
 	 */
 	@Nullable
 	public static <A extends Annotation> A getAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {

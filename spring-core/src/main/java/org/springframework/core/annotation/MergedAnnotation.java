@@ -83,11 +83,7 @@ public interface MergedAnnotation<A extends Annotation> {
 	boolean isPresent();
 
 	/**
-	 * Determine if the annotation is directly present on the source.
-	 * <p>A directly present annotation is one that the user has explicitly
-	 * declared and not one that is {@linkplain #isMetaPresent() meta-present}
-	 * or {@link Inherited @Inherited}.
-	 * @return {@code true} if the annotation is directly present
+	 *	确定注释是否直接出现在源上，而不是出现在子类或者使用@Inherited继承来的
 	 */
 	boolean isDirectlyPresent();
 

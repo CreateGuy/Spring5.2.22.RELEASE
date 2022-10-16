@@ -39,7 +39,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
 
 /**
- * Internal class used to evaluate {@link Conditional} annotations.
+ * 候选评估器，用于判断是否跳过某个类
  *
  * @author Phillip Webb
  * @author Juergen Hoeller

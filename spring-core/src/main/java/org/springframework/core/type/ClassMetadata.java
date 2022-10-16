@@ -47,13 +47,12 @@ public interface ClassMetadata {
 	boolean isAnnotation();
 
 	/**
-	 * Return whether the underlying class is marked as abstract.
+	 * 判断当前Class是否是一个抽象类
 	 */
 	boolean isAbstract();
 
 	/**
-	 * Return whether the underlying class represents a concrete class,
-	 * i.e. neither an interface nor an abstract class.
+	 * 判断当前Class是否是一个接口或者一个抽象类
 	 */
 	default boolean isConcrete() {
 		return !(isInterface() || isAbstract());
@@ -65,9 +64,7 @@ public interface ClassMetadata {
 	boolean isFinal();
 
 	/**
-	 * Determine whether the underlying class is independent, i.e. whether
-	 * it is a top-level class or a nested class (static inner class) that
-	 * can be constructed independently from an enclosing class.
+	 * 判断当前Class是否是独立的
 	 */
 	boolean isIndependent();
 

@@ -35,26 +35,36 @@ import org.springframework.lang.Nullable;
  */
 final class SimpleAnnotationMetadata implements AnnotationMetadata {
 
+	//类名称
 	private final String className;
 
+	//有表示类的类型的作用
 	private final int access;
 
+	//外部类名称，不是一个内部类那么这里就为空
 	@Nullable
 	private final String enclosingClassName;
 
+	//父类名称
 	@Nullable
 	private final String superClassName;
 
+	//是否为独立的内部类：不懂
 	private final boolean independentInnerClass;
 
+	//实现的接口名称
 	private final String[] interfaceNames;
 
+	//内部类名称
 	private final String[] memberClassNames;
 
+	//方法集合
 	private final MethodMetadata[] annotatedMethods;
 
+	//注解和元注解集合类
 	private final MergedAnnotations annotations;
 
+	//注解类型集合，当尝试获取的时候，会从annotations中获取注解信息
 	@Nullable
 	private Set<String> annotationTypes;
 
@@ -137,10 +147,18 @@ final class SimpleAnnotationMetadata implements AnnotationMetadata {
 		return annotationTypes;
 	}
 
+	/**
+	 * 判断是否有标志了某个注解的方法
+	 * @param annotationName the fully qualified class name of the annotation
+	 * type to look for
+	 * @return
+	 */
 	@Override
 	public Set<MethodMetadata> getAnnotatedMethods(String annotationName) {
 		Set<MethodMetadata> annotatedMethods = null;
+		//遍历所有注解方法
 		for (MethodMetadata annotatedMethod : this.annotatedMethods) {
+			//判断是否包含了某个注解
 			if (annotatedMethod.isAnnotated(annotationName)) {
 				if (annotatedMethods == null) {
 					annotatedMethods = new LinkedHashSet<>(4);

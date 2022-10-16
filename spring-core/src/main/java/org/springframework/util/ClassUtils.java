@@ -947,12 +947,15 @@ public abstract class ClassUtils {
 	 */
 	public static String getShortName(String className) {
 		Assert.hasLength(className, "Class name must not be empty");
+		//先获得最后一个 . 的位置
 		int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
 		int nameEndIndex = className.indexOf(CGLIB_CLASS_SEPARATOR);
 		if (nameEndIndex == -1) {
 			nameEndIndex = className.length();
 		}
+		//从最后一个 . 的位置到最后开始截取
 		String shortName = className.substring(lastDotIndex + 1, nameEndIndex);
+		//替换分隔符
 		shortName = shortName.replace(INNER_CLASS_SEPARATOR, PACKAGE_SEPARATOR);
 		return shortName;
 	}

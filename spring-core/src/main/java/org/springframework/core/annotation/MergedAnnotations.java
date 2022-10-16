@@ -443,19 +443,13 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	enum SearchStrategy {
 
 		/**
-		 * Find only directly declared annotations, without considering
-		 * {@link Inherited @Inherited} annotations and without searching
-		 * superclasses or implemented interfaces.
+		 * 只查找直接声明的注解，而不考虑@Inherited注解，也不搜索超类或实现的接口。
 		 */
 		DIRECT,
 
 		/**
-		 * Find all directly declared annotations as well as any
-		 * {@link Inherited @Inherited} superclass annotations. This strategy
-		 * is only really useful when used with {@link Class} types since the
-		 * {@link Inherited @Inherited} annotation is ignored for all other
-		 * {@linkplain AnnotatedElement annotated elements}. This strategy does
-		 * not search implemented interfaces.
+		 * 查找所有直接声明的注解以及任何@Inherited超类注解
+		 * 此策略仅在与Class类型一起使用时才真正有用，因为对于所有其他带注解的元素，@Inherited注释都被忽略。此策略不搜索已实现的接口。
 		 */
 		INHERITED_ANNOTATIONS,
 
