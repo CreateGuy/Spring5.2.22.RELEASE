@@ -39,9 +39,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for concrete, full-fledged {@link BeanDefinition} classes,
- * factoring out common properties of {@link GenericBeanDefinition},
- * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
+ * 成熟的bean：其子类有@bean的bean，@Configuration的bean，通过@ComponentScan扫描出的bean
  *
  * <p>The autowire constants match the ones defined in the
  * {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
@@ -146,6 +144,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean abstractFlag = false;
 
+	/**
+	 * 是否懒加载
+	 */
 	@Nullable
 	private Boolean lazyInit;
 
@@ -156,10 +157,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String[] dependsOn;
 
+	//当前bean是否可以作为依赖注入的候选bean
 	private boolean autowireCandidate = true;
 
+	//当前bean是否作为相同类型bean的首选
 	private boolean primary = false;
 
+	//fixme qualifiers的设置是通过element得到的
+	//猜测是通过xml注入的bean，然后内部有设置了@Qualifier的属性
+	//然后这个qualifiers表示当前BeanDefinition内部需要什么类型的bean
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
 	@Nullable
@@ -195,11 +201,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean synthetic = false;
 
+	//bean的角色信息分类，由@Role注解获得
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
+	//bean的描述信息，由@Description注解获得
 	@Nullable
 	private String description;
 
+	//bean对应的class文件
 	@Nullable
 	private Resource resource;
 

@@ -234,11 +234,20 @@ public abstract class AnnotationConfigUtils {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
 
+	/**
+	 * 获得特定注解上的值，设置到BeanDefinition的属性中
+	 * @param abd
+	 * @param metadata 注解元数据，可能是类也有可能是方法上的
+	 */
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		//从metadata获得@Lazy注解的属性
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		if (lazy != null) {
 			abd.setLazyInit(lazy.getBoolean("value"));
 		}
+		//如果abd中定义的注解元数据和metadata不一样，那从abd中的试一试是否可以拿到@Lazy的属性
+		//比如ConfigurationClassBeanDefinition是@Configuration注解的类中，通过 @Bean 注解实例化的 Bean
+		//这种的话abd.getMetadata()是类注解元数据，而metadata是这个类的某个方法的注解元数据
 		else if (abd.getMetadata() != metadata) {
 			lazy = attributesFor(abd.getMetadata(), Lazy.class);
 			if (lazy != null) {
@@ -246,28 +255,43 @@ public abstract class AnnotationConfigUtils {
 			}
 		}
 
+		//是否包含了@Primary注解，包含了就设置当前bean为该类型的首选
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+		//看当前bean a是否依赖于另外一个bean b，但是只需要有这个b，并不需要a持有b
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
+			//value值：某一个bean名称
 			abd.setDependsOn(dependsOn.getStringArray("value"));
 		}
 
+		//获得该bean的角色分类
 		AnnotationAttributes role = attributesFor(metadata, Role.class);
 		if (role != null) {
 			abd.setRole(role.getNumber("value").intValue());
 		}
+
+		//看当前bean是否有描述信息
 		AnnotationAttributes description = attributesFor(metadata, Description.class);
 		if (description != null) {
 			abd.setDescription(description.getString("value"));
 		}
 	}
 
+	/**
+	 * 如果是设置了代理模式，那么就返回一个作用域的BeanDefinitionHolder
+	 * @param metadata
+	 * @param definition
+	 * @param registry
+	 * @return
+	 */
 	static BeanDefinitionHolder applyScopedProxyMode(
 			ScopeMetadata metadata, BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
 
+		//获得这个bean的代理模式
 		ScopedProxyMode scopedProxyMode = metadata.getScopedProxyMode();
+		//如果是不代理，就直接返回
 		if (scopedProxyMode.equals(ScopedProxyMode.NO)) {
 			return definition;
 		}
@@ -275,6 +299,12 @@ public abstract class AnnotationConfigUtils {
 		return ScopedProxyCreator.createScopedProxy(definition, registry, proxyTargetClass);
 	}
 
+	/**
+	 * 查看注解元数据是否有某些注解的属性
+	 * @param metadata
+	 * @param annotationClass
+	 * @return
+	 */
 	@Nullable
 	static AnnotationAttributes attributesFor(AnnotatedTypeMetadata metadata, Class<?> annotationClass) {
 		return attributesFor(metadata, annotationClass.getName());

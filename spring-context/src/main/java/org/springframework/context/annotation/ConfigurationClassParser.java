@@ -308,20 +308,25 @@ class ConfigurationClassParser {
 				//BeanDefinitionHolder是beanDefinition + beanName
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
-				// Check the set of scanned definitions for any further config classes and parse recursively if needed
+				//检查所有候选BeanDefinitionHolder，看是否是标志了@Configuration注解，并根据需要递归解析
 				for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
+					//获得原始BeanDefinition
 					BeanDefinition bdCand = holder.getBeanDefinition().getOriginatingBeanDefinition();
+					//有些可能就是原始的BeanDefinition，并没有进行封装，所有直接getBeanDefinition就是原始的BeanDefinition
+					//像RootBeanDefinition会在代理中用到，他的getOriginatingBeanDefinition()就不为空
 					if (bdCand == null) {
 						bdCand = holder.getBeanDefinition();
 					}
+					//判断当前BeanDefinition是否标志了@Configuration注解
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, this.metadataReaderFactory)) {
+						//又递归解析
 						parse(bdCand.getBeanClassName(), holder.getBeanName());
 					}
 				}
 			}
 		}
 
-		// Process any @Import annotations
+		//处理标志了@Imports注解的
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
 		// Process any @ImportResource annotations

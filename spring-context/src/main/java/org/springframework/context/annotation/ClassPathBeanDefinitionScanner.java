@@ -64,6 +64,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 	private BeanDefinitionDefaults beanDefinitionDefaults = new BeanDefinitionDefaults();
 
+	//不支持依赖注入候选者的规则
 	@Nullable
 	private String[] autowireCandidatePatterns;
 
@@ -280,17 +281,25 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				candidate.setScope(scopeMetadata.getScopeName());
 				//通过名称生产器获得bean名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+				//当是成熟的BeanDefinition的时候，进一步处理
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				//当是有注解的BeanDefinition
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					//获得特定注解上的值，设置到BeanDefinition的属性中
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+				//检查bean名称是否冲突了
 				if (checkCandidate(beanName, candidate)) {
+					//封装成BeanDefinitionHolder：实际上就是保存了BeanDefinition和beanName
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+					//如果是设置了代理模式，那么就返回一个作用域的BeanDefinitionHolder
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+					//添加到候选beanDefinitions集合中
 					beanDefinitions.add(definitionHolder);
+					//注册到bean工厂中
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
@@ -299,14 +308,13 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 	/**
-	 * Apply further settings to the given bean definition,
-	 * beyond the contents retrieved from scanning the component class.
-	 * @param beanDefinition the scanned bean definition
-	 * @param beanName the generated bean name for the given bean
+	 *  对bean定义应用进一步的设置
 	 */
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
+		//看不支持依赖注入候选者的规则是否为空
 		if (this.autowireCandidatePatterns != null) {
+			//设置是否作为依赖注入的候选者标志位
 			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
 		}
 	}
@@ -324,45 +332,34 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 
 	/**
-	 * Check the given candidate's bean name, determining whether the corresponding
-	 * bean definition needs to be registered or conflicts with an existing definition.
-	 * @param beanName the suggested name for the bean
-	 * @param beanDefinition the corresponding bean definition
-	 * @return {@code true} if the bean can be registered as-is;
-	 * {@code false} if it should be skipped because there is an
-	 * existing, compatible bean definition for the specified name
-	 * @throws ConflictingBeanDefinitionException if an existing, incompatible
-	 * bean definition has been found for the specified name
+	 * 检查bean名称是否冲突了
 	 */
 	protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
+		//判断bean工厂中是否有这个bean名称
 		if (!this.registry.containsBeanDefinition(beanName)) {
 			return true;
 		}
+		//拿到bean工厂中有关于beanName的beanDefinition，进行判断
 		BeanDefinition existingDef = this.registry.getBeanDefinition(beanName);
 		BeanDefinition originatingDef = existingDef.getOriginatingBeanDefinition();
 		if (originatingDef != null) {
 			existingDef = originatingDef;
 		}
+		//判断是否是存在竞争关系：两者是不是一样的
 		if (isCompatible(beanDefinition, existingDef)) {
 			return false;
 		}
+		//到这就说明一个class被导入了多次到bean工厂中
 		throw new ConflictingBeanDefinitionException("Annotation-specified bean name '" + beanName +
 				"' for bean class [" + beanDefinition.getBeanClassName() + "] conflicts with existing, " +
 				"non-compatible bean definition of same name and class [" + existingDef.getBeanClassName() + "]");
 	}
 
 	/**
-	 * Determine whether the given new bean definition is compatible with
-	 * the given existing bean definition.
-	 * <p>The default implementation considers them as compatible when the existing
-	 * bean definition comes from the same source or from a non-scanning source.
-	 * @param newDefinition the new bean definition, originated from scanning
-	 * @param existingDefinition the existing bean definition, potentially an
-	 * explicitly defined one or a previously generated one from scanning
-	 * @return whether the definitions are considered as compatible, with the
-	 * new definition to be skipped in favor of the existing definition
+	 * 判断新的BeanDefinition和bean工厂中BeanDefinition是否是同一个
 	 */
 	protected boolean isCompatible(BeanDefinition newDefinition, BeanDefinition existingDefinition) {
+		//如果返回false要求：1、是通过@Comonoent扫描出来的，2、两者的资源(class)是一样的，3、两者都是同一个BeanDefinition
 		return (!(existingDefinition instanceof ScannedGenericBeanDefinition) ||  // explicitly registered overriding bean
 				(newDefinition.getSource() != null && newDefinition.getSource().equals(existingDefinition.getSource())) ||  // scanned same file twice
 				newDefinition.equals(existingDefinition));  // scanned equivalent class twice

@@ -23,12 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds a textual description to bean definitions derived from
- * {@link org.springframework.stereotype.Component} or {@link Bean}.
- *
- * @author Juergen Hoeller
- * @since 4.0
- * @see org.springframework.beans.factory.config.BeanDefinition#getDescription()
+ *	bean的描述信息
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -36,7 +31,7 @@ import java.lang.annotation.Target;
 public @interface Description {
 
 	/**
-	 * The textual description to associate with the bean definition.
+	 * bean的一些描述信息
 	 */
 	String value();
 

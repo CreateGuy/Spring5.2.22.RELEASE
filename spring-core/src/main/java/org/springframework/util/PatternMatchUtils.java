@@ -19,8 +19,7 @@ package org.springframework.util;
 import org.springframework.lang.Nullable;
 
 /**
- * Utility methods for simple pattern matching, in particular for
- * Spring's typical "xxx*", "*xxx" and "*xxx*" pattern styles.
+ * 字符串匹配某些规则的攻击类
  *
  * @author Juergen Hoeller
  * @since 2.0

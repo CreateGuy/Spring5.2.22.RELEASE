@@ -75,10 +75,7 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
-	 * Check whether the given bean definition is a candidate for a configuration class
-	 * (or a nested component class declared within a configuration/component class,
-	 * to be auto-registered as well), and mark it accordingly.
-	 * 检查给定的bean定义是否是候选配置类
+	 * 检查给定的bean定义是否是候选配置类中携带了@Configuration注解
 	 * @param beanDef the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
@@ -139,7 +136,7 @@ abstract class ConfigurationClassUtils {
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
-		//当没有标志@Configuration注解，且
+		//当标志@Configuration注解，且
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}

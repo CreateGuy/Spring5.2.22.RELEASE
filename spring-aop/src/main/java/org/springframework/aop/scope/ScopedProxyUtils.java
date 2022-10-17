@@ -44,24 +44,18 @@ public abstract class ScopedProxyUtils {
 
 
 	/**
-	 * Generate a scoped proxy for the supplied target bean, registering the target
-	 * bean with an internal name and setting 'targetBeanName' on the scoped proxy.
-	 * @param definition the original bean definition
-	 * @param registry the bean definition registry
-	 * @param proxyTargetClass whether to create a target class proxy
-	 * @return the scoped proxy definition
-	 * @see #getTargetBeanName(String)
-	 * @see #getOriginalBeanName(String)
+	 * 返回一个作用域代理BeanDefinitionHolder
 	 */
 	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
-
+		//获得bean原始名称
 		String originalBeanName = definition.getBeanName();
+		//获得原始的BeanDefinition
 		BeanDefinition targetDefinition = definition.getBeanDefinition();
+		//获得目标名称：将原始名称加了一个前缀
 		String targetBeanName = getTargetBeanName(originalBeanName);
 
-		// Create a scoped proxy definition for the original bean name,
-		// "hiding" the target bean in an internal target definition.
+		//用原始bean的定义创建对应的作用域定义
 		RootBeanDefinition proxyDefinition = new RootBeanDefinition(ScopedProxyFactoryBean.class);
 		proxyDefinition.setDecoratedDefinition(new BeanDefinitionHolder(targetDefinition, targetBeanName));
 		proxyDefinition.setOriginatingBeanDefinition(targetDefinition);
@@ -77,22 +71,21 @@ public abstract class ScopedProxyUtils {
 			proxyDefinition.getPropertyValues().add("proxyTargetClass", Boolean.FALSE);
 		}
 
-		// Copy autowire settings from original bean definition.
+		//从原始bean定义复制@autowire注解的设置
 		proxyDefinition.setAutowireCandidate(targetDefinition.isAutowireCandidate());
 		proxyDefinition.setPrimary(targetDefinition.isPrimary());
 		if (targetDefinition instanceof AbstractBeanDefinition) {
 			proxyDefinition.copyQualifiersFrom((AbstractBeanDefinition) targetDefinition);
 		}
 
-		// The target bean should be ignored in favor of the scoped proxy.
+		//已经是代理模式，相当于多例，下面两者属性也没有了意义
 		targetDefinition.setAutowireCandidate(false);
 		targetDefinition.setPrimary(false);
 
-		// Register the target bean as separate bean in the factory.
+		//往bean工厂中注册一个新的BeanDefinition
 		registry.registerBeanDefinition(targetBeanName, targetDefinition);
 
-		// Return the scoped proxy definition as primary bean definition
-		// (potentially an inner bean).
+		//将新的作用域BeanDefinition返回
 		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
 	}
 
