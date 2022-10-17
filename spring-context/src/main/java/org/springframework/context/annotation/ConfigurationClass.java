@@ -55,6 +55,7 @@ final class ConfigurationClass {
 	@Nullable
 	private String beanName;
 
+	//有值就代表自己是被谁导入到容器中的
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<>(1);
 
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<>();

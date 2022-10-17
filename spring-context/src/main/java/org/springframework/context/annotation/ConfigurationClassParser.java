@@ -112,6 +112,7 @@ class ConfigurationClassParser {
 
 	private static final PropertySourceFactory DEFAULT_PROPERTY_SOURCE_FACTORY = new DefaultPropertySourceFactory();
 
+	//默认的排出过滤器
 	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER = className ->
 			(className.startsWith("java.lang.annotation.") || className.startsWith("org.springframework.stereotype."));
 
@@ -141,6 +142,7 @@ class ConfigurationClassParser {
 
 	private final List<String> propertySourceNames = new ArrayList<>();
 
+	//这个只有内部类，或者被@Import导入的类会放入这个双端队列
 	private final ImportStack importStack = new ImportStack();
 
 	private final DeferredImportSelectorHandler deferredImportSelectorHandler = new DeferredImportSelectorHandler();
@@ -566,7 +568,7 @@ class ConfigurationClassParser {
 
 
 	/**
-	 * Returns {@code @Import} class, considering all meta-annotations.
+	 * 返回当前sourceClass中的@Import导入SourceClass(类)
 	 */
 	private Set<SourceClass> getImports(SourceClass sourceClass) throws IOException {
 		Set<SourceClass> imports = new LinkedHashSet<>();
@@ -576,40 +578,46 @@ class ConfigurationClassParser {
 	}
 
 	/**
-	 * Recursively collect all declared {@code @Import} values. Unlike most
-	 * meta-annotations it is valid to have several {@code @Import}s declared with
-	 * different values; the usual process of returning values from the first
-	 * meta-annotation on a class is not sufficient.
-	 * <p>For example, it is common for a {@code @Configuration} class to declare direct
-	 * {@code @Import}s in addition to meta-imports originating from an {@code @Enable}
-	 * annotation.
-	 * @param sourceClass the class to search
-	 * @param imports the imports collected so far
-	 * @param visited used to track visited classes to prevent infinite recursion
-	 * @throws IOException if there is any problem reading metadata from the named class
+	 * 递归的方法获取SourceClass(类)上的@Import中引入的SourceClass(类)
+	 * @param sourceClass 源头类
+	 * @param imports 最终包含了导入的SourceClass(类)
+	 * @param visited 只是内部有用
+	 * @throws IOException
 	 */
 	private void collectImports(SourceClass sourceClass, Set<SourceClass> imports, Set<SourceClass> visited)
 			throws IOException {
 
 		if (visited.add(sourceClass)) {
+			//每一次for循环结束都代表一个sourceClass(类)解析完毕
 			for (SourceClass annotation : sourceClass.getAnnotations()) {
 				String annName = annotation.getMetadata().getClassName();
 				if (!annName.equals(Import.class.getName())) {
 					collectImports(annotation, imports, visited);
 				}
 			}
+			//添加有关@Import注解信息的属性到集合中
 			imports.addAll(sourceClass.getAnnotationAttributes(Import.class.getName(), "value"));
 		}
 	}
 
+	/**
+	 * 处理引入的类
+	 * @param configClass 源头(从哪里开始解析@Import)的配置类
+	 * @param currentSourceClass 源头的SourceClass
+	 * @param importCandidates 从源头解析出来需要导入的类
+	 * @param exclusionFilter 排出过滤器
+	 * @param checkForCircularImports 是否检查循环导入
+	 */
 	private void processImports(ConfigurationClass configClass, SourceClass currentSourceClass,
 			Collection<SourceClass> importCandidates, Predicate<String> exclusionFilter,
 			boolean checkForCircularImports) {
 
+		//需要导入的类为空
 		if (importCandidates.isEmpty()) {
 			return;
 		}
 
+		//判断是否存在循环导入
 		if (checkForCircularImports && isChainedImportOnStack(configClass)) {
 			this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 		}
@@ -667,14 +675,25 @@ class ConfigurationClassParser {
 		}
 	}
 
+	/**
+	 * 检查是否会发生循环导入
+	 * @param configClass
+	 * @return
+	 */
 	private boolean isChainedImportOnStack(ConfigurationClass configClass) {
+
+		//如果configClass包含在importStack中，就代表这个configClass被谁导入了
+		//例如有两个键值对 a ： b(就代表 a 被 b导入了)， b ： a
 		if (this.importStack.contains(configClass)) {
 			String configClassName = configClass.getMetadata().getClassName();
+			//先通过a 拿到 b
 			AnnotationMetadata importingClass = this.importStack.getImportingClassFor(configClassName);
 			while (importingClass != null) {
+				//发现b 不是 a，即不是 a：a的情况
 				if (configClassName.equals(importingClass.getClassName())) {
 					return true;
 				}
+				//又重新通过b拿到a，这样configClass 和 importingClass就一样了，就出现了循环导入
 				importingClass = this.importStack.getImportingClassFor(importingClass.getClassName());
 			}
 		}
@@ -752,6 +771,7 @@ class ConfigurationClassParser {
 	@SuppressWarnings("serial")
 	private static class ImportStack extends ArrayDeque<ConfigurationClass> implements ImportRegistry {
 
+		//如果键值对是 a ：b，就代表a被b导入了
 		private final MultiValueMap<String, AnnotationMetadata> imports = new LinkedMultiValueMap<>();
 
 		public void registerImport(AnnotationMetadata importingClass, String importedClass) {
