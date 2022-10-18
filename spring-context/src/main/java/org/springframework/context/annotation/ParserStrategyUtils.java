@@ -34,22 +34,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Common delegate code for the handling of parser strategies, e.g.
- * {@code TypeFilter}, {@code ImportSelector}, {@code ImportBeanDefinitionRegistrar}
- *
- * @author Juergen Hoeller
- * @author Phillip Webb
- * @since 4.3.3
+ * 貌似只是为了实例化前的准备
  */
 abstract class ParserStrategyUtils {
 
 	/**
-	 * Instantiate a class using an appropriate constructor and return the new
-	 * instance as the specified assignable type. The returned instance will
-	 * have {@link BeanClassLoaderAware}, {@link BeanFactoryAware},
-	 * {@link EnvironmentAware}, and {@link ResourceLoaderAware} contracts
-	 * invoked if they are implemented by the given object.
-	 * @since 5.2
+	 * 使用适当的构造函数实例化
 	 */
 	@SuppressWarnings("unchecked")
 	static <T> T instantiateClass(Class<?> clazz, Class<T> assignableTo, Environment environment,
@@ -57,35 +47,61 @@ abstract class ParserStrategyUtils {
 
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.isAssignable(assignableTo, clazz);
+		//接口不能实例化
 		if (clazz.isInterface()) {
 			throw new BeanInstantiationException(clazz, "Specified class is an interface");
 		}
 		ClassLoader classLoader = (registry instanceof ConfigurableBeanFactory ?
 				((ConfigurableBeanFactory) registry).getBeanClassLoader() : resourceLoader.getClassLoader());
+		//通过合适的构造器创建实例对象
 		T instance = (T) createInstance(clazz, environment, resourceLoader, registry, classLoader);
+		//看是否实现了Aware方法，如果实现了就执行对应的方法
 		ParserStrategyUtils.invokeAwareMethods(instance, environment, resourceLoader, registry, classLoader);
 		return instance;
 	}
 
+	/**
+	 * 创建一个实例
+	 * @param clazz
+	 * @param environment
+	 * @param resourceLoader
+	 * @param registry
+	 * @param classLoader
+	 * @return
+	 */
 	private static Object createInstance(Class<?> clazz, Environment environment,
 			ResourceLoader resourceLoader, BeanDefinitionRegistry registry,
 			@Nullable ClassLoader classLoader) {
 
+		//获得当前class有几个构造方法
 		Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+		//只有 有参构造器
 		if (constructors.length == 1 && constructors[0].getParameterCount() > 0) {
 			try {
 				Constructor<?> constructor = constructors[0];
+				//看能否拿到入参
 				Object[] args = resolveArgs(constructor.getParameterTypes(),
 						environment, resourceLoader, registry, classLoader);
+				//调用具体的构造方法，进行实例化
 				return BeanUtils.instantiateClass(constructor, args);
 			}
 			catch (Exception ex) {
 				throw new BeanInstantiationException(clazz, "No suitable constructor found", ex);
 			}
 		}
+		//会调用无参构造方法进行实例化
 		return BeanUtils.instantiateClass(clazz);
 	}
 
+	/**
+	 * 通过环境，资源加载器，bean工厂，类加载器获得参数列表
+	 * @param parameterTypes 参数类型
+	 * @param environment 环境
+	 * @param resourceLoader 资源加载器
+	 * @param registry bean工厂
+	 * @param classLoader 类加载器
+	 * @return 解析完成的参数列表
+	 */
 	private static Object[] resolveArgs(Class<?>[] parameterTypes,
 			Environment environment, ResourceLoader resourceLoader,
 			BeanDefinitionRegistry registry, @Nullable ClassLoader classLoader) {
@@ -98,6 +114,15 @@ abstract class ParserStrategyUtils {
 			return parameters;
 	}
 
+	/**
+	 * 只能获得几种参数，否则就会抛出异常
+	 * @param parameterType
+	 * @param environment
+	 * @param resourceLoader
+	 * @param registry
+	 * @param classLoader
+	 * @return
+	 */
 	@Nullable
 	private static Object resolveParameter(Class<?> parameterType,
 			Environment environment, ResourceLoader resourceLoader,
@@ -120,11 +145,11 @@ abstract class ParserStrategyUtils {
 
 	/**
 	 * 看bean是否实现了某些Aware接口，以进行后置处理
-	 * @param parserStrategyBean
-	 * @param environment
-	 * @param resourceLoader
-	 * @param registry
-	 * @param classLoader
+	 * @param parserStrategyBean bean
+	 * @param environment 当前环境
+	 * @param resourceLoader 资源加载器
+	 * @param registry bean工厂
+	 * @param classLoader 类加载器
 	 */
 	private static void invokeAwareMethods(Object parserStrategyBean, Environment environment,
 			ResourceLoader resourceLoader, BeanDefinitionRegistry registry, @Nullable ClassLoader classLoader) {

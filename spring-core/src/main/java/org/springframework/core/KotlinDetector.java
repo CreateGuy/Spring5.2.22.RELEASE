@@ -34,6 +34,7 @@ public abstract class KotlinDetector {
 	@Nullable
 	private static final Class<? extends Annotation> kotlinMetadata;
 
+	//是否存在Kotlin标志位
 	private static final boolean kotlinReflectPresent;
 
 	static {
@@ -67,8 +68,7 @@ public abstract class KotlinDetector {
 	}
 
 	/**
-	 * Determine whether the given {@code Class} is a Kotlin type
-	 * (with Kotlin metadata present on it).
+	 * 要求有某些注解才支持Kotlin
 	 */
 	public static boolean isKotlinType(Class<?> clazz) {
 		return (kotlinMetadata != null && clazz.getDeclaredAnnotation(kotlinMetadata) != null);

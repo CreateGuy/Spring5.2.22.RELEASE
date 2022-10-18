@@ -226,6 +226,12 @@ class ConfigurationClassParser {
 	}
 
 
+	/**
+	 * 处理配置类(并不是单指有@Configuration的类，比如@Comonoent也算)
+	 * @param configClass class对应的ConfigurationClass
+	 * @param filter 排出过滤器
+	 * @throws IOException
+	 */
 	protected void processConfigurationClass(ConfigurationClass configClass, Predicate<String> filter) throws IOException {
 		//判断这个配置类是否需要跳过
 		if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
@@ -368,7 +374,11 @@ class ConfigurationClassParser {
 	}
 
 	/**
-	 *  注册在配置类本身的成员（嵌套）类
+	 * 注册在配置类本身的成员（嵌套）类
+	 * @param configClass
+	 * @param sourceClass
+	 * @param filter 排出过滤器
+	 * @throws IOException
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,
 			Predicate<String> filter) throws IOException {
@@ -390,9 +400,9 @@ class ConfigurationClassParser {
 			for (SourceClass candidate : candidates) {
 				//importStack是用于判断循环导入的,如果包含在这里就说明出现了循环导入
 				//importStack的push方法只会在这里和处理@Imports注解的时候会执行
-				//也就是说可能会出现有一个A @Imports B ，然后 B 里面又有一个 标志了@Compent的 A
+				//也就是说可能会出现有一个A @Imports B ，importStack就有A了，然后 B 里面又有一个 标志了@Compent的 A
 				if (this.importStack.contains(configClass)) {
-					//抛出了异常
+					//抛出了循环导入异常
 					this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 				}
 				else {
@@ -404,7 +414,7 @@ class ConfigurationClassParser {
 						processConfigurationClass(candidate.asConfigClass(configClass), filter);
 					}
 					finally {
-						//推出一个内部类，是双端队列，一边出，一边进
+						//推出一个内部类或者导入类(带有@Import)，是双端队列，一边出，一边进
 						this.importStack.pop();
 					}
 				}
@@ -624,14 +634,20 @@ class ConfigurationClassParser {
 		else {
 			this.importStack.push(configClass);
 			try {
+				//遍历所有需要导入的类
 				for (SourceClass candidate : importCandidates) {
+					//判断是否是ImportSelector类型
 					if (candidate.isAssignable(ImportSelector.class)) {
 						// Candidate class is an ImportSelector -> delegate to it to determine imports
 						Class<?> candidateClass = candidate.loadClass();
+						//实例化一个ImportSelector
 						ImportSelector selector = ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,
 								this.environment, this.resourceLoader, this.registry);
+						//获得这个selector设置的排除过滤器
 						Predicate<String> selectorFilter = selector.getExclusionFilter();
 						if (selectorFilter != null) {
+							//执行了这行代码后实际上就是 exclusionFilter + selectorFilter的排除过滤器在一起了
+							//从内部代码上来看：也就是说会先执行exclusionFilter 再 执行selectorFilter
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
 						if (selector instanceof DeferredImportSelector) {
@@ -644,19 +660,19 @@ class ConfigurationClassParser {
 						}
 					}
 					else if (candidate.isAssignable(ImportBeanDefinitionRegistrar.class)) {
-						// Candidate class is an ImportBeanDefinitionRegistrar ->
-						// delegate to it to register additional bean definitions
 						Class<?> candidateClass = candidate.loadClass();
+						//实例化一个ImportBeanDefinitionRegistrar
 						ImportBeanDefinitionRegistrar registrar =
 								ParserStrategyUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class,
 										this.environment, this.resourceLoader, this.registry);
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
-						// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
-						// process it as an @Configuration class
+						//候选类不是ImportSelector或ImportBeanDefinitionRegistrar那就当成@Configuration类处理
+						//如果是成@Configuration类就有可能出现循环依赖，就放入下面的importStack的imports中
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
+						//处理此配置类
 						processConfigurationClass(candidate.asConfigClass(configClass), exclusionFilter);
 					}
 				}
@@ -768,6 +784,10 @@ class ConfigurationClassParser {
 	}
 
 
+	/**
+	 * 这个类本身就是一个双端队列
+	 * 内部花有一个imports是用来保存有导入关系的
+	 */
 	@SuppressWarnings("serial")
 	private static class ImportStack extends ArrayDeque<ConfigurationClass> implements ImportRegistry {
 
@@ -1023,6 +1043,12 @@ class ConfigurationClassParser {
 			return ClassUtils.forName(className, resourceLoader.getClassLoader());
 		}
 
+		/**
+		 * 判断是否是ImportSelector类型
+		 * @param clazz
+		 * @return
+		 * @throws IOException
+		 */
 		public boolean isAssignable(Class<?> clazz) throws IOException {
 			if (this.source instanceof Class) {
 				return clazz.isAssignableFrom((Class<?>) this.source);

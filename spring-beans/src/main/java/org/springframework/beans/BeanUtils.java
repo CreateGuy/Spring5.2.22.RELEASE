@@ -75,6 +75,9 @@ public abstract class BeanUtils {
 	private static final Set<Class<?>> unknownEditorTypes =
 			Collections.newSetFromMap(new ConcurrentReferenceHashMap<>(64));
 
+	/**
+	 * 作用是填充构造方法的参数列表，没有找到值，但又是一个基本类型，就可以填充默认值
+	 */
 	private static final Map<Class<?>, Object> DEFAULT_TYPE_VALUES;
 
 	static {
@@ -118,27 +121,16 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Instantiate a class using its 'primary' constructor (for Kotlin classes,
-	 * potentially having default arguments declared) or its default constructor
-	 * (for regular Java classes, expecting a standard no-arg setup).
-	 * <p>Note that this method tries to set the constructor accessible
-	 * if given a non-accessible (that is, non-public) constructor.
-	 * @param clazz the class to instantiate
-	 * @return the new instance
-	 * @throws BeanInstantiationException if the bean cannot be instantiated.
-	 * The cause may notably indicate a {@link NoSuchMethodException} if no
-	 * primary/default constructor was found, a {@link NoClassDefFoundError}
-	 * or other {@link LinkageError} in case of an unresolvable class definition
-	 * (e.g. due to a missing dependency at runtime), or an exception thrown
-	 * from the constructor invocation itself.
-	 * @see Constructor#newInstance
+	 * 使用无参构造方法，实例化
 	 */
 	public static <T> T instantiateClass(Class<T> clazz) throws BeanInstantiationException {
 		Assert.notNull(clazz, "Class must not be null");
+		//接口不能实例化
 		if (clazz.isInterface()) {
 			throw new BeanInstantiationException(clazz, "Specified class is an interface");
 		}
 		try {
+			//clazz.getDeclaredConstructor()就是返回无参构造方法，如果没有无参构造方法会报错
 			return instantiateClass(clazz.getDeclaredConstructor());
 		}
 		catch (NoSuchMethodException ex) {
@@ -154,17 +146,13 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Instantiate a class using its no-arg constructor and return the new instance
-	 * as the specified assignable type.
-	 * <p>Useful in cases where the type of the class to instantiate (clazz) is not
-	 * available, but the type desired (assignableTo) is known.
-	 * <p>Note that this method tries to set the constructor accessible if given a
-	 * non-accessible (that is, non-public) constructor.
-	 * @param clazz class to instantiate
-	 * @param assignableTo type that clazz must be assignableTo
-	 * @return the new instance
-	 * @throws BeanInstantiationException if the bean cannot be instantiated
-	 * @see Constructor#newInstance
+	 * 应该是要求两个class有一定的关系
+	 * 比如：一个类(B)是不是继承来自于另一个父类(A)，一个接口(A)是不是实现了另外一个接口(B)，或者两个类相同
+	 * @param clazz
+	 * @param assignableTo
+	 * @param <T>
+	 * @return
+	 * @throws BeanInstantiationException
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instantiateClass(Class<?> clazz, Class<T> assignableTo) throws BeanInstantiationException {
@@ -173,50 +161,58 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Convenience method to instantiate a class using the given constructor.
-	 * <p>Note that this method tries to set the constructor accessible if given a
-	 * non-accessible (that is, non-public) constructor, and supports Kotlin classes
-	 * with optional parameters and default values.
-	 * @param ctor the constructor to instantiate
-	 * @param args the constructor arguments to apply (use {@code null} for an unspecified
-	 * parameter, Kotlin optional parameters and Java primitive types are supported)
-	 * @return the new instance
-	 * @throws BeanInstantiationException if the bean cannot be instantiated
-	 * @see Constructor#newInstance
+	 * 使用给定的构造器，进行实例化
+	 * @param ctor
+	 * @param args
+	 * @param <T>
+	 * @return
+	 * @throws BeanInstantiationException
 	 */
 	public static <T> T instantiateClass(Constructor<T> ctor, Object... args) throws BeanInstantiationException {
 		Assert.notNull(ctor, "Constructor must not be null");
 		try {
+			//使构造方法可以使用
 			ReflectionUtils.makeAccessible(ctor);
+			//判断是否可是使用Kotlin反射
 			if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass())) {
 				return KotlinDelegate.instantiateClass(ctor, args);
 			}
 			else {
 				Class<?>[] parameterTypes = ctor.getParameterTypes();
+				//如果说传入的参数列表还没有构造方法的参数列表多，就直接报错
 				Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
 				Object[] argsWithDefaultValues = new Object[args.length];
+				//传入的参数列表必须和构造方法的参数列表一致，没有的也必须要占一个位置，会填充默认值的
+				//填充构造方法所需的参数列表
 				for (int i = 0 ; i < args.length; i++) {
+					//参数未找到就使用默认值
 					if (args[i] == null) {
 						Class<?> parameterType = parameterTypes[i];
+						//只有是一个基本类型才能填充默认值
 						argsWithDefaultValues[i] = (parameterType.isPrimitive() ? DEFAULT_TYPE_VALUES.get(parameterType) : null);
 					}
 					else {
 						argsWithDefaultValues[i] = args[i];
 					}
 				}
+				//这里就直接到某个构造方法了
 				return ctor.newInstance(argsWithDefaultValues);
 			}
 		}
 		catch (InstantiationException ex) {
+			//是一个抽象类，无法实例化
 			throw new BeanInstantiationException(ctor, "Is it an abstract class?", ex);
 		}
 		catch (IllegalAccessException ex) {
+			//构造方法不可以访问
 			throw new BeanInstantiationException(ctor, "Is the constructor accessible?", ex);
 		}
 		catch (IllegalArgumentException ex) {
+			//参数不对
 			throw new BeanInstantiationException(ctor, "Illegal arguments for constructor", ex);
 		}
 		catch (InvocationTargetException ex) {
+			//构造方法抛出了异常
 			throw new BeanInstantiationException(ctor, "Constructor threw exception", ex.getTargetException());
 		}
 	}

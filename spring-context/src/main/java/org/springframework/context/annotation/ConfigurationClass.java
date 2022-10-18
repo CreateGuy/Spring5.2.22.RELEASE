@@ -63,6 +63,9 @@ final class ConfigurationClass {
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
 			new LinkedHashMap<>();
 
+	//表示当前ConfigurationClass使用@Import导入了那些ImportBeanDefinitionRegistrar
+	//key是ImportBeanDefinitionRegistrar，value是ConfigurationClass(导入类)上的注解信息，不包含内部的
+	//执行ImportBeanDefinitionRegistrar中的注册BeanDefinitions会用到
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =
 			new LinkedHashMap<>();
 
@@ -197,6 +200,11 @@ final class ConfigurationClass {
 		this.importedResources.put(importedResource, readerClass);
 	}
 
+	/**
+	 *
+	 * @param registrar 是(导入类)上的使用@Import导入的类
+	 * @param importingClassMetadata 是ConfigurationClass(导入类)上的注解信息，不包含内部的
+	 */
 	public void addImportBeanDefinitionRegistrar(ImportBeanDefinitionRegistrar registrar, AnnotationMetadata importingClassMetadata) {
 		this.importBeanDefinitionRegistrars.put(registrar, importingClassMetadata);
 	}
