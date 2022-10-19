@@ -40,24 +40,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * General purpose factory loading mechanism for internal use within the framework.
- *
- * <p>{@code SpringFactoriesLoader} {@linkplain #loadFactories loads} and instantiates
- * factories of a given type from {@value #FACTORIES_RESOURCE_LOCATION} files which
- * may be present in multiple JAR files in the classpath. The {@code spring.factories}
- * file must be in {@link Properties} format, where the key is the fully qualified
- * name of the interface or abstract class, and the value is a comma-separated list of
- * implementation class names. For example:
- *
- * <pre class="code">example.MyService=example.MyServiceImpl1,example.MyServiceImpl2</pre>
- *
- * where {@code example.MyService} is the name of the interface, and {@code MyServiceImpl1}
- * and {@code MyServiceImpl2} are two implementations.
- *
- * @author Arjen Poutsma
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @since 3.2
+ * spring.factories文件的加载器
  */
 public final class SpringFactoriesLoader {
 
@@ -70,6 +53,12 @@ public final class SpringFactoriesLoader {
 
 	private static final Log logger = LogFactory.getLog(SpringFactoriesLoader.class);
 
+	/**
+	 * 表示哪些类加载器从spring.factories中加载了哪些bean名称
+	 * key：是类加载器
+	 * value中的key：表示某种类型的bean，比如是org.springframework.boot.autoconfigure.EnableAutoConfiguration
+	 * value中的value：表示某种类型的bean，比如说自动装配类，这里就会有127个了
+	 */
 	private static final Map<ClassLoader, MultiValueMap<String, String>> cache = new ConcurrentReferenceHashMap<>();
 
 
@@ -108,21 +97,24 @@ public final class SpringFactoriesLoader {
 	}
 
 	/**
-	 * Load the fully qualified class names of factory implementations of the
-	 * given type from {@value #FACTORIES_RESOURCE_LOCATION}, using the given
-	 * class loader.
-	 * @param factoryType the interface or abstract class representing the factory
-	 * @param classLoader the ClassLoader to use for loading resources; can be
-	 * {@code null} to use the default
-	 * @throws IllegalArgumentException if an error occurs while loading factory names
-	 * @see #loadFactories
+	 * 从spring.factories中加载factoryType类型bean
+	 * @param factoryType 比如是org.springframework.boot.autoconfigure.EnableAutoConfiguration
+	 * @param classLoader
+	 * @return
 	 */
 	public static List<String> loadFactoryNames(Class<?> factoryType, @Nullable ClassLoader classLoader) {
 		String factoryTypeName = factoryType.getName();
+		//先获取spring.factories中的所有bean名称，然后获取factoryTypeName类型的bean
 		return loadSpringFactories(classLoader).getOrDefault(factoryTypeName, Collections.emptyList());
 	}
 
+	/**
+	 * 使用传入的类加载器从指定目录的指定文件中加载 bean名称
+	 * @param classLoader
+	 * @return
+	 */
 	private static Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader) {
+		//看能否从缓冲中获取
 		MultiValueMap<String, String> result = cache.get(classLoader);
 		if (result != null) {
 			return result;
@@ -136,9 +128,15 @@ public final class SpringFactoriesLoader {
 			while (urls.hasMoreElements()) {
 				URL url = urls.nextElement();
 				UrlResource resource = new UrlResource(url);
+				//一个配置文件
 				Properties properties = PropertiesLoaderUtils.loadProperties(resource);
+				//spring.factories中 相同类型的bean被放在了一起
+				//properties.entrySet()就感觉是获取所有的类型
 				for (Map.Entry<?, ?> entry : properties.entrySet()) {
+					//比如key是EnableAutoConfiguration
+					//value就是所有的自动配置类
 					String factoryTypeName = ((String) entry.getKey()).trim();
+					//value是用逗号分隔了，然后转为数组
 					for (String factoryImplementationName : StringUtils.commaDelimitedListToStringArray((String) entry.getValue())) {
 						result.add(factoryTypeName, factoryImplementationName.trim());
 					}

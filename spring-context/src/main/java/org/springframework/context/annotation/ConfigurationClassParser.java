@@ -138,6 +138,7 @@ class ConfigurationClassParser {
 
 	private final Map<ConfigurationClass, ConfigurationClass> configurationClasses = new LinkedHashMap<>();
 
+	//已处理过父类集合：像有多个类继承A类，那A类只需要处理一次即可
 	private final Map<String, ConfigurationClass> knownSuperclasses = new HashMap<>();
 
 	private final List<String> propertySourceNames = new ArrayList<>();
@@ -194,6 +195,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+		//调用延迟ImportSelector处理器
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -271,12 +273,7 @@ class ConfigurationClassParser {
 	}
 
 	/**
-	 * Apply processing and build a complete {@link ConfigurationClass} by reading the
-	 * annotations, members and methods from the source class. This method can be called
-	 * multiple times as relevant sources are discovered.
-	 * @param configClass the configuration class being build
-	 * @param sourceClass a source class
-	 * @return the superclass, or {@code null} if none found or previously processed
+	 * 处理配置类
 	 */
 	@Nullable
 	protected final SourceClass doProcessConfigurationClass(
@@ -334,42 +331,52 @@ class ConfigurationClassParser {
 			}
 		}
 
-		//处理标志了@Imports注解的
+		//处理标注了@Imports注解
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
-		// Process any @ImportResource annotations
+		//处理标注了@ImportResource注解
+		//看是否有关于@ImportResource注解的属性
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
 		if (importResource != null) {
+			//获得需要导入的xml文件的位置
 			String[] resources = importResource.getStringArray("locations");
+			//获得怎么将xml中的bean转为BeanDefinition的转换器
 			Class<? extends BeanDefinitionReader> readerClass = importResource.getClass("reader");
 			for (String resource : resources) {
+				//通过上下文环境解析xml文件位置，如果找不到会抛出异常
 				String resolvedResource = this.environment.resolveRequiredPlaceholders(resource);
+				//加入到对应的集合中，后面会处理
 				configClass.addImportedResource(resolvedResource, readerClass);
 			}
 		}
 
-		// Process individual @Bean methods
+		//处理内部标注了@Bean的方法
+		//返回内部标注了@Bean的方法元数据
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
+			//放入configClass中保存起来
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
-		// Process default methods on interfaces
+		//看class实现的接口内部是否有标注了@Bean的方法，如果有加入对应的集合中
 		processInterfaces(configClass, sourceClass);
 
-		// Process superclass, if any
+		//如果有父类，继续处理
 		if (sourceClass.getMetadata().hasSuperClass()) {
 			String superclass = sourceClass.getMetadata().getSuperClassName();
+			//如果有父类，并且父类不是java开头的，并且还没有处理过，就继续递归调用
 			if (superclass != null && !superclass.startsWith("java") &&
 					!this.knownSuperclasses.containsKey(superclass)) {
+
+				//加入已处理过父类集合中
 				this.knownSuperclasses.put(superclass, configClass);
-				// Superclass found, return its annotation metadata and recurse
+				//返回父类
 				return sourceClass.getSuperClass();
 			}
 		}
 
-		// No superclass -> processing is complete
+		//没有父类，处理完成
 		return null;
 	}
 
@@ -423,31 +430,42 @@ class ConfigurationClassParser {
 	}
 
 	/**
-	 * Register default methods on interfaces implemented by the configuration class.
+	 * 处理实现的接口内部是否有标注了@Bean的方法，如果有加入对应的集合中
+	 * @param configClass
+	 * @param sourceClass
+	 * @throws IOException
 	 */
 	private void processInterfaces(ConfigurationClass configClass, SourceClass sourceClass) throws IOException {
+		//遍历所有实现的接口
 		for (SourceClass ifc : sourceClass.getInterfaces()) {
+			//获得这个class上有@Bean注解的方法信息
 			Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(ifc);
 			for (MethodMetadata methodMetadata : beanMethods) {
+				//如果不是抽象的就加入对应的集合中
 				if (!methodMetadata.isAbstract()) {
 					// A default method or other concrete method on a Java 8+ interface...
 					configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 				}
 			}
+			//继续处理，看接口有没有实现另外一个接口(递归调用)
 			processInterfaces(configClass, ifc);
 		}
 	}
 
 	/**
-	 * Retrieve the metadata for all <code>@Bean</code> methods.
+	 * 获得当前class内部标注了@Bean的方法元数据
+	 * @param sourceClass 对应的class
+	 * @return
 	 */
 	private Set<MethodMetadata> retrieveBeanMethodMetadata(SourceClass sourceClass) {
+		//获得Class的所有注解元数据
 		AnnotationMetadata original = sourceClass.getMetadata();
+		//获得有关于@Bean的方法注解元数据
 		Set<MethodMetadata> beanMethods = original.getAnnotatedMethods(Bean.class.getName());
+		//当有方法注解元数据并且类注解元数据是一个标准的
 		if (beanMethods.size() > 1 && original instanceof StandardAnnotationMetadata) {
-			// Try reading the class file via ASM for deterministic declaration order...
-			// Unfortunately, the JVM's standard reflection returns methods in arbitrary
-			// order, even between different runs of the same application on the same JVM.
+			//尝试通过ASM读取类文件以确定声明顺序，不懂
+			//应该是在为了确保在不同的虚拟机上运行能够获得一样的beanMethods的顺序
 			try {
 				AnnotationMetadata asm =
 						this.metadataReaderFactory.getMetadataReader(original.getClassName()).getAnnotationMetadata();
@@ -650,10 +668,13 @@ class ConfigurationClassParser {
 							//从内部代码上来看：也就是说会先执行exclusionFilter 再 执行selectorFilter
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
+						//如果是一个延迟导入选择器
 						if (selector instanceof DeferredImportSelector) {
+							//加入到延迟导入选择处理器中
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
+							//
 							String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());
 							Collection<SourceClass> importSourceClasses = asSourceClasses(importClassNames, exclusionFilter);
 							processImports(configClass, currentSourceClass, importSourceClasses, exclusionFilter, false);
@@ -857,6 +878,7 @@ class ConfigurationClassParser {
 				handler.processGroupImports();
 			}
 			else {
+				//注册进去
 				this.deferredImportSelectors.add(holder);
 			}
 		}
@@ -927,10 +949,15 @@ class ConfigurationClassParser {
 	}
 
 
+	/**
+	 * 延迟ImportSelector的处理器
+	 */
 	private static class DeferredImportSelectorHolder {
 
+		//谁导入的
 		private final ConfigurationClass configurationClass;
 
+		//@Import中的延迟类
 		private final DeferredImportSelector importSelector;
 
 		public DeferredImportSelectorHolder(ConfigurationClass configClass, DeferredImportSelector selector) {

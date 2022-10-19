@@ -21,22 +21,24 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.MethodMetadata;
 
 /**
- * {@link MethodMetadata} created from a
- * {@link SimpleMethodMetadataReadingVisitor}.
- *
- * @author Phillip Webb
- * @since 5.2
+ * 简单的方法元数据类
+ * 比如：一个类内部有标注了@Bean的方法，就会变成一个SimpleMethodMetadata
  */
 final class SimpleMethodMetadata implements MethodMetadata {
 
+	//方法名称
 	private final String methodName;
 
+	//访问修饰符
 	private final int access;
 
+	//貌似是外部类
 	private final String declaringClassName;
 
+	//返回类型名称
 	private final String returnTypeName;
 
+	//方法的注解元数据
 	private final MergedAnnotations annotations;
 
 

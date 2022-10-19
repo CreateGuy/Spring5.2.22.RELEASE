@@ -1255,10 +1255,9 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Convert a comma delimited list (e.g., a row from a CSV file) into an
-	 * array of strings.
-	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @return an array of strings, or the empty array in case of empty input
+	 * 用逗号分隔传入的str
+	 * @param str
+	 * @return
 	 */
 	public static String[] commaDelimitedListToStringArray(@Nullable String str) {
 		return delimitedListToStringArray(str, ",");

@@ -58,12 +58,14 @@ final class ConfigurationClass {
 	//有值就代表自己是被谁导入到容器中的
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<>(1);
 
+	//类内部的标注了@Bean的方法的信息，也会有类实现接口内部标注了@Bean的方法
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<>();
 
+	//表示当前ConfigurationClass使用@ImportResource导入了哪些BeanDefinitionReader
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
 			new LinkedHashMap<>();
 
-	//表示当前ConfigurationClass使用@Import导入了那些ImportBeanDefinitionRegistrar
+	//表示当前ConfigurationClass使用@Import导入了哪些ImportBeanDefinitionRegistrar
 	//key是ImportBeanDefinitionRegistrar，value是ConfigurationClass(导入类)上的注解信息，不包含内部的
 	//执行ImportBeanDefinitionRegistrar中的注册BeanDefinitions会用到
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =

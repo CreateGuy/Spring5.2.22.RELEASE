@@ -21,15 +21,7 @@ import org.springframework.beans.factory.parsing.ProblemReporter;
 import org.springframework.core.type.MethodMetadata;
 
 /**
- * Represents a {@link Configuration @Configuration} class method marked with the
- * {@link Bean @Bean} annotation.
- *
- * @author Chris Beams
- * @author Juergen Hoeller
- * @since 3.0
- * @see ConfigurationClass
- * @see ConfigurationClassParser
- * @see ConfigurationClassBeanDefinitionReader
+ * 	存放了标注了@Bean注解的方法的信息
  */
 final class BeanMethod extends ConfigurationMethod {
 

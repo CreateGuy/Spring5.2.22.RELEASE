@@ -58,13 +58,14 @@ final class SimpleAnnotationMetadata implements AnnotationMetadata {
 	//内部类名称
 	private final String[] memberClassNames;
 
-	//方法集合
+	//方法元数据集合
+	//包含了方法的注解元数据
 	private final MethodMetadata[] annotatedMethods;
 
-	//注解和元注解集合类
+	//类源数据
 	private final MergedAnnotations annotations;
 
-	//注解类型集合，当尝试获取的时候，会从annotations中获取注解信息
+	//类注解元数据集合，当尝试获取的时候，会从annotations中获取注解信息
 	@Nullable
 	private Set<String> annotationTypes;
 
@@ -156,7 +157,7 @@ final class SimpleAnnotationMetadata implements AnnotationMetadata {
 	@Override
 	public Set<MethodMetadata> getAnnotatedMethods(String annotationName) {
 		Set<MethodMetadata> annotatedMethods = null;
-		//遍历所有注解方法
+		//遍历所有方法注解原数据
 		for (MethodMetadata annotatedMethod : this.annotatedMethods) {
 			//判断是否包含了某个注解
 			if (annotatedMethod.isAnnotated(annotationName)) {

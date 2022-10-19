@@ -21,15 +21,14 @@ import org.springframework.beans.factory.parsing.ProblemReporter;
 import org.springframework.core.type.MethodMetadata;
 
 /**
- * Base class for a {@link Configuration @Configuration} class method.
- *
- * @author Chris Beams
- * @since 3.1
+ * BeanMethod的父类
  */
 abstract class ConfigurationMethod {
 
+	//方法原数据
 	protected final MethodMetadata metadata;
 
+	//外部类的ConfigurationClass
 	protected final ConfigurationClass configurationClass;
 
 

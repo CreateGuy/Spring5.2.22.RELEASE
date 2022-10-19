@@ -102,12 +102,10 @@ public interface PropertyResolver {
 	String resolvePlaceholders(String text);
 
 	/**
-	 * Resolve ${...} placeholders in the given text, replacing them with corresponding
-	 * property values as resolved by {@link #getProperty}. Unresolvable placeholders with
-	 * no default value will cause an IllegalArgumentException to be thrown.
-	 * @return the resolved String (never {@code null})
-	 * @throws IllegalArgumentException if given text is {@code null}
-	 * or if any placeholders are unresolvable
+	 * 解析传入的文本。将其替换为对应的属性值，无法解析将抛出异常
+	 * @param text 一个路径(classpath:beans.xml)或者其他class的全路径
+	 * @return text对应的属性值
+	 * @throws IllegalArgumentException
 	 */
 	String resolveRequiredPlaceholders(String text) throws IllegalArgumentException;
 
