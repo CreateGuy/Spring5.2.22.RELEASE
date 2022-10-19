@@ -116,6 +116,7 @@ class ConfigurationClassParser {
 	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER = className ->
 			(className.startsWith("java.lang.annotation.") || className.startsWith("org.springframework.stereotype."));
 
+	//对延迟ImportSelector的处理器的排序规则，是针对order的
 	private static final Comparator<DeferredImportSelectorHolder> DEFERRED_IMPORT_COMPARATOR =
 			(o1, o2) -> AnnotationAwareOrderComparator.INSTANCE.compare(o1.getImportSelector(), o2.getImportSelector());
 
@@ -859,6 +860,9 @@ class ConfigurationClassParser {
 
 	private class DeferredImportSelectorHandler {
 
+		/**
+		 * 延时的ImportSelectors
+		 */
 		@Nullable
 		private List<DeferredImportSelectorHolder> deferredImportSelectors = new ArrayList<>();
 
@@ -884,13 +888,17 @@ class ConfigurationClassParser {
 		}
 
 		public void process() {
+			//获得延时ImportSelectors集合
 			List<DeferredImportSelectorHolder> deferredImports = this.deferredImportSelectors;
 			this.deferredImportSelectors = null;
 			try {
 				if (deferredImports != null) {
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
+					//设置排序规则
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
+					//将延迟Import注册到分组处理器中
 					deferredImports.forEach(handler::register);
+					//开始处理
 					handler.processGroupImports();
 				}
 			}
@@ -903,22 +911,34 @@ class ConfigurationClassParser {
 
 	private class DeferredImportSelectorGroupingHandler {
 
+		//key是一个分组器，value是属于这个分组器的 延迟Import
 		private final Map<Object, DeferredImportSelectorGrouping> groupings = new LinkedHashMap<>();
 
+		//key是导入类的注解元数据，value是导入类对应的ConfigurationClass
 		private final Map<AnnotationMetadata, ConfigurationClass> configurationClasses = new HashMap<>();
 
+		/**
+		 * 往分组器集合中注册延迟Import
+		 * @param deferredImport
+		 */
 		public void register(DeferredImportSelectorHolder deferredImport) {
+			//获得当前导入选择器的分组器
 			Class<? extends Group> group = deferredImport.getImportSelector().getImportGroup();
+			//如果这个分组器没有注册过(有没有在groupings中)，就执行下面第三行的lambda表达式，如果存在就直接返回
+			//lambda表达式：包装为DeferredImportSelectorGrouping放入集合中，并返回
 			DeferredImportSelectorGrouping grouping = this.groupings.computeIfAbsent(
 					(group != null ? group : deferredImport),
 					key -> new DeferredImportSelectorGrouping(createGroup(group)));
+			//给这个分组器添加一个延迟ImportSelector
 			grouping.add(deferredImport);
 			this.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(),
 					deferredImport.getConfigurationClass());
 		}
 
 		public void processGroupImports() {
+			//遍历所有的分组器
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
+				//获得排除过滤器
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
 				grouping.getImports().forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
@@ -954,10 +974,10 @@ class ConfigurationClassParser {
 	 */
 	private static class DeferredImportSelectorHolder {
 
-		//谁导入的
+		//导入类
 		private final ConfigurationClass configurationClass;
 
-		//@Import中的延迟类
+		//导入类上@Import中的延迟类
 		private final DeferredImportSelector importSelector;
 
 		public DeferredImportSelectorHolder(ConfigurationClass configClass, DeferredImportSelector selector) {
@@ -977,8 +997,10 @@ class ConfigurationClassParser {
 
 	private static class DeferredImportSelectorGrouping {
 
+		//当前分组器
 		private final DeferredImportSelector.Group group;
 
+		//延迟ImportSelector集合
 		private final List<DeferredImportSelectorHolder> deferredImports = new ArrayList<>();
 
 		DeferredImportSelectorGrouping(Group group) {
@@ -990,8 +1012,7 @@ class ConfigurationClassParser {
 		}
 
 		/**
-		 * Return the imports defined by the group.
-		 * @return each import with its associated configuration class
+		 * 处理
 		 */
 		public Iterable<Group.Entry> getImports() {
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
@@ -1001,7 +1022,12 @@ class ConfigurationClassParser {
 			return this.group.selectImports();
 		}
 
+		/**
+		 * 获得这个分组器中所有延迟Import中的排除过滤器
+		 * @return
+		 */
 		public Predicate<String> getCandidateFilter() {
+			//有一个默认的排除过滤器
 			Predicate<String> mergedFilter = DEFAULT_EXCLUSION_FILTER;
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
 				Predicate<String> selectorFilter = deferredImport.getImportSelector().getExclusionFilter();
@@ -1016,8 +1042,14 @@ class ConfigurationClassParser {
 
 	private static class DefaultDeferredImportSelectorGroup implements Group {
 
+		//需要导入的类(不是像启动类的一样的导入类)
 		private final List<Entry> imports = new ArrayList<>();
 
+		/**
+		 * 将导入选择器中的所有需要导入的类放入imports集合中(springboot中有了新的实现)
+		 * @param metadata
+		 * @param selector
+		 */
 		@Override
 		public void process(AnnotationMetadata metadata, DeferredImportSelector selector) {
 			for (String importClassName : selector.selectImports(metadata)) {
