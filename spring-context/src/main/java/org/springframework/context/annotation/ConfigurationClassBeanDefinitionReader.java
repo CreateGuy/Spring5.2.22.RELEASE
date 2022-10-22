@@ -128,15 +128,19 @@ class ConfigurationClassBeanDefinitionReader {
 	private void loadBeanDefinitionsForConfigurationClass(
 			ConfigurationClass configClass, TrackedConditionEvaluator trackedConditionEvaluator) {
 
+		//判断当前配置类是否需要跳过：跳过的原因有导入类都需要跳过的，那么步骤应该就错了，先要搞定导入类，再才处理注解上的所需的导入类
 		if (trackedConditionEvaluator.shouldSkip(configClass)) {
 			String beanName = configClass.getBeanName();
 			if (StringUtils.hasLength(beanName) && this.registry.containsBeanDefinition(beanName)) {
+				//移除bean工厂中有关这个类的BeanDefinition
 				this.registry.removeBeanDefinition(beanName);
 			}
+			//然后删除有关这个类的循环依赖的信息
 			this.importRegistry.removeImportingClass(configClass.getMetadata().getClassName());
 			return;
 		}
 
+		//如果当前配置类是被类导入进来的
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
@@ -149,19 +153,26 @@ class ConfigurationClassBeanDefinitionReader {
 	}
 
 	/**
-	 * Register the {@link Configuration} class itself as a bean definition.
+	 * 往bean工厂中注册一个BeanDefinition
+	 * @param configClass
 	 */
 	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass) {
+		//先获取注解元数据
 		AnnotationMetadata metadata = configClass.getMetadata();
 		AnnotatedGenericBeanDefinition configBeanDef = new AnnotatedGenericBeanDefinition(metadata);
 
+		//通过范围元数据解析器，获得当前配置类的范围元数据
 		ScopeMetadata scopeMetadata = scopeMetadataResolver.resolveScopeMetadata(configBeanDef);
 		configBeanDef.setScope(scopeMetadata.getScopeName());
+		//获取bean的名称
 		String configBeanName = this.importBeanNameGenerator.generateBeanName(configBeanDef, this.registry);
+		//获得特定注解上的值，设置到BeanDefinition的属性中
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
-
+		//将BeanDefinition包装为BeanDefinitionHolder
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
+		//如果是设置了代理模式，那么就返回一个作用域的BeanDefinitionHolder
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		//注册到bean工厂中：如果设置了代理模式在上一行代码的方法就已经注册了一个BeanDefinition进去，只是名称前加了前缀
 		this.registry.registerBeanDefinition(definitionHolder.getBeanName(), definitionHolder.getBeanDefinition());
 		configClass.setBeanName(configBeanName);
 
@@ -171,8 +182,8 @@ class ConfigurationClassBeanDefinitionReader {
 	}
 
 	/**
-	 * Read the given {@link BeanMethod}, registering bean definitions
-	 * with the BeanDefinitionRegistry based on its contents.
+	 * 通过beanMethod的内容创建bean，并注册到bean工厂中
+	 * @param beanMethod
 	 */
 	@SuppressWarnings("deprecation")  // for RequiredAnnotationBeanPostProcessor.SKIP_REQUIRED_CHECK_ATTRIBUTE
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
@@ -180,11 +191,12 @@ class ConfigurationClassBeanDefinitionReader {
 		MethodMetadata metadata = beanMethod.getMetadata();
 		String methodName = metadata.getMethodName();
 
-		// Do we need to mark the bean as skipped by its condition?
+		//检查是否需要根据@Condition注解进行跳过
 		if (this.conditionEvaluator.shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN)) {
 			configClass.skippedBeanMethods.add(methodName);
 			return;
 		}
+		//如果是已经设置为跳过了，也跳过
 		if (configClass.skippedBeanMethods.contains(methodName)) {
 			return;
 		}
@@ -192,11 +204,12 @@ class ConfigurationClassBeanDefinitionReader {
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
-		// Consider name and any aliases
+		//获取名称
 		List<String> names = new ArrayList<>(Arrays.asList(bean.getStringArray("name")));
+		//当没有设置名称的时候，才会用方法名称作为bean名称
 		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);
 
-		// Register aliases even when overridden
+		//上面的names.remove会移除一个名称，所以如果names还可以for循环表示有别名了，依旧也需要注册到bean工厂中
 		for (String alias : names) {
 			this.registry.registerAlias(beanName, alias);
 		}
@@ -457,22 +470,34 @@ class ConfigurationClassBeanDefinitionReader {
 
 		private final Map<ConfigurationClass, Boolean> skipped = new HashMap<>();
 
+		/**
+		 * 判断当前配置类是否需要跳过
+		 * @param configClass
+		 * @return
+		 */
 		public boolean shouldSkip(ConfigurationClass configClass) {
+			//先从缓存中看
 			Boolean skip = this.skipped.get(configClass);
 			if (skip == null) {
+				//看当前配置类是否是被其他人导入的
 				if (configClass.isImported()) {
 					boolean allSkipped = true;
+					//遍历当前配置类的所有导入类
 					for (ConfigurationClass importedBy : configClass.getImportedBy()) {
 						if (!shouldSkip(importedBy)) {
 							allSkipped = false;
 							break;
 						}
 					}
+					//allSkipped默认为ture，只有所有导入类都需要跳过的情况，才会返回true
+					//我理解是所有导入类都需要跳过的，那么步骤应该就错了，先要搞定导入类，再才处理注解上的所需的导入类
 					if (allSkipped) {
-						// The config classes that imported this one were all skipped, therefore we are skipped...
+						//导入此配置的配置类都被跳过，因此我们被跳过。。
 						skip = true;
 					}
 				}
+
+				//继续校验
 				if (skip == null) {
 					skip = conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN);
 				}

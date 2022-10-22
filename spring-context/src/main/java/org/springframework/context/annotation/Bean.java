@@ -27,7 +27,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Indicates that a method produces a bean to be managed by the Spring container.
+ * 使方法生成由Spring容器管理的bean
  *
  * <h3>Overview</h3>
  *
@@ -255,49 +255,17 @@ public @interface Bean {
 	Autowire autowire() default Autowire.NO;
 
 	/**
-	 * Is this bean a candidate for getting autowired into some other bean?
-	 * <p>Default is {@code true}; set this to {@code false} for internal delegates
-	 * that are not meant to get in the way of beans of the same type in other places.
-	 * @since 5.1
+	 * 表示当前bean是否可以作为入参进行依赖注入
 	 */
 	boolean autowireCandidate() default true;
 
 	/**
-	 * The optional name of a method to call on the bean instance during initialization.
-	 * Not commonly used, given that the method may be called programmatically directly
-	 * within the body of a Bean-annotated method.
-	 * <p>The default value is {@code ""}, indicating no init method to be called.
-	 * @see org.springframework.beans.factory.InitializingBean
-	 * @see org.springframework.context.ConfigurableApplicationContext#refresh()
+	 * 初始化期间要在bean实例上调用的方法
 	 */
 	String initMethod() default "";
 
 	/**
-	 * The optional name of a method to call on the bean instance upon closing the
-	 * application context, for example a {@code close()} method on a JDBC
-	 * {@code DataSource} implementation, or a Hibernate {@code SessionFactory} object.
-	 * The method must have no arguments but may throw any exception.
-	 * <p>As a convenience to the user, the container will attempt to infer a destroy
-	 * method against an object returned from the {@code @Bean} method. For example, given
-	 * an {@code @Bean} method returning an Apache Commons DBCP {@code BasicDataSource},
-	 * the container will notice the {@code close()} method available on that object and
-	 * automatically register it as the {@code destroyMethod}. This 'destroy method
-	 * inference' is currently limited to detecting only public, no-arg methods named
-	 * 'close' or 'shutdown'. The method may be declared at any level of the inheritance
-	 * hierarchy and will be detected regardless of the return type of the {@code @Bean}
-	 * method (i.e., detection occurs reflectively against the bean instance itself at
-	 * creation time).
-	 * <p>To disable destroy method inference for a particular {@code @Bean}, specify an
-	 * empty string as the value, e.g. {@code @Bean(destroyMethod="")}. Note that the
-	 * {@link org.springframework.beans.factory.DisposableBean} callback interface will
-	 * nevertheless get detected and the corresponding destroy method invoked: In other
-	 * words, {@code destroyMethod=""} only affects custom close/shutdown methods and
-	 * {@link java.io.Closeable}/{@link java.lang.AutoCloseable} declared close methods.
-	 * <p>Note: Only invoked on beans whose lifecycle is under the full control of the
-	 * factory, which is always the case for singletons but not guaranteed for any
-	 * other scope.
-	 * @see org.springframework.beans.factory.DisposableBean
-	 * @see org.springframework.context.ConfigurableApplicationContext#close()
+	 * 销毁bean的时候调用的方法
 	 */
 	String destroyMethod() default AbstractBeanDefinition.INFER_METHOD;
 

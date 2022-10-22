@@ -56,6 +56,7 @@ final class ConfigurationClass {
 	private String beanName;
 
 	//有值就代表自己是被谁导入到容器中的
+	//有可能出现A和B都导入了C，就会有多个了
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<>(1);
 
 	//类内部的标注了@Bean的方法的信息，也会有类实现接口内部标注了@Bean的方法
@@ -71,6 +72,7 @@ final class ConfigurationClass {
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =
 			new LinkedHashMap<>();
 
+	//由于@Condition条件的不满足，跳过的bean方法
 	final Set<String> skippedBeanMethods = new HashSet<>();
 
 
@@ -173,8 +175,8 @@ final class ConfigurationClass {
 	}
 
 	/**
-	 * Merge the imported-by declarations from the given configuration class into this one.
-	 * @since 4.0.5
+	 * 表明当前配置类的导入类多了一个
+	 * @param otherConfigClass
 	 */
 	public void mergeImportedBy(ConfigurationClass otherConfigClass) {
 		this.importedBy.addAll(otherConfigClass.importedBy);
@@ -219,13 +221,20 @@ final class ConfigurationClass {
 		return this.importedResources;
 	}
 
+	/**
+	 * 验证是否是最终类
+	 * @param problemReporter
+	 */
 	public void validate(ProblemReporter problemReporter) {
-		// A configuration class may not be final (CGLIB limitation) unless it declares proxyBeanMethods=false
+		//获取有关@Configuration的属性
 		Map<String, Object> attributes = this.metadata.getAnnotationAttributes(Configuration.class.getName());
+		//如果是标注了@Configurationd的类，并且开起了proxyBeanMethods：即对最终的类进行校验
 		if (attributes != null && (Boolean) attributes.get("proxyBeanMethods")) {
+			//标注了@Configurationd的类不能是final类
 			if (this.metadata.isFinal()) {
 				problemReporter.error(new FinalConfigurationProblem());
 			}
+			//如果有标注了@Bean的方法，也进行验证
 			for (BeanMethod beanMethod : this.beanMethods) {
 				beanMethod.validate(problemReporter);
 			}

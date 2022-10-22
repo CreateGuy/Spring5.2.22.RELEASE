@@ -52,6 +52,11 @@ public class FullyQualifiedAnnotationBeanNameGenerator extends AnnotationBeanNam
 			new FullyQualifiedAnnotationBeanNameGenerator();
 
 
+	/**
+	 * 直接使用class文件的全限名称作为bean名称
+	 * @param definition
+	 * @return
+	 */
 	@Override
 	protected String buildDefaultBeanName(BeanDefinition definition) {
 		String beanClassName = definition.getBeanClassName();

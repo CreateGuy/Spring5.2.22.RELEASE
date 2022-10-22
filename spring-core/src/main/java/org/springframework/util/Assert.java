@@ -622,12 +622,11 @@ public abstract class Assert {
 		}
 	}
 
+
 	/**
-	 * Assert that the provided object is an instance of the provided class.
-	 * <pre class="code">Assert.instanceOf(Foo.class, foo);</pre>
-	 * @param type the type to check against
-	 * @param obj the object to check
-	 * @throws IllegalArgumentException if the object is not an instance of type
+	 * obj所提供的对象是type的实例
+	 * @param type
+	 * @param obj
 	 */
 	public static void isInstanceOf(Class<?> type, @Nullable Object obj) {
 		isInstanceOf(type, obj, "");

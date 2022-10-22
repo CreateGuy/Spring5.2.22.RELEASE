@@ -56,8 +56,9 @@ public interface DeferredImportSelector extends ImportSelector {
 	interface Group {
 
 		/**
-		 * Process the {@link AnnotationMetadata} of the importing @{@link Configuration}
-		 * class using the specified {@link DeferredImportSelector}.
+		 * 使用指定的延迟ImportSelector导入自动配置类
+		 * @param metadata 导入类的注解元数据
+		 * @param selector 导入类上@Import中的类
 		 */
 		void process(AnnotationMetadata metadata, DeferredImportSelector selector);
 
@@ -69,13 +70,14 @@ public interface DeferredImportSelector extends ImportSelector {
 
 
 		/**
-		 * An entry that holds the {@link AnnotationMetadata} of the importing
-		 * {@link Configuration} class and the class name to import.
+		 * 保存导入配置类的AnnotationMetadata和要导入的类名的名称
 		 */
 		class Entry {
 
+			//导入类的注解元数据
 			private final AnnotationMetadata metadata;
 
+			//要被导入的配置类
 			private final String importClassName;
 
 			public Entry(AnnotationMetadata metadata, String importClassName) {

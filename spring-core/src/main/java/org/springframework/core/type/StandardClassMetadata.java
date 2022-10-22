@@ -24,14 +24,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ClassMetadata} implementation that uses standard reflection
- * to introspect a given {@code Class}.
- *
- * @author Juergen Hoeller
- * @since 2.5
+ * 标准的类元数据
  */
 public class StandardClassMetadata implements ClassMetadata {
 
+	//当前元数据对应的class
 	private final Class<?> introspectedClass;
 
 

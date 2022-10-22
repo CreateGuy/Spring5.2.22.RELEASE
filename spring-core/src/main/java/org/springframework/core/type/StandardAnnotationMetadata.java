@@ -34,22 +34,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * {@link AnnotationMetadata} implementation that uses standard reflection
- * to introspect a given {@link Class}.
- *
- * @author Juergen Hoeller
- * @author Mark Fisher
- * @author Chris Beams
- * @author Phillip Webb
- * @author Sam Brannen
- * @since 2.5
+ * 标准的注解元数据，包含了类元数据
  */
 public class StandardAnnotationMetadata extends StandardClassMetadata implements AnnotationMetadata {
 
+	//合并后的注解元数据：即包含了注解上的注解
 	private final MergedAnnotations mergedAnnotations;
 
 	private final boolean nestedAnnotationsAsMap;
 
+	//类上包含了的注解，不包含了嵌套注解
 	@Nullable
 	private Set<String> annotationTypes;
 

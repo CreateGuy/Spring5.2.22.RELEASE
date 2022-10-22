@@ -28,7 +28,7 @@ abstract class ConfigurationMethod {
 	//方法原数据
 	protected final MethodMetadata metadata;
 
-	//外部类的ConfigurationClass
+	//外部类的ConfigurationClass(这里指的是包含这个方法的类)
 	protected final ConfigurationClass configurationClass;
 
 

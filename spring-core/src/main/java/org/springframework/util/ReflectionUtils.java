@@ -556,12 +556,8 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Make the given method accessible, explicitly setting it accessible if
-	 * necessary. The {@code setAccessible(true)} method is only called
-	 * when actually necessary, to avoid unnecessary conflicts with a JVM
-	 * SecurityManager (if active).
-	 * @param method the method to make accessible
-	 * @see java.lang.reflect.Method#setAccessible
+	 * 使给定的方法可访问，必要时直接执行setAccessible：取消 Java 语言访问检查(暴力反射)
+	 * @param method
 	 */
 	@SuppressWarnings("deprecation")  // on JDK 9
 	public static void makeAccessible(Method method) {
