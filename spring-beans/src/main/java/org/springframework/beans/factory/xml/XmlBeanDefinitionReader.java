@@ -311,11 +311,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Load bean definitions from the specified XML file.
-	 * @param encodedResource the resource descriptor for the XML file,
-	 * allowing to specify an encoding to use for parsing the file
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * 从指定的XML文件加载bean定义。
+	 * @param encodedResource
+	 * @return
+	 * @throws BeanDefinitionStoreException
 	 */
 	public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
 		Assert.notNull(encodedResource, "EncodedResource must not be null");
@@ -335,6 +334,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			if (encodedResource.getEncoding() != null) {
 				inputSource.setEncoding(encodedResource.getEncoding());
 			}
+			//准备
 			return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 		}
 		catch (IOException ex) {
@@ -375,19 +375,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * Actually load bean definitions from the specified XML file.
-	 * @param inputSource the SAX InputSource to read from
-	 * @param resource the resource descriptor for the XML file
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
-	 * @see #doLoadDocument
-	 * @see #registerBeanDefinitions
+	 * 实际从指定的XML文件加载bean定义。
+	 * @param inputSource 针对于某个文件的
+	 * @param resource 针对于某个文件的
+	 * @return
+	 * @throws BeanDefinitionStoreException
 	 */
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 
 		try {
 			Document doc = doLoadDocument(inputSource, resource);
+			//注册到bean工厂中
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Loaded " + count + " bean definitions from " + resource);

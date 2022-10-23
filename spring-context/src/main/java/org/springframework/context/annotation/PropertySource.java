@@ -26,13 +26,8 @@ import java.lang.annotation.Target;
 import org.springframework.core.io.support.PropertySourceFactory;
 
 /**
- * Annotation providing a convenient and declarative mechanism for adding a
- * {@link org.springframework.core.env.PropertySource PropertySource} to Spring's
- * {@link org.springframework.core.env.Environment Environment}. To be used in
- * conjunction with @{@link Configuration} classes.
- *
- * <h3>Example usage</h3>
- *
+ *	用于导入 Spring 的 yml  配置文件
+ **
  * <p>Given a file {@code app.properties} containing the key/value pair
  * {@code testbean.name=myTestBean}, the following {@code @Configuration} class
  * uses {@code @PropertySource} to contribute {@code app.properties} to the

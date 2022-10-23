@@ -82,10 +82,10 @@ public interface BeanDefinitionReader {
 
 
 	/**
-	 * Load bean definitions from the specified resource.
-	 * @param resource the resource descriptor
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
+	 * 从指定的资源加载bean定义(或者叫将资源转为BeanDefinitions)
+	 * @param resource 资源
+	 * @return
+	 * @throws BeanDefinitionStoreException
 	 */
 	int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException;
 
@@ -98,16 +98,10 @@ public interface BeanDefinitionReader {
 	int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException;
 
 	/**
-	 * Load bean definitions from the specified resource location.
-	 * <p>The location can also be a location pattern, provided that the
-	 * ResourceLoader of this bean definition reader is a ResourcePatternResolver.
-	 * @param location the resource location, to be loaded with the ResourceLoader
-	 * (or ResourcePatternResolver) of this bean definition reader
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
-	 * @see #getResourceLoader()
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
+	 * 从指定的资源位置加载bean定义。
+	 * @param location 资源路径
+	 * @return
+	 * @throws BeanDefinitionStoreException
 	 */
 	int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
 

@@ -144,7 +144,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	private String serializationId;
 
-	/** Whether to allow re-registration of a different definition with the same name. */
+	/**是否允许重新注册具有相同名称的不同定义*/
 	private boolean allowBeanDefinitionOverriding = true;
 
 	/** Whether to allow eager class loading even for lazy-init beans. */
@@ -238,9 +238,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Return whether it should be allowed to override bean definitions by registering
-	 * a different definition with the same name, automatically replacing the former.
-	 * @since 4.1.2
+	 * 返回是否允许通过注册具有相同名称的不同定义来覆盖bean定义，并自动替换前者。
 	 */
 	public boolean isAllowBeanDefinitionOverriding() {
 		return this.allowBeanDefinitionOverriding;

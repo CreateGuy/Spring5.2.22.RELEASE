@@ -136,6 +136,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final String INFER_METHOD = "(inferred)";
 
 
+	//注册此bean的类
 	@Nullable
 	private volatile Object beanClass;
 
@@ -176,9 +177,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean lenientConstructorResolution = true;
 
+	//工厂bean名称：注册此bean的类(是谁包含了@Bean这个方法)
 	@Nullable
 	private String factoryBeanName;
 
+	//工厂方法名称：最开始是有@Bean这个方法的名称
 	@Nullable
 	private String factoryMethodName;
 
@@ -190,9 +193,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
+	//初始化完成后方法
 	@Nullable
 	private String initMethodName;
 
+	//销毁时的方法
 	@Nullable
 	private String destroyMethodName;
 

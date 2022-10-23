@@ -44,7 +44,7 @@ public abstract class ScopedProxyUtils {
 
 
 	/**
-	 * 返回一个作用域代理BeanDefinitionHolder
+	 * 返回一个作用域代理BeanDefinitionHolder对象
 	 */
 	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {

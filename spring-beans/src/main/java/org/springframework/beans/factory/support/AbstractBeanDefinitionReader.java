@@ -51,16 +51,21 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//bean工厂
 	private final BeanDefinitionRegistry registry;
 
+	//资源加载器
 	@Nullable
 	private ResourceLoader resourceLoader;
 
+	//类加载器
 	@Nullable
 	private ClassLoader beanClassLoader;
 
+	//当前环境上下文
 	private Environment environment;
 
+	//bean名称生成器
 	private BeanNameGenerator beanNameGenerator = DefaultBeanNameGenerator.INSTANCE;
 
 
@@ -196,21 +201,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
-	 * Load bean definitions from the specified resource location.
-	 * <p>The location can also be a location pattern, provided that the
-	 * ResourceLoader of this bean definition reader is a ResourcePatternResolver.
-	 * @param location the resource location, to be loaded with the ResourceLoader
-	 * (or ResourcePatternResolver) of this bean definition reader
-	 * @param actualResources a Set to be filled with the actual Resource objects
-	 * that have been resolved during the loading process. May be {@code null}
-	 * to indicate that the caller is not interested in those Resource objects.
-	 * @return the number of bean definitions found
-	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
-	 * @see #getResourceLoader()
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
+	 * 从指定的资源位置加载bean定义。
+	 * @param location 资源路径
+	 * @param actualResources 实际资源集合
+	 * @return 加载了多少BeanDefinitions
+	 * @throws BeanDefinitionStoreException
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+		//获得资源加载器
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -218,9 +216,11 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 
 		if (resourceLoader instanceof ResourcePatternResolver) {
-			// Resource pattern matching available.
+			// 资源模式匹配可用,不懂
 			try {
+				//获得当前路径下的所有资源
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				//从资源加载BeanDefinitions，还会注册到bean工厂中
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);

@@ -26,7 +26,8 @@ import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * 用于导入 Spring 的 xml 配置文件，让该配置文件中定义的 bean 对象加载到Spring容器中。
+ * 主要用于导入 Spring 的 xml 配置文件，比如让该配置文件中定义的 bean 对象加载到Spring容器中。
+ * 也有可能是导入 groovy(脚本) 文件
  *
  * <p>Like {@link Import @Import}, this annotation provides functionality similar to
  * the {@code <import/>} element in Spring XML. It is typically used when designing

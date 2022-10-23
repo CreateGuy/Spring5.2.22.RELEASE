@@ -62,7 +62,9 @@ final class ConfigurationClass {
 	//类内部的标注了@Bean的方法的信息，也会有类实现接口内部标注了@Bean的方法
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<>();
 
-	//表示当前ConfigurationClass使用@ImportResource导入了哪些BeanDefinitionReader
+	//表示当前ConfigurationClass使用@ImportResource导入了哪些文件
+	//key是资源路径：比如classpath:bean.xml
+	//value设置的读取器
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
 			new LinkedHashMap<>();
 
