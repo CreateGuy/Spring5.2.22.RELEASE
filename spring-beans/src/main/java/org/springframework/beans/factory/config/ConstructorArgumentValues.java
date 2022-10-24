@@ -32,19 +32,21 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Holder for constructor argument values, typically as part of a bean definition.
- *
- * <p>Supports values for a specific index in the constructor argument list
- * as well as for generic argument matches by type.
- *
- * @author Juergen Hoeller
- * @since 09.11.2003
- * @see BeanDefinition#getConstructorArgumentValues
+ * 构造方法参数值的持有者，通常作为bean定义的一部分。
+ * 支持设置构造函数参数列表中特定索引的值，以及按类型进行泛型参数匹配。
  */
 public class ConstructorArgumentValues {
 
+	/**
+	 * 参数位置和参数值的映射
+	 * key是参数位置
+	 * value是参数值包装的一个类
+	 */
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
+	/**
+	 * 泛型参数位置和参数值的映射
+	 */
 	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
 
 
@@ -113,17 +115,19 @@ public class ConstructorArgumentValues {
 	}
 
 	/**
-	 * Add an argument value for the given index in the constructor argument list,
-	 * merging the new value (typically a collection) with the current value
-	 * if demanded: see {@link org.springframework.beans.Mergeable}.
-	 * @param key the index in the constructor argument list
-	 * @param newValue the argument value in the form of a ValueHolder
+	 * 将新值推放入指定位置，支持合并
+	 * @param key 参数位置
+	 * @param newValue 参数新值
 	 */
 	private void addOrMergeIndexedArgumentValue(Integer key, ValueHolder newValue) {
+		//获得参数包装类
 		ValueHolder currentValue = this.indexedArgumentValues.get(key);
+		//如果有设置值并且参数值就是一个合并类型
 		if (currentValue != null && newValue.getValue() instanceof Mergeable) {
 			Mergeable mergeable = (Mergeable) newValue.getValue();
+			//是否支持合并参数值
 			if (mergeable.isMergeEnabled()) {
+				//进行合并并设置
 				newValue.setValue(mergeable.merge(currentValue.getValue()));
 			}
 		}
@@ -434,17 +438,19 @@ public class ConstructorArgumentValues {
 
 
 	/**
-	 * Holder for a constructor argument value, with an optional type
-	 * attribute indicating the target type of the actual constructor argument.
+	 * 构造方法参数值的包装类
 	 */
 	public static class ValueHolder implements BeanMetadataElement {
 
+		//参数值
 		@Nullable
 		private Object value;
 
+		//参数值类型
 		@Nullable
 		private String type;
 
+		//参数名称
 		@Nullable
 		private String name;
 

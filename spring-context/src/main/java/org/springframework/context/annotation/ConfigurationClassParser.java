@@ -828,6 +828,8 @@ class ConfigurationClassParser {
 	private static class ImportStack extends ArrayDeque<ConfigurationClass> implements ImportRegistry {
 
 		//如果键值对是 a ：b，就代表a被b导入了
+		//key是被被导入类的名称
+		//value是导入类的注解元数据
 		private final MultiValueMap<String, AnnotationMetadata> imports = new LinkedMultiValueMap<>();
 
 		public void registerImport(AnnotationMetadata importingClass, String importedClass) {

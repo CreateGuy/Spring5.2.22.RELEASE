@@ -103,12 +103,16 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//当前生效的Profiles：比如 dev
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 
+	//默认的Profiles
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
 
+	//Profiles来源：可能是application.yml，application-dev.yml，某些类
 	private final MutablePropertySources propertySources = new MutablePropertySources();
 
+	//property解析器
 	private final ConfigurablePropertyResolver propertyResolver =
 			new PropertySourcesPropertyResolver(this.propertySources);
 

@@ -70,7 +70,6 @@ final class ConfigurationClass {
 
 	//表示当前ConfigurationClass使用@Import导入了哪些ImportBeanDefinitionRegistrar
 	//key是ImportBeanDefinitionRegistrar，value是ConfigurationClass(导入类)上的注解信息，不包含内部的
-	//执行ImportBeanDefinitionRegistrar中的注册BeanDefinitions会用到
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =
 			new LinkedHashMap<>();
 

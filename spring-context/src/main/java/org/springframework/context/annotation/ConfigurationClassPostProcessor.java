@@ -303,6 +303,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			if (!this.localBeanNameGeneratorSet) {
 				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(
 						AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
+				//填充component和import的bean的名称生成器
 				if (generator != null) {
 					this.componentScanBeanNameGenerator = generator;
 					this.importBeanNameGenerator = generator;
@@ -322,35 +323,47 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
+
+		//此do while是为了处理 配置类中又导入(扫描)配置类，而这个配置类是一个标注了@Configuration的类
 		do {
 			//重点：开始解析配置类
 			parser.parse(candidates);
 			//校验所有的配置类
 			parser.validate();
 
+			//获得所有解析出来的配置类
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
 			configClasses.removeAll(alreadyParsed);
 
-			// Read the model and create bean definitions based on its content
+			//创建转换器(ConfigurationClass -> BeanDefinitio)
 			if (this.reader == null) {
 				this.reader = new ConfigurationClassBeanDefinitionReader(
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			//将所有的configClasses,内部的@Bean方法等等，注册到bean工厂中
 			this.reader.loadBeanDefinitions(configClasses);
+			//添加在已经处理的配置类集合中
 			alreadyParsed.addAll(configClasses);
 
+			//清除候选配置类，这里指的是最开始的配置类比如是启动类，而不是导入或者扫描的类
 			candidates.clear();
+
+			//最开始的候选配置类比bean工厂的bean数量要多，就说明通过候选配置类又导入了新类
+			//而新类可能又需要进行导入操作
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
 				Set<String> oldCandidateNames = new HashSet<>(Arrays.asList(candidateNames));
 				Set<String> alreadyParsedClasses = new HashSet<>();
+				//alreadyParsedClasses表示这一次循环 已经导入到bean工厂的配置类
 				for (ConfigurationClass configurationClass : alreadyParsed) {
 					alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());
 				}
 				for (String candidateName : newCandidateNames) {
+					//如果是最开始的候选配置类就不用加入了
 					if (!oldCandidateNames.contains(candidateName)) {
 						BeanDefinition bd = registry.getBeanDefinition(candidateName);
+						//如果不需要跳过，又不是才处理的配置类，那么就是新的配置类，需要再次执行
 						if (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, this.metadataReaderFactory) &&
 								!alreadyParsedClasses.contains(bd.getBeanClassName())) {
 							candidates.add(new BeanDefinitionHolder(bd, candidateName));
@@ -362,7 +375,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		while (!candidates.isEmpty());
 
-		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes
+		//将所有被导入的类(值的是内部类和被使用@Import导入的类)，注册到bean工厂中
+		//为的是让这些类执行ImportAware接口下的setImportMetadata方法
 		if (sbr != null && !sbr.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) {
 			sbr.registerSingleton(IMPORT_REGISTRY_BEAN_NAME, parser.getImportRegistry());
 		}
@@ -468,10 +482,19 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return pvs;
 		}
 
+		/**
+		 * 执行被导入类的setImportMetadata后置方法
+		 * @param bean
+		 * @param beanName
+		 * @return
+		 */
 		@Override
 		public Object postProcessBeforeInitialization(Object bean, String beanName) {
+			//如果当前bean执行ImportAware
 			if (bean instanceof ImportAware) {
+				//获得所有被导入类
 				ImportRegistry ir = this.beanFactory.getBean(IMPORT_REGISTRY_BEAN_NAME, ImportRegistry.class);
+				//获得被导入类的 导入类的注解元数据
 				AnnotationMetadata importingClass = ir.getImportingClassFor(ClassUtils.getUserClass(bean).getName());
 				if (importingClass != null) {
 					((ImportAware) bean).setImportMetadata(importingClass);

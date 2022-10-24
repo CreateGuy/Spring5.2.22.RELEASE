@@ -82,17 +82,8 @@ public interface AnnotatedTypeMetadata {
 	}
 
 	/**
-	 * Retrieve the attributes of the annotation of the given type, if any (i.e. if
-	 * defined on the underlying element, as direct annotation or meta-annotation),
-	 * also taking attribute overrides on composed annotations into account.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
-	 * @param classValuesAsString whether to convert class references to String
-	 * class names for exposure as values in the returned Map, instead of Class
-	 * references which might potentially have to be loaded first
-	 * @return a Map of attributes, with the attribute name as key (e.g. "value")
-	 * and the defined attribute value as Map value. This return value will be
-	 * {@code null} if no matching annotation is defined.
+	 * 返回注解在当前注解元数据中的属性
+	 * 貌似必须标注在类上面才能找到，注解内部的注解无法找到
 	 */
 	@Nullable
 	default Map<String, Object> getAnnotationAttributes(String annotationName,

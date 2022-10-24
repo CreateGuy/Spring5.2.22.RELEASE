@@ -116,10 +116,9 @@ class ConfigurationClassBeanDefinitionReader {
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, resourceLoader);
 	}
 
-
 	/**
-	 * Read {@code configurationModel}, registering bean definitions
-	 * with the registry based on its contents.
+	 * 注册bean定义
+	 * @param configurationModel
 	 */
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
 		TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
