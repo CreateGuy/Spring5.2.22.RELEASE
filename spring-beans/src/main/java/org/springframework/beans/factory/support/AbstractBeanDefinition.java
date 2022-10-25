@@ -156,6 +156,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
+	/** 要求当前bean初始化之前，要先将其他bean进行初始化*/
 	@Nullable
 	private String[] dependsOn;
 

@@ -697,7 +697,7 @@ class ConfigurationClassParser {
 					}
 					else {
 						//候选类不是ImportSelector或ImportBeanDefinitionRegistrar那就当成@Configuration类处理
-						//如果是成@Configuration类就有可能出现循环依赖，就放入下面的importStack的imports中
+						//如果是成@Configuration类就有可能出现循环导入，就放入下面的importStack的imports中
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
 						//处理此配置类
