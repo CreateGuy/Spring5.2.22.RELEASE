@@ -236,9 +236,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Create a new AbstractBeanDefinition as a deep copy of the given
-	 * bean definition.
-	 * @param original the original bean definition to copy from
+	 * 根据传入的源BeanDefinitio，创建新的BeanDefinitio
+	 * @param original
 	 */
 	protected AbstractBeanDefinition(BeanDefinition original) {
 		setParentName(original.getParentName());
@@ -293,22 +292,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 	}
 
-
 	/**
-	 * Override settings in this bean definition (presumably a copied parent
-	 * from a parent-child inheritance relationship) from the given bean
-	 * definition (presumably the child).
-	 * <ul>
-	 * <li>Will override beanClass if specified in the given bean definition.
-	 * <li>Will always take {@code abstract}, {@code scope},
-	 * {@code lazyInit}, {@code autowireMode}, {@code dependencyCheck},
-	 * and {@code dependsOn} from the given bean definition.
-	 * <li>Will add {@code constructorArgumentValues}, {@code propertyValues},
-	 * {@code methodOverrides} from the given bean definition to existing ones.
-	 * <li>Will override {@code factoryBeanName}, {@code factoryMethodName},
-	 * {@code initMethodName}, and {@code destroyMethodName} if specified
-	 * in the given bean definition.
-	 * </ul>
+	 * 从给定bean定义（可能是子级）重写当前bean的设置（可能是从父子继承关系复制的父级）。
+	 * @param other
 	 */
 	public void overrideFrom(BeanDefinition other) {
 		if (StringUtils.hasLength(other.getBeanClassName())) {

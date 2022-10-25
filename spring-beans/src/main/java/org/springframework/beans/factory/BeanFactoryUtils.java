@@ -53,10 +53,9 @@ public abstract class BeanFactoryUtils {
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = "#";
 
 	/**
-	 * Cache from name with factory bean prefix to stripped name without dereference.
-	 * @since 5.1
-	 * @see BeanFactory#FACTORY_BEAN_PREFIX
-	 */
+	 * key是带有FactoryBean前缀的bean名称
+	 * value是对应真实的bean名称
+	 * */
 	private static final Map<String, String> transformedBeanNameCache = new ConcurrentHashMap<>();
 
 
@@ -72,11 +71,11 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
-	 * Return the actual bean name, stripping out the factory dereference
-	 * prefix (if any, also stripping repeated factory prefixes if found).
-	 * @param name the name of the bean
-	 * @return the transformed name
-	 * @see BeanFactory#FACTORY_BEAN_PREFIX
+	 * 返回实际的bean名称，去掉FactoryBean取消引用
+	 * 实现了FactoryBean的类的bean名称会有一个&
+	 * 不加&是这个类型的bean，加了的是执行getObject方法得到的
+	 * @param name
+	 * @return
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
@@ -84,6 +83,7 @@ public abstract class BeanFactoryUtils {
 			return name;
 		}
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
+			//层层剖析，获得真实bean名称
 			do {
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 			}

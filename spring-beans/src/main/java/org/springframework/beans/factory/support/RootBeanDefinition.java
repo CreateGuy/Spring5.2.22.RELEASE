@@ -60,7 +60,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
-	/** Determines if the definition needs to be re-merged. */
+	/** 是否支持合并 */
 	volatile boolean stale;
 
 	boolean allowCaching = true;
@@ -74,7 +74,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Class<?> resolvedTargetType;
 
-	/** Package-visible field for caching if the bean is a factory bean. */
+	/** 是否是一个 {@link org.springframework.beans.factory.FactoryBean}*/
 	@Nullable
 	volatile Boolean isFactoryBean;
 

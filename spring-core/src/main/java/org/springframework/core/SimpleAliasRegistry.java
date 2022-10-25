@@ -39,7 +39,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	//别名缓存
-	//key是别名，value是bean的名称
+	//key是别名，value是bean的名称(有可能也是别名，变成了嵌套的关系)
 	private final Map<String, String> aliasMap = new ConcurrentHashMap<>(16);
 
 
@@ -201,9 +201,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
-	 * Determine the raw name, resolving aliases to canonical names.
-	 * @param name the user-specified name
-	 * @return the transformed name
+	 * 如果是别名，获得真实的名称
+	 * @param name
+	 * @return
 	 */
 	public String canonicalName(String name) {
 		String canonicalName = name;
