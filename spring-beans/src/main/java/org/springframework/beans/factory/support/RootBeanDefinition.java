@@ -108,7 +108,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	Object[] preparedConstructorArguments;
 
-	/** Common lock for the two post-processing fields below. */
+	/** 两个 post-processing 的公共锁*/
 	final Object postProcessingLock = new Object();
 
 	/** 允许程序修改合并的bean定义。 */
@@ -118,12 +118,21 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;
 
+	/**
+	 * 已经检查过的有@Resource注解的方法或者属性的集合
+	 */
 	@Nullable
 	private Set<Member> externallyManagedConfigMembers;
 
+	/**
+	 * bean的实例化方法集合
+	 */
 	@Nullable
 	private Set<String> externallyManagedInitMethods;
 
+	/**
+	 * bean的销毁方法集合
+	 */
 	@Nullable
 	private Set<String> externallyManagedDestroyMethods;
 
@@ -431,6 +440,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 检查方法是否已经在缓存中了
+	 * @param configMember
+	 * @return
+	 */
 	public boolean isExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
 			return (this.externallyManagedConfigMembers != null &&
@@ -438,6 +452,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 将实例化方法注册到相关的集合中
+	 * @param initMethod 实例化方法
+	 */
 	public void registerExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
 			if (this.externallyManagedInitMethods == null) {
@@ -447,6 +465,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 判断是否在实例化方法集合中
+	 * @param initMethod
+	 * @return
+	 */
 	public boolean isExternallyManagedInitMethod(String initMethod) {
 		synchronized (this.postProcessingLock) {
 			return (this.externallyManagedInitMethods != null &&
@@ -454,6 +477,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 将销毁方法注册到相关的集合中
+	 * @param destroyMethod
+	 */
 	public void registerExternallyManagedDestroyMethod(String destroyMethod) {
 		synchronized (this.postProcessingLock) {
 			if (this.externallyManagedDestroyMethods == null) {
@@ -463,6 +490,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		}
 	}
 
+	/**
+	 * 判断是否在销毁方法集合中
+	 * @param destroyMethod
+	 * @return
+	 */
 	public boolean isExternallyManagedDestroyMethod(String destroyMethod) {
 		synchronized (this.postProcessingLock) {
 			return (this.externallyManagedDestroyMethods != null &&

@@ -144,10 +144,17 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 
+	/**
+	 * 查找生命周期方法
+	 * @param beanDefinition the merged bean definition for the bean
+	 * @param beanType the actual type of the managed bean instance
+	 * @param beanName the name of the bean
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		//返回clazz的生命周期方法
 		LifecycleMetadata metadata = findLifecycleMetadata(beanType);
+		//检查生命周期方法重复性
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -297,13 +304,17 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 		private final Class<?> targetClass;
 
+		//实例化方法集合
 		private final Collection<LifecycleElement> initMethods;
 
+		//销毁方法集合
 		private final Collection<LifecycleElement> destroyMethods;
 
+		//已经检查过的实例化方法集合
 		@Nullable
 		private volatile Set<LifecycleElement> checkedInitMethods;
 
+		//已经检查过的销毁方法集合
 		@Nullable
 		private volatile Set<LifecycleElement> checkedDestroyMethods;
 
@@ -315,8 +326,13 @@ public class InitDestroyAnnotationBeanPostProcessor
 			this.destroyMethods = destroyMethods;
 		}
 
+		/**
+		 * 检查生命周期方法重复性
+		 * @param beanDefinition
+		 */
 		public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 			Set<LifecycleElement> checkedInitMethods = new LinkedHashSet<>(this.initMethods.size());
+			//这个for循环仅仅是检查实例化方法是否重复了
 			for (LifecycleElement element : this.initMethods) {
 				String methodIdentifier = element.getIdentifier();
 				if (!beanDefinition.isExternallyManagedInitMethod(methodIdentifier)) {
@@ -328,6 +344,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 				}
 			}
 			Set<LifecycleElement> checkedDestroyMethods = new LinkedHashSet<>(this.destroyMethods.size());
+			//这个for循环和上面的一样
 			for (LifecycleElement element : this.destroyMethods) {
 				String methodIdentifier = element.getIdentifier();
 				if (!beanDefinition.isExternallyManagedDestroyMethod(methodIdentifier)) {
@@ -386,6 +403,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 		private final Method method;
 
+		//生命周期方法的名称
 		private final String identifier;
 
 		public LifecycleElement(Method method) {

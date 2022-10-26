@@ -33,9 +33,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Internal class for managing injection metadata.
- * Not intended for direct use in applications.
- *
+ *  用于管理注入元数据的内部类（比如是管理的@Resource的）
  * <p>Used by {@link AutowiredAnnotationBeanPostProcessor},
  * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} and
  * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
@@ -46,8 +44,8 @@ import org.springframework.util.ReflectionUtils;
 public class InjectionMetadata {
 
 	/**
-	 * An empty {@code InjectionMetadata} instance with no-op callbacks.
-	 * @since 5.2
+	 * 没有操作回调的空InjectionMetadata实例
+	 * 表示没有任何相关元数据
 	 */
 	public static final InjectionMetadata EMPTY = new InjectionMetadata(Object.class, Collections.emptyList()) {
 		@Override
@@ -68,8 +66,10 @@ public class InjectionMetadata {
 
 	private final Class<?> targetClass;
 
+	//查询出有@Resource的属性和方法
 	private final Collection<InjectedElement> injectedElements;
 
+	//检查完毕后的有@Resource的属性和方法
 	@Nullable
 	private volatile Set<InjectedElement> checkedElements;
 
@@ -98,6 +98,10 @@ public class InjectionMetadata {
 		return this.targetClass != clazz;
 	}
 
+	/**
+	 * 检查injectedElements的重复性
+	 * @param beanDefinition
+	 */
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<>(this.injectedElements.size());
 		for (InjectedElement element : this.injectedElements) {
@@ -138,7 +142,7 @@ public class InjectionMetadata {
 
 
 	/**
-	 * Return an {@code InjectionMetadata} instance, possibly for empty elements.
+	 * 返回一个InjectionMetadata实例，可能为空元素。
 	 * @param elements the elements to inject (possibly empty)
 	 * @param clazz the target class
 	 * @return a new {@link #InjectionMetadata(Class, Collection)} instance
@@ -166,10 +170,13 @@ public class InjectionMetadata {
 	 */
 	public abstract static class InjectedElement {
 
+		//需要自动装配成员(是属性或者方法)
 		protected final Member member;
 
+		//是否是文件
 		protected final boolean isField;
 
+		//属性描述符，用于操作属性的
 		@Nullable
 		protected final PropertyDescriptor pd;
 
