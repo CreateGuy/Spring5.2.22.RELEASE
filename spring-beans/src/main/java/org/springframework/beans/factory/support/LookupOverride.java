@@ -23,9 +23,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Represents an override of a method that looks up an object in the same IoC context.
- *
- * <p>Methods eligible for lookup override must not have arguments.
+ * 表示对在相同Ioc上下文中查找对象的方法的重写（@Lookup）。
+ * 符合查找覆盖条件的方法不能有参数。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -36,6 +35,7 @@ public class LookupOverride extends MethodOverride {
 	@Nullable
 	private final String beanName;
 
+	/** 原方法*/
 	@Nullable
 	private Method method;
 

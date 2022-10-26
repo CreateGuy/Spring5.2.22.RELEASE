@@ -94,6 +94,9 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	@Nullable
 	private ConversionService conversionService;
 
+	/**
+	 * 该类注册使用默认的属性编辑器
+	 */
 	private boolean defaultEditorsActive = false;
 
 	private boolean configValueEditorsActive = false;

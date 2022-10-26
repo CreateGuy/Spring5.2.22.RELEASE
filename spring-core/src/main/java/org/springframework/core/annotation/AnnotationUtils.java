@@ -138,8 +138,7 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
-	 * Determine whether the given class is a candidate for carrying the specified annotation
-	 * (at type, method or field level).
+	 * 确定传入的类是否是承载某种注解的的候选类(在类型、方法或字段级别)。
 	 * @param clazz the class to introspect
 	 * @param annotationType the searchable annotation type
 	 * @return {@code false} if the class is known to have no such annotations at any level;

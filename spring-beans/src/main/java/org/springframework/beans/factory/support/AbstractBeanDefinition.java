@@ -171,9 +171,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	//然后这个qualifiers表示当前BeanDefinition内部需要什么类型的bean
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	/** 创建bean实例的回调方法*/
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
+	/** 是否允许访问非公共构造方法*/
 	private boolean nonPublicAccessAllowed = true;
 
 	private boolean lenientConstructorResolution = true;
@@ -182,7 +184,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String factoryBeanName;
 
-	//工厂方法名称：最开始是有@Bean这个方法的名称
+	//工厂方法名称：是@Bean这个方法的名称，就是一个@Bean方法生成的一个BeanDefinition，然后AbstractBeanDefinition就是方法名称
 	@Nullable
 	private String factoryMethodName;
 
@@ -192,6 +194,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+	/** 使用了@Lookup的方法 的集合*/
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
 	//初始化完成后方法
@@ -1126,33 +1129,30 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Validate and prepare the method overrides defined for this bean.
-	 * Checks for existence of a method with the specified name.
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 检查是否存在具有@Lookup的方法，并准备为这些方法进行重写，
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exist and determine their overloaded status.
+		//检查查找方法是否存在，并确定它们的重载状态。
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
 	}
 
 	/**
-	 * Validate and prepare the given method override.
-	 * Checks for existence of a method with the specified name,
-	 * marking it as not overloaded if none found.
-	 * @param mo the MethodOverride object to validate
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 准备为这些方法进行重写，
+	 * @param mo 有@Lookup的重写方法
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		//获得有没有重载方法
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
 					"Invalid method override: no method with name '" + mo.getMethodName() +
 					"' on class [" + getBeanClassName() + "]");
 		}
+		//不懂为什么为1
 		else if (count == 1) {
-			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			//将override标记为未重载，以避免参数类型检查的开销。
 			mo.setOverloaded(false);
 		}
 	}

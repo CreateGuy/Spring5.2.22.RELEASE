@@ -36,6 +36,8 @@ import org.springframework.lang.Nullable;
  */
 public class MethodOverrides {
 
+	/** BeanDefinition会持有一个MethodOverrides
+	 * 而这里的overrides表示这个BeanDefinition对应的bean 有多少个@Lookup方法*/
 	private final Set<MethodOverride> overrides = new CopyOnWriteArraySet<>();
 
 

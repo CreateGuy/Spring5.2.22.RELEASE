@@ -24,12 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Object representing the override of a method on a managed object by the IoC
- * container.
- *
- * <p>Note that the override mechanism is <em>not</em> intended as a generic
- * means of inserting crosscutting code: use AOP for that.
- *
+ *	IOC容器使用@Lookup对于方法的重写
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -37,6 +32,7 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class MethodOverride implements BeanMetadataElement {
 
+	//方法名称
 	private final String methodName;
 
 	private boolean overloaded = true;

@@ -158,7 +158,7 @@ public abstract class ObjectUtils {
 	}
 
 	/**
-	 * Unwrap the given object which is potentially a {@link java.util.Optional}.
+	 * 对于对象进行捷报，因为他可能是 {@link java.util.Optional}.
 	 * @param obj the candidate object
 	 * @return either the value held within the {@code Optional}, {@code null}
 	 * if the {@code Optional} is empty, or simply the given object as-is
