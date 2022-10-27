@@ -191,6 +191,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+	/**
+	 * 如果bean是从xml中注册的又设置过属性的话，这里就存放的属性值
+	 * 其他情况不清楚
+	 */
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
@@ -613,15 +617,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public int getResolvedAutowireMode() {
 		if (this.autowireMode == AUTOWIRE_AUTODETECT) {
-			// Work out whether to apply setter autowiring or constructor autowiring.
-			// If it has a no-arg constructor it's deemed to be setter autowiring,
-			// otherwise we'll try constructor autowiring.
 			Constructor<?>[] constructors = getBeanClass().getConstructors();
 			for (Constructor<?> constructor : constructors) {
+				//如果有无参的构造方法则使用类型进行自动装配属性
 				if (constructor.getParameterCount() == 0) {
 					return AUTOWIRE_BY_TYPE;
 				}
 			}
+			//没有无参构造方法的情况则按照贪婪策略匹配出的最符合的构造方法来自动装配的常量
 			return AUTOWIRE_CONSTRUCTOR;
 		}
 		else {

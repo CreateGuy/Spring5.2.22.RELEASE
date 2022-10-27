@@ -33,7 +33,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
- *  用于管理注入元数据的内部类（比如是管理的@Resource的）
+ *  用于管理注入元数据的内部类（比如是管理的@Resource，@Autowired）
  * <p>Used by {@link AutowiredAnnotationBeanPostProcessor},
  * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} and
  * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
@@ -173,7 +173,7 @@ public class InjectionMetadata {
 		//需要自动装配成员(是属性或者方法)
 		protected final Member member;
 
-		//是否是文件
+		//是否是属性
 		protected final boolean isField;
 
 		//属性描述符，用于操作属性的

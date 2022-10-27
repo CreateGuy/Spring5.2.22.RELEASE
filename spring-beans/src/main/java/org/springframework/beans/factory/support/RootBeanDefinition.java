@@ -111,7 +111,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** 两个 post-processing 的公共锁*/
 	final Object postProcessingLock = new Object();
 
-	/** 允许程序修改合并的bean定义。 */
+	/** 是否已经调用后置处理器对beanDefinition进行修改了。 */
 	boolean postProcessed = false;
 
 	/** 是否开启实例化前 后置处理器的的处理 */
@@ -119,7 +119,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	volatile Boolean beforeInstantiationResolved;
 
 	/**
-	 * 已经检查过的有@Resource注解的方法或者属性的集合
+	 * 已经检查过的有@Resource或者@Autowired注解的方法或者属性的集合
 	 */
 	@Nullable
 	private Set<Member> externallyManagedConfigMembers;

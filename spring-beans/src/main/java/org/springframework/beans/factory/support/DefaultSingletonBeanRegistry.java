@@ -86,7 +86,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** 二级缓存 */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
-	/** Set of registered singletons, containing the bean names in registration order. */
+	/** 已经注册的单例集合，包括循环依赖中的半成品bean */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	/** 单例的 当前正在创建的beanName集合 */
@@ -157,12 +157,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Add the given singleton factory for building the specified singleton
-	 * if necessary.
-	 * <p>To be called for eager registration of singletons, e.g. to be able to
-	 * resolve circular references.
-	 * @param beanName the name of the bean
-	 * @param singletonFactory the factory for the singleton object
+	 * 为了解决循环依赖，将singletonFactory注册到三级工厂中
+	 * @param beanName bean名称
+	 * @param singletonFactory 一个已经包含了半成品bean入参的lambda表达式
 	 */
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");

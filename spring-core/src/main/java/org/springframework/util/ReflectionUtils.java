@@ -341,32 +341,33 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Perform the given callback operation on all matching methods of the given
-	 * class and superclasses (or given interface and super-interfaces).
-	 * <p>The same named method occurring on subclass and superclass will appear
-	 * twice, unless excluded by the specified {@link MethodFilter}.
+	 * 递归获得桥接方法的真实方法的集合
 	 * @param clazz the class to introspect
 	 * @param mc the callback to invoke for each method
-	 * @param mf the filter that determines the methods to apply the callback to
+	 * @param mf 简单的通过方法名称和参数个数简单判断是否是桥接方法的真实方法
 	 * @throws IllegalStateException if introspection fails
 	 */
 	public static void doWithMethods(Class<?> clazz, MethodCallback mc, @Nullable MethodFilter mf) {
-		// Keep backing up the inheritance hierarchy.
+		//获得所有的方法
 		Method[] methods = getDeclaredMethods(clazz, false);
 		for (Method method : methods) {
+			//通过传入的mf先简单的匹配
 			if (mf != null && !mf.matches(method)) {
 				continue;
 			}
 			try {
+				//加入到候选集合中
 				mc.doWith(method);
 			}
 			catch (IllegalAccessException ex) {
 				throw new IllegalStateException("Not allowed to access method '" + method.getName() + "': " + ex);
 			}
 		}
+		//如果有父类并且不是Object那么就递归继续获取
 		if (clazz.getSuperclass() != null && (mf != USER_DECLARED_METHODS || clazz.getSuperclass() != Object.class)) {
 			doWithMethods(clazz.getSuperclass(), mc, mf);
 		}
+		//接口也继续递归：或许是因为高版本jdk在接口中支持了 default
 		else if (clazz.isInterface()) {
 			for (Class<?> superIfc : clazz.getInterfaces()) {
 				doWithMethods(superIfc, mc, mf);
