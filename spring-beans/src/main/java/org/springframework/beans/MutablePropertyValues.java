@@ -46,9 +46,12 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 
 	private final List<PropertyValue> propertyValueList;
 
+	//已经处理的属性
+	//我的理解是属性是可以由自动装配去设置的，但是我已经通过其他途径在这里设置了值了，就不需要使用自动装配了
 	@Nullable
 	private Set<String> processedProperties;
 
+	//表示是否已经转换过属性类型
 	private volatile boolean converted = false;
 
 
@@ -269,6 +272,11 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 		return this.propertyValueList.toArray(new PropertyValue[0]);
 	}
 
+	/**
+	 * 获得指定属性名称的PropertyValue对象
+	 * @param propertyName the name to search for
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public PropertyValue getPropertyValue(String propertyName) {
@@ -281,12 +289,9 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 	}
 
 	/**
-	 * Get the raw property value, if any.
+	 * 获得指定属性名称的值
 	 * @param propertyName the name to search for
-	 * @return the raw property value, or {@code null} if none found
-	 * @since 4.0
-	 * @see #getPropertyValue(String)
-	 * @see PropertyValue#getValue()
+	 * @return
 	 */
 	@Nullable
 	public Object get(String propertyName) {
@@ -294,6 +299,11 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 		return (pv != null ? pv.getValue() : null);
 	}
 
+	/**
+	 * 返回不在old中的或者值不相同的集合
+	 * @param old the old property values
+	 * @return
+	 */
 	@Override
 	public PropertyValues changesSince(PropertyValues old) {
 		MutablePropertyValues changes = new MutablePropertyValues();
@@ -312,6 +322,11 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 		return changes;
 	}
 
+	/**
+	 * 查看指定的属性是否已经被标记为已处理
+	 * @param propertyName the name of the property we're interested in
+	 * @return
+	 */
 	@Override
 	public boolean contains(String propertyName) {
 		return (getPropertyValue(propertyName) != null ||
@@ -323,14 +338,9 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 		return this.propertyValueList.isEmpty();
 	}
 
-
 	/**
-	 * Register the specified property as "processed" in the sense
-	 * of some processor calling the corresponding setter method
-	 * outside of the PropertyValue(s) mechanism.
-	 * <p>This will lead to {@code true} being returned from
-	 * a {@link #contains} call for the specified property.
-	 * @param propertyName the name of the property.
+	 * 将指定属性标记为已处理
+	 * @param propertyName
 	 */
 	public void registerProcessedProperty(String propertyName) {
 		if (this.processedProperties == null) {
@@ -340,8 +350,8 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 	}
 
 	/**
-	 * Clear the "processed" registration of the given property, if any.
-	 * @since 3.2.13
+	 * 清空已处理集合
+	 * @param propertyName
 	 */
 	public void clearProcessedProperty(String propertyName) {
 		if (this.processedProperties != null) {

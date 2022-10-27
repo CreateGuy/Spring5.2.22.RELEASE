@@ -19,74 +19,58 @@ package org.springframework.core.env;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for resolving properties against any underlying source.
- *
- * @author Chris Beams
- * @author Juergen Hoeller
- * @since 3.1
- * @see Environment
+ * 属性解析器
  * @see PropertySourcesPropertyResolver
  */
 public interface PropertyResolver {
 
 	/**
-	 * Return whether the given property key is available for resolution,
-	 * i.e. if the value for the given key is not {@code null}.
+	 * *返回给定的属性键是否可用于解析
+	 * 即通过key是否可以找到value
 	 */
 	boolean containsProperty(String key);
 
 	/**
-	 * Return the property value associated with the given key,
-	 * or {@code null} if the key cannot be resolved.
-	 * @param key the property name to resolve
-	 * @see #getProperty(String, String)
-	 * @see #getProperty(String, Class)
-	 * @see #getRequiredProperty(String)
+	 * 返回与给定键相关联的属性值，如果键不能解析则返回null
 	 */
 	@Nullable
 	String getProperty(String key);
 
 	/**
-	 * Return the property value associated with the given key, or
-	 * {@code defaultValue} if the key cannot be resolved.
-	 * @param key the property name to resolve
-	 * @param defaultValue the default value to return if no value is found
-	 * @see #getRequiredProperty(String)
-	 * @see #getProperty(String, Class)
+	 * 返回与给定键相关联的属性值，如果键不能解析则返回defaultValue。
+	 * @param key
+	 * @param defaultValue
+	 * @return
 	 */
 	String getProperty(String key, String defaultValue);
 
 	/**
-	 * Return the property value associated with the given key,
-	 * or {@code null} if the key cannot be resolved.
-	 * @param key the property name to resolve
-	 * @param targetType the expected type of the property value
-	 * @see #getRequiredProperty(String, Class)
+	 * 将key对应是属性值转为目标类型
+	 * @param key
+	 * @param targetType
+	 * @param <T>
+	 * @return
 	 */
 	@Nullable
 	<T> T getProperty(String key, Class<T> targetType);
 
 	/**
-	 * Return the property value associated with the given key,
-	 * or {@code defaultValue} if the key cannot be resolved.
-	 * @param key the property name to resolve
-	 * @param targetType the expected type of the property value
-	 * @param defaultValue the default value to return if no value is found
-	 * @see #getRequiredProperty(String, Class)
+	 * 将key对应是属性值转为目标类型,如果不行就返回defaultValue
+	 * @param key
+	 * @param targetType
+	 * @param defaultValue
+	 * @param <T>
+	 * @return
 	 */
 	<T> T getProperty(String key, Class<T> targetType, T defaultValue);
 
 	/**
-	 * Return the property value associated with the given key (never {@code null}).
-	 * @throws IllegalStateException if the key cannot be resolved
-	 * @see #getRequiredProperty(String, Class)
+	 * 返回与给定键相关联的属性值(绝不为空)。
 	 */
 	String getRequiredProperty(String key) throws IllegalStateException;
 
 	/**
-	 * Return the property value associated with the given key, converted to the given
-	 * targetType (never {@code null}).
-	 * @throws IllegalStateException if the given key cannot be resolved
+	 * 返回与给定键相关联的属性值，转换为给定的targetType(绝不为空)。
 	 */
 	<T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException;
 

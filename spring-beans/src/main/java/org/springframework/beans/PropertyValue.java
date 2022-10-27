@@ -23,14 +23,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Object to hold information and value for an individual bean property.
- * Using an object here, rather than just storing all properties in
- * a map keyed by property name, allows for more flexibility, and the
- * ability to handle indexed properties etc in an optimized way.
- *
- * <p>Note that the value doesn't need to be the final required type:
- * A {@link BeanWrapper} implementation should handle any necessary conversion,
- * as this object doesn't know anything about the objects it will be applied to.
+ * 用于保存单个bean属性的信息和值。
+ * 在这里使用对象，而不是将所有属性存储在一个按属性名键的映射中，允许更大的灵活性，并能够以优化的方式处理索引属性等。
  *
  * @author Rod Johnson
  * @author Rob Harrop
@@ -47,14 +41,23 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	@Nullable
 	private final Object value;
 
+	/**
+	 * 当前属性在bean进行属性注入时,如果属性在指定bean中不存在,是否要忽略
+	 */
 	private boolean optional = false;
 
+	/**
+	 * 是否已经做了类型转换
+	 */
 	private boolean converted = false;
 
+	/**
+	 * 转换后的值
+	 */
 	@Nullable
 	private Object convertedValue;
 
-	/** Package-visible field that indicates whether conversion is necessary. */
+	/** 是否需要进行类型转换 */
 	@Nullable
 	volatile Boolean conversionNecessary;
 
