@@ -48,10 +48,8 @@ import org.springframework.util.Assert;
 public interface GenericConverter {
 
 	/**
-	 * Return the source and target types that this converter can convert between.
-	 * <p>Each entry is a convertible source-to-target type pair.
-	 * <p>For {@link ConditionalConverter conditional converters} this method may return
-	 * {@code null} to indicate all source-to-target pairs should be considered.
+	 * 返回此转换器可以在两者之间进行转换的源和目标类型。
+	 * @return
 	 */
 	@Nullable
 	Set<ConvertiblePair> getConvertibleTypes();
@@ -68,7 +66,7 @@ public interface GenericConverter {
 
 
 	/**
-	 * Holder for a source-to-target class pair.
+	 * 可以转换的源类和目标类的映射关系
 	 */
 	final class ConvertiblePair {
 

@@ -22,8 +22,8 @@ import java.nio.charset.Charset;
 import org.springframework.util.StringUtils;
 
 /**
- * Editor for {@code java.nio.charset.Charset}, translating charset
- * String representations into Charset objects and back.
+ * String转Charset的属性编辑器
+ * 属性编辑器：就是做类型转换的，将传入的文本转为对应类型
  *
  * <p>Expects the same syntax as Charset's {@link java.nio.charset.Charset#name()},
  * e.g. {@code UTF-8}, {@code ISO-8859-16}, etc.

@@ -72,6 +72,9 @@ public abstract class BeanUtils {
 
 	private static final Log logger = LogFactory.getLog(BeanUtils.class);
 
+	/**
+	 * 无法通过类型加指定后缀获取属性编辑器的类
+	 */
 	private static final Set<Class<?>> unknownEditorTypes =
 			Collections.newSetFromMap(new ConcurrentReferenceHashMap<>(64));
 
@@ -492,16 +495,13 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Find a JavaBeans PropertyEditor following the 'Editor' suffix convention
-	 * (e.g. "mypackage.MyDomainClass" -> "mypackage.MyDomainClassEditor").
-	 * <p>Compatible to the standard JavaBeans convention as implemented by
-	 * {@link java.beans.PropertyEditorManager} but isolated from the latter's
-	 * registered default editors for primitive types.
-	 * @param targetType the type to find an editor for
-	 * @return the corresponding editor, or {@code null} if none found
+	 * 通过targetType的类名+ Editor 找到一个属性编辑器的bean
+	 * @param targetType
+	 * @return
 	 */
 	@Nullable
 	public static PropertyEditor findEditorByConvention(@Nullable Class<?> targetType) {
+		//数组类型和本方法的宗旨冲突了
 		if (targetType == null || targetType.isArray() || unknownEditorTypes.contains(targetType)) {
 			return null;
 		}
@@ -523,11 +523,13 @@ public abstract class BeanUtils {
 			}
 		}
 
+		//方法内部规定是通过类名+Editor查询指定的属性编辑器
 		String targetTypeName = targetType.getName();
 		String editorName = targetTypeName + "Editor";
 		try {
 			Class<?> editorClass = cl.loadClass(editorName);
 			if (editorClass != null) {
+				//查询出来的类必须实现了PropertyEditor接口才行，否则也加入无效的集合中
 				if (!PropertyEditor.class.isAssignableFrom(editorClass)) {
 					if (logger.isInfoEnabled()) {
 						logger.info("Editor class [" + editorName +
@@ -536,6 +538,7 @@ public abstract class BeanUtils {
 					unknownEditorTypes.add(targetType);
 					return null;
 				}
+				//实例化这个属性编辑器
 				return (PropertyEditor) instantiateClass(editorClass);
 			}
 			// Misbehaving ClassLoader returned null instead of ClassNotFoundException
@@ -548,6 +551,7 @@ public abstract class BeanUtils {
 			logger.trace("No property editor [" + editorName + "] found for type " +
 					targetTypeName + " according to 'Editor' suffix convention");
 		}
+		//到这就说明查到失败，加入特定的集合中，以防重复操作
 		unknownEditorTypes.add(targetType);
 		return null;
 	}

@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Property editor for Boolean/boolean properties.
+ * 将传入的值转换为Boolean
  *
  * <p>This is not meant to be used as system PropertyEditor but rather as
  * locale-specific Boolean editor within custom controller code, to parse
@@ -39,52 +39,60 @@ import org.springframework.util.StringUtils;
 public class CustomBooleanEditor extends PropertyEditorSupport {
 
 	/**
-	 * Value of {@code "true"}.
+	 * 表示字符串true 可以表示 Boolean的true
 	 */
 	public static final String VALUE_TRUE = "true";
 
 	/**
-	 * Value of {@code "false"}.
+	 * 表示字符串false 可以表示 Boolean的false
 	 */
 	public static final String VALUE_FALSE = "false";
 
 	/**
-	 * Value of {@code "on"}.
+	 * 表示字符串on 可以表示 Boolean的true
 	 */
 	public static final String VALUE_ON = "on";
 
 	/**
-	 * Value of {@code "off"}.
+	 *表示字符串off 可以表示 Boolean的false
 	 */
 	public static final String VALUE_OFF = "off";
 
 	/**
-	 * Value of {@code "yes"}.
+	 *表示字符串yes 可以表示 Boolean的true
 	 */
 	public static final String VALUE_YES = "yes";
 
 	/**
-	 * Value of {@code "no"}.
+	 *表示字符串no 可以表示 Boolean的false
 	 */
 	public static final String VALUE_NO = "no";
 
 	/**
-	 * Value of {@code "1"}.
+	 * 表示字符串1 可以表示 Boolean的true
 	 */
 	public static final String VALUE_1 = "1";
 
 	/**
-	 * Value of {@code "0"}.
+	 * 表示字符串0 可以表示 Boolean的false
 	 */
 	public static final String VALUE_0 = "0";
 
-
+	/**
+	 * 用户自定义表示 Boolean的true 的值
+	 */
 	@Nullable
 	private final String trueString;
 
+	/**
+	 * 用户自定义表示 Boolean的false 的值
+	 */
 	@Nullable
 	private final String falseString;
 
+	/**
+	 * 是否创建空值
+	 */
 	private final boolean allowEmpty;
 
 
@@ -127,6 +135,11 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 	}
 
 
+	/**
+	 * 将传入的值转换为Boolean
+	 * @param text
+	 * @throws IllegalArgumentException
+	 */
 	@Override
 	public void setAsText(@Nullable String text) throws IllegalArgumentException {
 		String input = (text != null ? text.trim() : null);
@@ -134,17 +147,21 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
 			// Treat empty String as null value.
 			setValue(null);
 		}
+		//跟用户自定义的true值对象进行比较
 		else if (this.trueString != null && this.trueString.equalsIgnoreCase(input)) {
 			setValue(Boolean.TRUE);
 		}
+		//跟用户自定义的false值对象进行比较
 		else if (this.falseString != null && this.falseString.equalsIgnoreCase(input)) {
 			setValue(Boolean.FALSE);
 		}
+		//跟当前类定义的的true值对象进行比较
 		else if (this.trueString == null &&
 				(VALUE_TRUE.equalsIgnoreCase(input) || VALUE_ON.equalsIgnoreCase(input) ||
 						VALUE_YES.equalsIgnoreCase(input) || VALUE_1.equals(input))) {
 			setValue(Boolean.TRUE);
 		}
+		//跟当前类定义的的false值对象进行比较
 		else if (this.falseString == null &&
 				(VALUE_FALSE.equalsIgnoreCase(input) || VALUE_OFF.equalsIgnoreCase(input) ||
 						VALUE_NO.equalsIgnoreCase(input) || VALUE_0.equals(input))) {

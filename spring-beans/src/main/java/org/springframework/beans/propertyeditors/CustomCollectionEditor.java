@@ -30,15 +30,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Property editor for Collections, converting any source Collection
- * to a given target Collection type.
- *
- * <p>By default registered for Set, SortedSet and List,
- * to automatically convert any given Collection to one of those
- * target types if the type does not match the target property.
- *
- * @author Juergen Hoeller
- * @since 1.1.3
+ * 将集合类型转为目标类型的属性编辑器
  * @see java.util.Collection
  * @see java.util.Set
  * @see java.util.SortedSet
@@ -46,9 +38,15 @@ import org.springframework.util.ReflectionUtils;
  */
 public class CustomCollectionEditor extends PropertyEditorSupport {
 
+	/**
+	 * 默认集合类型：传入的是空值或者普通类型或者集合类型的时候，为其创建指定类型的空集合
+	 */
 	@SuppressWarnings("rawtypes")
 	private final Class<? extends Collection> collectionType;
 
+	/**
+	 * 传入的是空值，是否为创建空集合
+	 */
 	private final boolean nullAsEmptyCollection;
 
 
@@ -106,19 +104,22 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Convert the given value to a Collection of the target type.
+	 * 将传入的值转为为集合
+	 * @param value
 	 */
 	@Override
 	public void setValue(@Nullable Object value) {
+		//空值是否创建空集合
 		if (value == null && this.nullAsEmptyCollection) {
 			super.setValue(createCollection(this.collectionType, 0));
 		}
+		//如果是和原来相同的集合 或者是默认类型的集合，那么是否创建新集合
 		else if (value == null || (this.collectionType.isInstance(value) && !alwaysCreateNewCollection())) {
 			// Use the source value as-is, as it matches the target type.
 			super.setValue(value);
 		}
 		else if (value instanceof Collection) {
-			// Convert Collection elements.
+			//将传入的集合转为目标集合
 			Collection<?> source = (Collection<?>) value;
 			Collection<Object> target = createCollection(this.collectionType, source.size());
 			for (Object elem : source) {
@@ -126,8 +127,8 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 			}
 			super.setValue(target);
 		}
+		//将数组元素转换为集合元素
 		else if (value.getClass().isArray()) {
-			// Convert array elements to Collection elements.
 			int length = Array.getLength(value);
 			Collection<Object> target = createCollection(this.collectionType, length);
 			for (int i = 0; i < length; i++) {
@@ -136,7 +137,7 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 			super.setValue(target);
 		}
 		else {
-			// A plain value: convert it to a Collection with a single element.
+			//当成一个元素，放入集合中
 			Collection<Object> target = createCollection(this.collectionType, 1);
 			target.add(convertElement(value));
 			super.setValue(target);
@@ -173,11 +174,7 @@ public class CustomCollectionEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Return whether to always create a new Collection,
-	 * even if the type of the passed-in Collection already matches.
-	 * <p>Default is "false"; can be overridden to enforce creation of a
-	 * new Collection, for example to convert elements in any case.
-	 * @see #convertElement
+	 * 是否总是创建一个新的集合
 	 */
 	protected boolean alwaysCreateNewCollection() {
 		return false;

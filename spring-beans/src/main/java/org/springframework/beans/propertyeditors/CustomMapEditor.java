@@ -27,19 +27,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Property editor for Maps, converting any source Map
- * to a given target Map type.
- *
- * @author Juergen Hoeller
- * @since 2.0.1
+ * 将传入的值转为指定Map
  * @see java.util.Map
  * @see java.util.SortedMap
  */
 public class CustomMapEditor extends PropertyEditorSupport {
 
+	/**
+	 * 目标类型
+	 */
 	@SuppressWarnings("rawtypes")
 	private final Class<? extends Map> mapType;
 
+	/**
+	 * 传入空值的时候，是否创建空Map
+	 */
 	private final boolean nullAsEmptyMap;
 
 
@@ -100,9 +102,11 @@ public class CustomMapEditor extends PropertyEditorSupport {
 	 */
 	@Override
 	public void setValue(@Nullable Object value) {
+		//是否创建默认类型的Map
 		if (value == null && this.nullAsEmptyMap) {
 			super.setValue(createMap(this.mapType, 0));
 		}
+		//是默认类型的Map并且不允许创建新Mao，就直接放入
 		else if (value == null || (this.mapType.isInstance(value) && !alwaysCreateNewMap())) {
 			// Use the source value as-is, as it matches the target type.
 			super.setValue(value);
@@ -146,12 +150,8 @@ public class CustomMapEditor extends PropertyEditorSupport {
 	}
 
 	/**
-	 * Return whether to always create a new Map,
-	 * even if the type of the passed-in Map already matches.
-	 * <p>Default is "false"; can be overridden to enforce creation of a
-	 * new Map, for example to convert elements in any case.
-	 * @see #convertKey
-	 * @see #convertValue
+	 * 是否总是创建一个新Map
+	 * @return
 	 */
 	protected boolean alwaysCreateNewMap() {
 		return false;

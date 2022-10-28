@@ -1209,19 +1209,11 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Take a {@code String} that is a delimited list and convert it into
-	 * a {@code String} array.
-	 * <p>A single {@code delimiter} may consist of more than one character,
-	 * but it will still be considered as a single delimiter string, rather
-	 * than as bunch of potential delimiter characters, in contrast to
-	 * {@link #tokenizeToStringArray}.
-	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @param delimiter the delimiter between elements (this is a single delimiter,
-	 * rather than a bunch individual delimiter characters)
-	 * @param charsToDelete a set of characters to delete; useful for deleting unwanted
-	 * line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
-	 * @return an array of the tokens in the list
-	 * @see #tokenizeToStringArray
+	 * 对传入的字符串按照delimiter进行切分，并且忽略其中的charsToDelete字符串
+	 * @param str
+	 * @param delimiter 分隔符
+	 * @param charsToDelete 忽略的字符串
+	 * @return
 	 */
 	public static String[] delimitedListToStringArray(
 			@Nullable String str, @Nullable String delimiter, @Nullable String charsToDelete) {

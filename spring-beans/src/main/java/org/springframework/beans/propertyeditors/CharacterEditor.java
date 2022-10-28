@@ -22,15 +22,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Editor for a {@link Character}, to populate a property
- * of type {@code Character} or {@code char} from a String value.
+ * 将传入的值转为Character
+ * 如果是长度大于1的字符串就会直接抛出异常，因为Character是char的包装类，char是一个字符
  *
- * <p>Note that the JDK does not contain a default
- * {@link java.beans.PropertyEditor property editor} for {@code char}!
- * {@link org.springframework.beans.BeanWrapperImpl} will register this
- * editor by default.
- *
- * <p>Also supports conversion from a Unicode character sequence; e.g.
+ * 还支持unicode的转换，比如下面的字符A对应的unicode是u0041
  * {@code u0041} ('A').
  *
  * @author Juergen Hoeller
@@ -43,16 +38,18 @@ import org.springframework.util.StringUtils;
 public class CharacterEditor extends PropertyEditorSupport {
 
 	/**
-	 * The prefix that identifies a string as being a Unicode character sequence.
+	 * Unicode的前缀
 	 */
 	private static final String UNICODE_PREFIX = "\\u";
 
 	/**
-	 * The length of a Unicode character sequence.
+	 * Unicode的长度
 	 */
 	private static final int UNICODE_LENGTH = 6;
 
-
+	/**
+	 * 是否创建空值
+	 */
 	private final boolean allowEmpty;
 
 
@@ -71,6 +68,7 @@ public class CharacterEditor extends PropertyEditorSupport {
 
 	@Override
 	public void setAsText(@Nullable String text) throws IllegalArgumentException {
+		//是否为其创建空值
 		if (this.allowEmpty && !StringUtils.hasLength(text)) {
 			// Treat empty String as null value.
 			setValue(null);
@@ -78,12 +76,14 @@ public class CharacterEditor extends PropertyEditorSupport {
 		else if (text == null) {
 			throw new IllegalArgumentException("null String cannot be converted to char type");
 		}
+		//是Unicode
 		else if (isUnicodeCharacterSequence(text)) {
 			setAsUnicode(text);
 		}
 		else if (text.length() == 1) {
 			setValue(Character.valueOf(text.charAt(0)));
 		}
+		//最后当长度大于1的时候就会抛出异常
 		else {
 			throw new IllegalArgumentException("String [" + text + "] with length " +
 					text.length() + " cannot be converted to char type: neither Unicode nor single character");
@@ -96,12 +96,21 @@ public class CharacterEditor extends PropertyEditorSupport {
 		return (value != null ? value.toString() : "");
 	}
 
-
+	/**
+	 * 判断是否是Unicode
+	 * @param sequence
+	 * @return
+	 */
 	private boolean isUnicodeCharacterSequence(String sequence) {
 		return (sequence.startsWith(UNICODE_PREFIX) && sequence.length() == UNICODE_LENGTH);
 	}
 
+	/**
+	 * 将Unicode转为Character
+	 * @param text
+	 */
 	private void setAsUnicode(String text) {
+		//拿到的对应的ASCII码
 		int code = Integer.parseInt(text.substring(UNICODE_PREFIX.length()), 16);
 		setValue(Character.valueOf((char) code));
 	}

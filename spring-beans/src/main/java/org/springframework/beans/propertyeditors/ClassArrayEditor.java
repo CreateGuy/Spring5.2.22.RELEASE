@@ -25,16 +25,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Property editor for an array of {@link Class Classes}, to enable
- * the direct population of a {@code Class[]} property without having to
- * use a {@code String} class name property as bridge.
- *
- * <p>Also supports "java.lang.String[]"-style array class names, in contrast
- * to the standard {@link Class#forName(String)} method.
- *
- * @author Rob Harrop
- * @author Juergen Hoeller
- * @since 2.0
+ * 将传入的文本(class的全路径)用逗号切分，然后转为一个Class数组
  */
 public class ClassArrayEditor extends PropertyEditorSupport {
 
@@ -64,6 +55,7 @@ public class ClassArrayEditor extends PropertyEditorSupport {
 	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
 		if (StringUtils.hasText(text)) {
+			//用逗号分隔传入的text，得到Class名称数组
 			String[] classNames = StringUtils.commaDelimitedListToStringArray(text);
 			Class<?>[] classes = new Class<?>[classNames.length];
 			for (int i = 0; i < classNames.length; i++) {

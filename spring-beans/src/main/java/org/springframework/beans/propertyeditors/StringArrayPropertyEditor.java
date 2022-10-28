@@ -23,11 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Custom {@link java.beans.PropertyEditor} for String arrays.
- *
- * <p>Strings must be in CSV format, with a customizable separator.
- * By default values in the result are trimmed of whitespace.
- *
+ * 将传入的值转换为String[]
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Dave Syer
@@ -37,18 +33,30 @@ import org.springframework.util.StringUtils;
 public class StringArrayPropertyEditor extends PropertyEditorSupport {
 
 	/**
-	 * Default separator for splitting a String: a comma (",").
+	 * 默认的字符串数组类型的字符串分隔符
 	 */
 	public static final String DEFAULT_SEPARATOR = ",";
 
-
+	/**
+	 * 传入的字符串数组类型的字符串进行切分的分隔符
+	 */
 	private final String separator;
 
+	/**
+	 * 将字符串数组转为为字符串的时候，忽略其中的某些字符串
+	 * 比如 charsToDelete为1， 那么212，211,转出来就是 22,2
+	 */
 	@Nullable
 	private final String charsToDelete;
 
+	/**
+	 * 传入空值的时候，是否为其保存操作
+	 */
 	private final boolean emptyArrayAsNull;
 
+	/**
+	 * 是否清除字符串两边的空格
+	 */
 	private final boolean trimValues;
 
 
@@ -127,11 +135,13 @@ public class StringArrayPropertyEditor extends PropertyEditorSupport {
 
 	@Override
 	public void setAsText(String text) throws IllegalArgumentException {
+		//对传入的字符串按照separator进行切分，并且忽略其中的charsToDelete字符串
 		String[] array = StringUtils.delimitedListToStringArray(text, this.separator, this.charsToDelete);
 		if (this.emptyArrayAsNull && array.length == 0) {
 			setValue(null);
 		}
 		else {
+			//需要去除两边的空格
 			if (this.trimValues) {
 				array = StringUtils.trimArrayElements(array);
 			}

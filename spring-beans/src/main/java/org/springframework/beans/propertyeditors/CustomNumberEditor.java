@@ -24,10 +24,7 @@ import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Property editor for any Number subclass such as Short, Integer, Long,
- * BigInteger, Float, Double, BigDecimal. Can use a given NumberFormat for
- * (locale-specific) parsing and rendering, or alternatively the default
- * {@code decode} / {@code valueOf} / {@code toString} methods.
+ * 将传入的值转换为 Number的任何子类的属性编辑器
  *
  * <p>This is not meant to be used as system PropertyEditor but rather
  * as locale-specific number editor within custom controller code,
@@ -45,8 +42,14 @@ import org.springframework.util.StringUtils;
  */
 public class CustomNumberEditor extends PropertyEditorSupport {
 
+	/**
+	 * 转换为什么类型的Number
+	 */
 	private final Class<? extends Number> numberClass;
 
+	/**
+	 * 默认用这个对传入的参数进行转换
+	 */
 	@Nullable
 	private final NumberFormat numberFormat;
 
