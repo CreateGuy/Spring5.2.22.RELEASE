@@ -43,49 +43,16 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Encapsulates a Java {@link java.lang.reflect.Type}, providing access to
- * {@link #getSuperType() supertypes}, {@link #getInterfaces() interfaces}, and
- * {@link #getGeneric(int...) generic parameters} along with the ability to ultimately
- * {@link #resolve() resolve} to a {@link java.lang.Class}.
  *
- * <p>{@code ResolvableTypes} may be obtained from {@link #forField(Field) fields},
- * {@link #forMethodParameter(Method, int) method parameters},
- * {@link #forMethodReturnType(Method) method returns} or
- * {@link #forClass(Class) classes}. Most methods on this class will themselves return
- * {@link ResolvableType ResolvableTypes}, allowing easy navigation. For example:
- * <pre class="code">
- * private HashMap&lt;Integer, List&lt;String&gt;&gt; myMap;
- *
- * public void example() {
- *     ResolvableType t = ResolvableType.forField(getClass().getDeclaredField("myMap"));
- *     t.getSuperType(); // AbstractMap&lt;Integer, List&lt;String&gt;&gt;
- *     t.asMap(); // Map&lt;Integer, List&lt;String&gt;&gt;
- *     t.getGeneric(0).resolve(); // Integer
- *     t.getGeneric(1).resolve(); // List
- *     t.getGeneric(1); // List&lt;String&gt;
- *     t.resolveGeneric(1, 0); // String
- * }
- * </pre>
- *
- * @author Phillip Webb
- * @author Juergen Hoeller
- * @author Stephane Nicoll
- * @since 4.0
- * @see #forField(Field)
- * @see #forMethodParameter(Method, int)
- * @see #forMethodReturnType(Method)
- * @see #forConstructorParameter(Constructor, int)
- * @see #forClass(Class)
- * @see #forType(Type)
- * @see #forInstance(Object)
- * @see ResolvableTypeProvider
+ * 是对 Java type 的封装，提供对超类型、接口和泛型参数的访问，以及最终解析为类的能力。
+ * type：是指的是java提供的泛型接口
+ * ResolvableTypes可以从字段、方法参数、方法返回或类中获得
  */
 @SuppressWarnings("serial")
 public class ResolvableType implements Serializable {
 
 	/**
-	 * {@code ResolvableType} returned when no value is available. {@code NONE} is used
-	 * in preference to {@code null} so that multiple method calls can be safely chained.
+	 * 当无值时返回的ResolvableType。NONE优先于null
 	 */
 	public static final ResolvableType NONE = new ResolvableType(EmptyType.INSTANCE, null, null, 0);
 
@@ -96,18 +63,20 @@ public class ResolvableType implements Serializable {
 
 
 	/**
-	 * The underlying Java type being managed.
+	 * 被管理的底层Java type。
+	 * 简单type：只是一个普通类
+	 * 复杂type：是指的是这个类有泛型(ParameterizedType)
 	 */
 	private final Type type;
 
 	/**
-	 * Optional provider for the type.
+	 * 底层 type 的提供者，静态工厂方法中如果未提供类型，则根据该类型提供者获取类型
 	 */
 	@Nullable
 	private final TypeProvider typeProvider;
 
 	/**
-	 * The {@code VariableResolver} to use or {@code null} if no resolver is available.
+	 * 如果底层 type 为泛型数组，则保存数组的元素类型
 	 */
 	@Nullable
 	private final VariableResolver variableResolver;
@@ -118,18 +87,33 @@ public class ResolvableType implements Serializable {
 	@Nullable
 	private final ResolvableType componentType;
 
+	/**
+	 * 缓存的哈希码
+	 */
 	@Nullable
 	private final Integer hash;
 
+	/**
+	 * 底层类解析后的 type 的Class
+	 */
 	@Nullable
 	private Class<?> resolved;
 
+	/**
+	 * 父类型
+	 */
 	@Nullable
 	private volatile ResolvableType superType;
 
+	/**
+	 * 当前类型实现的接口
+	 */
 	@Nullable
 	private volatile ResolvableType[] interfaces;
 
+	/**
+	 * 当前类型的泛型参数
+	 */
 	@Nullable
 	private volatile ResolvableType[] generics;
 
@@ -656,30 +640,22 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} representing the generic parameter for the
-	 * given indexes. Indexes are zero based; for example given the type
-	 * {@code Map<Integer, List<String>>}, {@code getGeneric(0)} will access the
-	 * {@code Integer}. Nested generics can be accessed by specifying multiple indexes;
-	 * for example {@code getGeneric(1, 0)} will access the {@code String} from the
-	 * nested {@code List}. For convenience, if no indexes are specified the first
-	 * generic is returned.
-	 * <p>If no generic is available at the specified indexes {@link #NONE} is returned.
-	 * @param indexes the indexes that refer to the generic parameter
-	 * (may be omitted to return the first generic)
-	 * @return a {@link ResolvableType} for the specified generic, or {@link #NONE}
-	 * @see #hasGenerics()
-	 * @see #getGenerics()
-	 * @see #resolveGeneric(int...)
-	 * @see #resolveGenerics()
+	 * 返回指定顺序的 ResolvableType(参数上的泛型)
+	 * @param indexes 位置
+	 * @return
 	 */
 	public ResolvableType getGeneric(@Nullable int... indexes) {
+		//获得当前参数上的所有泛型信息
 		ResolvableType[] generics = getGenerics();
+		//如果没有穿，就只返回第一个
 		if (indexes == null || indexes.length == 0) {
 			return (generics.length == 0 ? NONE : generics[0]);
 		}
+		//获得参数中指定位置的泛型信息
 		ResolvableType generic = this;
 		for (int index : indexes) {
 			generics = generic.getGenerics();
+			//如果数量超过了参数的泛型数量，就返回NONE
 			if (index < 0 || index >= generics.length) {
 				return NONE;
 			}
@@ -689,31 +665,27 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return an array of {@link ResolvableType ResolvableTypes} representing the generic parameters of
-	 * this type. If no generics are available an empty array is returned. If you need to
-	 * access a specific generic consider using the {@link #getGeneric(int...)} method as
-	 * it allows access to nested generics and protects against
-	 * {@code IndexOutOfBoundsExceptions}.
-	 * @return an array of {@link ResolvableType ResolvableTypes} representing the generic parameters
-	 * (never {@code null})
-	 * @see #hasGenerics()
-	 * @see #getGeneric(int...)
-	 * @see #resolveGeneric(int...)
-	 * @see #resolveGenerics()
+	 * 返回由泛型参数封装而成的ResolvableType
+	 * @return
 	 */
 	public ResolvableType[] getGenerics() {
+		//
 		if (this == NONE) {
 			return EMPTY_TYPES_ARRAY;
 		}
 		ResolvableType[] generics = this.generics;
 		if (generics == null) {
+			//如果参数的类型只是一个简单的类型
 			if (this.type instanceof Class) {
+				//直接获得这个类泛型参数信息
 				Type[] typeParams = ((Class<?>) this.type).getTypeParameters();
 				generics = new ResolvableType[typeParams.length];
 				for (int i = 0; i < generics.length; i++) {
+					//对泛型参数进行封装
 					generics[i] = ResolvableType.forType(typeParams[i], this);
 				}
 			}
+			//已经是一个泛型参数了
 			else if (this.type instanceof ParameterizedType) {
 				Type[] actualTypeArguments = ((ParameterizedType) this.type).getActualTypeArguments();
 				generics = new ResolvableType[actualTypeArguments.length];
@@ -827,14 +799,14 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Resolve this type by a single level, returning the resolved value or {@link #NONE}.
-	 * <p>Note: The returned {@link ResolvableType} should only be used as an intermediary
-	 * as it cannot be serialized.
+	 * 解析 Type 获得ResolvableType
 	 */
 	ResolvableType resolveType() {
+		//是普通泛型参数
 		if (this.type instanceof ParameterizedType) {
 			return forType(((ParameterizedType) this.type).getRawType(), this.variableResolver);
 		}
+		//是通配符泛型参数：例如 ? extends Number
 		if (this.type instanceof WildcardType) {
 			Type resolved = resolveBounds(((WildcardType) this.type).getUpperBounds());
 			if (resolved == null) {
@@ -1407,12 +1379,11 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return a {@link ResolvableType} for the specified {@link Type} backed by a given
-	 * {@link VariableResolver}.
-	 * @param type the source type or {@code null}
-	 * @param typeProvider the type provider or {@code null}
-	 * @param variableResolver the variable resolver or {@code null}
-	 * @return a {@link ResolvableType} for the specified {@link Type} and {@link VariableResolver}
+	 * 返回由传入参数封装的ResolvableType
+	 * @param type 泛型参数
+	 * @param typeProvider 泛型提供者
+	 * @param variableResolver 泛型解析器
+	 * @return
 	 */
 	static ResolvableType forType(
 			@Nullable Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
@@ -1424,8 +1395,8 @@ public class ResolvableType implements Serializable {
 			return NONE;
 		}
 
-		// For simple Class references, build the wrapper right away -
-		// no expensive resolution necessary, so not worth caching...
+		//对于简单的类，立即构建
+		//不需要昂贵的分辨率，所以不值得缓存.
 		if (type instanceof Class) {
 			return new ResolvableType(type, typeProvider, variableResolver, (ResolvableType) null);
 		}

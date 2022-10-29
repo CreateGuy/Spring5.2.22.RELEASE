@@ -4,6 +4,8 @@ package com.lzx.demo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.TypeDescriptor;
 
 import java.util.Arrays;
 

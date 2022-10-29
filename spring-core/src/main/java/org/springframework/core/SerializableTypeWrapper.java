@@ -223,15 +223,24 @@ final class SerializableTypeWrapper {
 
 
 	/**
-	 * {@link TypeProvider} for {@link Type Types} obtained from a {@link Field}.
+	 * 属性类型提供者
 	 */
 	@SuppressWarnings("serial")
 	static class FieldTypeProvider implements TypeProvider {
 
+		/**
+		 * 属性名称
+		 */
 		private final String fieldName;
 
+		/**
+		 * 属性的声明类
+		 */
 		private final Class<?> declaringClass;
 
+		/**
+		 * 属性
+		 */
 		private transient Field field;
 
 		public FieldTypeProvider(Field field) {
@@ -250,7 +259,14 @@ final class SerializableTypeWrapper {
 			return this.field;
 		}
 
+		/**
+		 * 重新加载字段
+		 * @param inputStream
+		 * @throws IOException
+		 * @throws ClassNotFoundException
+		 */
 		private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+			//重新读取当前类的非静态和非瞬态字段
 			inputStream.defaultReadObject();
 			try {
 				this.field = this.declaringClass.getDeclaredField(this.fieldName);
