@@ -114,12 +114,21 @@ public class InjectionMetadata {
 		this.checkedElements = checkedElements;
 	}
 
+	/**
+	 * 对属性进行注入
+	 * @param target
+	 * @param beanName
+	 * @param pvs
+	 * @throws Throwable
+	 */
 	public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+		//如果没有检查后的属性，那么就用查询出来的
 		Collection<InjectedElement> checkedElements = this.checkedElements;
 		Collection<InjectedElement> elementsToIterate =
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
 			for (InjectedElement element : elementsToIterate) {
+				//重点
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -193,29 +202,46 @@ public class InjectionMetadata {
 			return this.member;
 		}
 
+		/**
+		 * 获得资源类型
+		 * @return
+		 */
 		protected final Class<?> getResourceType() {
+			//如果是属性
 			if (this.isField) {
 				return ((Field) this.member).getType();
 			}
 			else if (this.pd != null) {
 				return this.pd.getPropertyType();
 			}
+			//最后直接当成方法，取第一个参数值
 			else {
 				return ((Method) this.member).getParameterTypes()[0];
 			}
 		}
 
+		/**
+		 * 对需要的类型进行检查
+		 * @param resourceType
+		 */
 		protected final void checkResourceType(Class<?> resourceType) {
+			//是属性
 			if (this.isField) {
+				//获得属性的类型
 				Class<?> fieldType = ((Field) this.member).getType();
+				//要求@Resource上的类型和属性的类型是父子关系
 				if (!(resourceType.isAssignableFrom(fieldType) || fieldType.isAssignableFrom(resourceType))) {
 					throw new IllegalStateException("Specified field type [" + fieldType +
 							"] is incompatible with resource type [" + resourceType.getName() + "]");
 				}
 			}
+			//是方法上标志了@Resource
 			else {
+				//获得方法的第一个参数
 				Class<?> paramType =
 						(this.pd != null ? this.pd.getPropertyType() : ((Method) this.member).getParameterTypes()[0]);
+				//由于@Resource标注在方法上，spring是当做set方法才操作的
+				//要求@Resource上的类型和方法的第一个入参的类型是父子关系
 				if (!(resourceType.isAssignableFrom(paramType) || paramType.isAssignableFrom(resourceType))) {
 					throw new IllegalStateException("Specified parameter type [" + paramType +
 							"] is incompatible with resource type [" + resourceType.getName() + "]");
@@ -250,9 +276,7 @@ public class InjectionMetadata {
 		}
 
 		/**
-		 * Check whether this injector's property needs to be skipped due to
-		 * an explicit property value having been specified. Also marks the
-		 * affected property as processed for other processors to ignore it.
+		 * 检查是否因为指定了显式的属性值而需要跳过该注入器的属性
 		 */
 		protected boolean checkPropertySkipping(@Nullable PropertyValues pvs) {
 			Boolean skip = this.skip;

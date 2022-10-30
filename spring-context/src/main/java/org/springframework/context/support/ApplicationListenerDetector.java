@@ -50,7 +50,9 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	private final transient AbstractApplicationContext applicationContext;
 
 	/**
-	 * 注册到容器中的监听器集合
+	 * 注册一个监听器
+	 * key：监听器名称
+	 * value：是否是单例
 	 */
 	private final transient Map<String, Boolean> singletonNames = new ConcurrentHashMap<>(256);
 
@@ -73,13 +75,20 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 		return bean;
 	}
 
+	/**
+	 * 将
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		//如果bean是一个监听bean
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
-				// singleton bean (top-level or inner): register on the fly
+				//添加一个监听器到容器中
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
 			}
 			else if (Boolean.FALSE.equals(flag)) {
@@ -90,6 +99,7 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 							"because it does not have singleton scope. Only top-level listener beans are allowed " +
 							"to be of non-singleton scope.");
 				}
+				//具有其他作用域的bean不能可靠地处理事件
 				this.singletonNames.remove(beanName);
 			}
 		}

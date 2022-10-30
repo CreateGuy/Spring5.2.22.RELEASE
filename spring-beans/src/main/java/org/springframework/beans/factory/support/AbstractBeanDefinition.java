@@ -152,6 +152,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private Boolean lazyInit;
 
+	/**
+	 * 自动注入模式
+	 */
 	private int autowireMode = AUTOWIRE_NO;
 
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;

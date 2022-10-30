@@ -172,6 +172,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 	private boolean fallbackToDefaultTypeMatch = true;
 
+	/**
+	 * 是否一直使用JNDI的方法获取bean
+	 */
 	private boolean alwaysUseJndiLookup = false;
 
 	private transient BeanFactory jndiFactory = new SimpleJndiBeanFactory();
@@ -314,6 +317,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		return true;
 	}
 
+	/**
+	 * 对于@Resource的属性进行填充
+	 * @param pvs the property values that the factory is about to apply (never {@code null})
+	 * @param bean the bean instance created, but whose properties have not yet been set
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
 		InjectionMetadata metadata = findResourceMetadata(beanName, bean.getClass(), pvs);
@@ -496,18 +506,20 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Obtain the resource object for the given name and type.
-	 * @param element the descriptor for the annotated field/method
-	 * @param requestingBeanName the name of the requesting bean
-	 * @return the resource object (never {@code null})
-	 * @throws NoSuchBeanDefinitionException if no corresponding target resource found
+	 * 获取给定名称和类型的资源对象。
+	 * @param element
+	 * @param requestingBeanName
+	 * @return
+	 * @throws NoSuchBeanDefinitionException
 	 */
 	protected Object getResource(LookupElement element, @Nullable String requestingBeanName)
 			throws NoSuchBeanDefinitionException {
 
+		//使用JNDI的方法获取bean
 		if (StringUtils.hasLength(element.mappedName)) {
 			return this.jndiFactory.getBean(element.mappedName, element.lookupType);
 		}
+		//是否一直使用JNDI的方法获取bean
 		if (this.alwaysUseJndiLookup) {
 			return this.jndiFactory.getBean(element.name, element.lookupType);
 		}
@@ -519,11 +531,10 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 	/**
-	 * Obtain a resource object for the given name and type through autowiring
-	 * based on the given factory.
-	 * @param factory the factory to autowire against
-	 * @param element the descriptor for the annotated field/method
-	 * @param requestingBeanName the name of the requesting bean
+	 * 通过传入的工厂获得需要自动配置的bean
+	 * @param factory bean工厂
+	 * @param element 注解字段或者方法的描述符
+	 * @param requestingBeanName 声明bean的名称
 	 * @return the resource object (never {@code null})
 	 * @throws NoSuchBeanDefinitionException if no corresponding target resource found
 	 */
@@ -532,11 +543,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 		Object resource;
 		Set<String> autowiredBeanNames;
+		//获得需要自动配置的bean名称
 		String name = element.name;
 
 		if (factory instanceof AutowireCapableBeanFactory) {
 			AutowireCapableBeanFactory beanFactory = (AutowireCapableBeanFactory) factory;
 			DependencyDescriptor descriptor = element.getDependencyDescriptor();
+			//使用了默认名称和没在工厂中
 			if (this.fallbackToDefaultTypeMatch && element.isDefaultName && !factory.containsBean(name)) {
 				autowiredBeanNames = new LinkedHashSet<>();
 				resource = beanFactory.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, null);
@@ -545,6 +558,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 				}
 			}
 			else {
+				//解析bean名称获得bean实例
 				resource = beanFactory.resolveBeanByName(name, descriptor);
 				autowiredBeanNames = Collections.singleton(name);
 			}
@@ -581,17 +595,28 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 
 	/**
-	 * Class representing generic injection information about an annotated field
-	 * or setter method, supporting @Resource and related annotations.
+	 * 表示关于注解字段或setter方法的泛型注入信息，支持@Resource和相关注释。
 	 */
 	protected abstract static class LookupElement extends InjectionMetadata.InjectedElement {
 
+		/**
+		 * 自动注入参数的名称
+		 */
 		protected String name = "";
 
+		/**
+		 * 是否使用默认的规则生产的bean名称
+		 */
 		protected boolean isDefaultName = false;
 
+		/**
+		 * 自动注入参数的类型
+		 */
 		protected Class<?> lookupType = Object.class;
 
+		/**
+		 * 貌似是多例的名称
+		 */
 		@Nullable
 		protected String mappedName;
 
@@ -633,6 +658,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	 */
 	private class ResourceElement extends LookupElement {
 
+		/**
+		 * 是否进行懒加载
+		 */
 		private final boolean lazyLookup;
 
 		public ResourceElement(Member member, AnnotatedElement ae, @Nullable PropertyDescriptor pd) {
@@ -641,20 +669,25 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			String resourceName = resource.name();
 			Class<?> resourceType = resource.type();
 			this.isDefaultName = !StringUtils.hasLength(resourceName);
+			//如果没有设置名称
 			if (this.isDefaultName) {
+				//获得属性(方法)名称
 				resourceName = this.member.getName();
+				//如果是方法，就当成set方法
 				if (this.member instanceof Method && resourceName.startsWith("set") && resourceName.length() > 3) {
+					//去掉前面的set，然后当成入参的名称
 					resourceName = Introspector.decapitalize(resourceName.substring(3));
 				}
 			}
 			else if (embeddedValueResolver != null) {
 				resourceName = embeddedValueResolver.resolveStringValue(resourceName);
 			}
+			//进行检查
 			if (Object.class != resourceType) {
 				checkResourceType(resourceType);
 			}
 			else {
-				// No resource type specified... check field/method.
+				//没有指定类型，那么就按照Member的类型来获取
 				resourceType = getResourceType();
 			}
 			this.name = (resourceName != null ? resourceName : "");
@@ -665,8 +698,15 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			this.lazyLookup = (lazy != null && lazy.value());
 		}
 
+		/**
+		 * 获得要求的bean
+		 * @param target
+		 * @param requestingBeanName 需要的bean名称
+		 * @return
+		 */
 		@Override
 		protected Object getResourceToInject(Object target, @Nullable String requestingBeanName) {
+			//如果不是懒加载就执行getResource方法
 			return (this.lazyLookup ? buildLazyResourceProxy(this, requestingBeanName) :
 					getResource(this, requestingBeanName));
 		}

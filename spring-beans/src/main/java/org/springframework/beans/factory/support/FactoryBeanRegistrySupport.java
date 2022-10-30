@@ -88,10 +88,10 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	}
 
 	/**
-	 * Obtain an object to expose from the given FactoryBean.
-	 * @param factory the FactoryBean instance
-	 * @param beanName the name of the bean
-	 * @param shouldPostProcess whether the bean is subject to post-processing
+	 * 从FactoryBean获得bean
+	 * @param factory
+	 * @param beanName
+	 * @param shouldPostProcess 是否执行后置处理器
 	 * @return the object obtained from the FactoryBean
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
@@ -102,18 +102,21 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
 					object = doGetObjectFromFactoryBean(factory, beanName);
-					// Only post-process and store if not put there already during getObject() call above
-					// (e.g. because of circular reference processing triggered by custom getBean calls)
 					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
+					//如果不为空，可能有两个线程操作了factoryBeanObjectCache
+					//那么就直接将才创建的bean引用指向以前创建的，然后返回
 					if (alreadyThere != null) {
 						object = alreadyThere;
 					}
 					else {
+						//是否执行后置处理器
 						if (shouldPostProcess) {
+							//是正在创建的bean，直接返回
+							//也就说BeanFactory中创建的比FactoryBean等级要高
 							if (isSingletonCurrentlyInCreation(beanName)) {
-								// Temporarily return non-post-processed object, not storing it yet..
 								return object;
 							}
+							//将beanName标记为正在创建
 							beforeSingletonCreation(beanName);
 							try {
 								object = postProcessObjectFromFactoryBean(object, beanName);
@@ -126,6 +129,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 								afterSingletonCreation(beanName);
 							}
 						}
+						//放入FactoryBean缓存中
 						if (containsSingleton(beanName)) {
 							this.factoryBeanObjectCache.put(beanName, object);
 						}
@@ -135,6 +139,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			}
 		}
 		else {
+			//执行factoryBean的getObject方法
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (shouldPostProcess) {
 				try {
@@ -149,9 +154,9 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	}
 
 	/**
-	 * Obtain an object to expose from the given FactoryBean.
-	 * @param factory the FactoryBean instance
-	 * @param beanName the name of the bean
+	 * 从FactoryBean中获得bean
+	 * @param factory
+	 * @param beanName
 	 * @return the object obtained from the FactoryBean
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
@@ -169,6 +174,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				}
 			}
 			else {
+				//执行factoryBean的getObject方法
 				object = factory.getObject();
 			}
 		}
@@ -179,8 +185,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			throw new BeanCreationException(beanName, "FactoryBean threw exception on object creation", ex);
 		}
 
-		// Do not accept a null value for a FactoryBean that's not fully
-		// initialized yet: Many FactoryBeans just return null then.
+		//不接受空值
 		if (object == null) {
 			if (isSingletonCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(
@@ -192,14 +197,11 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	}
 
 	/**
-	 * Post-process the given object that has been obtained from the FactoryBean.
-	 * The resulting object will get exposed for bean references.
-	 * <p>The default implementation simply returns the given object as-is.
-	 * Subclasses may override this, for example, to apply post-processors.
-	 * @param object the object obtained from the FactoryBean.
-	 * @param beanName the name of the bean
-	 * @return the object to expose
-	 * @throws org.springframework.beans.BeansException if any post-processing failed
+	 * 对从FactoryBean中获得的给定对象进行后置处理。
+	 * @param object
+	 * @param beanName
+	 * @return
+	 * @throws BeansException
 	 */
 	protected Object postProcessObjectFromFactoryBean(Object object, String beanName) throws BeansException {
 		return object;

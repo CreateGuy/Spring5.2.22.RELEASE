@@ -72,6 +72,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	}
 
 	/**
+	 * 在实例化后执行的方法
 	 * Perform operations after the bean has been instantiated, via a constructor or factory method,
 	 * but before Spring property population (from explicit properties or autowiring) occurs.
 	 * <p>This is the ideal callback for performing custom field injection on the given bean
@@ -91,6 +92,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	}
 
 	/**
+	 * 对已经实例化后的bean，进行属性填充
+	 * 比如 {@link CommonAnnotationBeanPostProcessor} 中就会对于标记了@Resource的属性进行填充
 	 * Post-process the given property values before the factory applies them
 	 * to the given bean, without any need for property descriptors.
 	 * <p>Implementations should return {@code null} (the default) if they provide a custom

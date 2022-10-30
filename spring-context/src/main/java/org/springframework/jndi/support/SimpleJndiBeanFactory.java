@@ -38,7 +38,9 @@ import org.springframework.jndi.TypeMismatchNamingException;
 import org.springframework.lang.Nullable;
 
 /**
- * Simple JNDI-based implementation of Spring's
+ * 简单的基于jndi的实现。
+ * 不支持枚举bean定义，因此没有实现org
+ * JDNI：就是把资源取个名字，再根据名字来找资源
  * {@link org.springframework.beans.factory.BeanFactory} interface.
  * Does not support enumerating bean definitions, hence doesn't implement
  * the {@link org.springframework.beans.factory.ListableBeanFactory} interface.

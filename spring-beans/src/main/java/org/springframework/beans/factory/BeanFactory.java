@@ -117,10 +117,9 @@ import org.springframework.lang.Nullable;
 public interface BeanFactory {
 
 	/**
-	 * Used to dereference a {@link FactoryBean} instance and distinguish it from
-	 * beans <i>created</i> by the FactoryBean. For example, if the bean named
-	 * {@code myJndiObject} is a FactoryBean, getting {@code &myJndiObject}
-	 * will return the factory, not the instance returned by the factory.
+	 * 用于解FactoryBean实例并将其与由FactoryBean创建的bean区分开来。
+	 * 例如，如果名为myObject的bean是一个FactoryBean，那么获取&myObject将返回工厂，而不是工厂返回的实例。
+	 * 获取myObject就会调用getObject方法获得bean的实例
 	 */
 	String FACTORY_BEAN_PREFIX = "&";
 

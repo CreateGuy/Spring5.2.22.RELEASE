@@ -207,18 +207,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private MessageSource messageSource;
 
-	/** Helper class used in event publishing. */
+	/** 用于事件发布的工具类，不懂 */
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
-	/** Statically specified listeners. */
+	/** 监听器 */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
 	/** Local listeners registered before refresh. */
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
 
-	/** ApplicationEvents published before the multicaster setup. */
+	/** 已经发布过的应用上下文事件 */
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
@@ -497,6 +497,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.beanFactoryPostProcessors;
 	}
 
+	/**
+	 * 添加一个监听器到容器中
+	 * @param listener the ApplicationListener to register
+	 */
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		Assert.notNull(listener, "ApplicationListener must not be null");

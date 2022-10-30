@@ -80,7 +80,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * 提供默认和自定义属性编辑器的注册中心
+ * 提供默认和自定义属性编辑器的注册中心，不仅仅有属性编辑器还有转换服务
  * 属性编辑器的缺点：
  *	类型不安全：setValue()方法入参是Object，getValue()返回值是Object，依赖于约定好的类型强转，不安全
  *  线程不安全：依赖于setValue() 后 getValue()，实例是线程不安全的

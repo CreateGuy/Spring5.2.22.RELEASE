@@ -23,17 +23,7 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface that defines type conversion methods. Typically (but not necessarily)
- * implemented in conjunction with the {@link PropertyEditorRegistry} interface.
- *
- * <p><b>Note:</b> Since TypeConverter implementations are typically based on
- * {@link java.beans.PropertyEditor PropertyEditors} which aren't thread-safe,
- * TypeConverters themselves are <em>not</em> to be considered as thread-safe either.
- *
- * @author Juergen Hoeller
- * @since 2.0
- * @see SimpleTypeConverter
- * @see BeanWrapperImpl
+ * 定义类型转换方法的接口。通常(但不一定)PropertyEditorRegistry接口一起实现)。
  */
 public interface TypeConverter {
 

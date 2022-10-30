@@ -118,16 +118,8 @@ public interface FactoryBean<T> {
 	Class<?> getObjectType();
 
 	/**
-	 * Is the object managed by this factory a singleton? That is,
-	 * will {@link #getObject()} always return the same object
-	 * (a reference that can be cached)?
-	 * <p><b>NOTE:</b> If a FactoryBean indicates to hold a singleton object,
-	 * the object returned from {@code getObject()} might get cached
-	 * by the owning BeanFactory. Hence, do not return {@code true}
-	 * unless the FactoryBean always exposes the same reference.
-	 * <p>The singleton status of the FactoryBean itself will generally
-	 * be provided by the owning BeanFactory; usually, it has to be
-	 * defined as singleton there.
+	 * 这个工厂管理的对象是单例的吗?即getObject返回的一直是一个对象
+	 * 如果返回true可能会被beanFactory中的覆盖
 	 * <p><b>NOTE:</b> This method returning {@code false} does not
 	 * necessarily indicate that returned objects are independent instances.
 	 * An implementation of the extended {@link SmartFactoryBean} interface

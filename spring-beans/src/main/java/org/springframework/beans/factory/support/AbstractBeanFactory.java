@@ -146,7 +146,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** Custom PropertyEditors to apply to the beans of this factory. */
 	private final Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new HashMap<>(4);
 
-	/** A custom TypeConverter to use, overriding the default PropertyEditor mechanism. */
+	/** 使用自定义TupeConverter，覆盖默认的PropertuEditor机制。 */
 	@Nullable
 	private TypeConverter typeConverter;
 
@@ -1798,11 +1798,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
-		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		//如果bean是FactoryBean，就不解析直接返回
+		//比如：&myObject，可能是工厂bean不需要初始化某些值
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
+			//也就说bean名称有了和FactoryBean类型bean名称一样的格式，就直接抛出异常
 			if (!(beanInstance instanceof FactoryBean)) {
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
@@ -1812,27 +1814,29 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return beanInstance;
 		}
 
-		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
-		// If it's a FactoryBean, we use it to create a bean instance, unless the
-		// caller actually wants a reference to the factory.
+		//现在我们有了一个bean实例，它可以是一个普通的bean，也可以是一个FactoryBean
+		//不是FactoryBean，直接返回
 		if (!(beanInstance instanceof FactoryBean)) {
 			return beanInstance;
 		}
 
 		Object object = null;
 		if (mbd != null) {
+			//表明自己是一个isFactoryBean;
 			mbd.isFactoryBean = true;
 		}
 		else {
+			//尝试从缓存中获得实例
 			object = getCachedObjectForFactoryBean(beanName);
 		}
+		//从FactoryBean获得bean实例
 		if (object == null) {
-			// Return bean instance from factory.
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
-			// Caches object obtained from FactoryBean if it is a singleton.
+			//获得合并后的BeanDefinition
 			if (mbd == null && containsBeanDefinition(beanName)) {
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
+			//是否是合成的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}

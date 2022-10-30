@@ -427,12 +427,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
+	/**
+	 * 执行bean的初始化后的后置处理方法
+	 * @param existingBean the existing bean instance
+	 * @param beanName the name of the bean, to be passed to it if necessary
+	 * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+	 * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+	 * enforce the given instance to be returned, i.e. no proxies etc)
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
 		Object result = existingBean;
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			//实际上只有一个有作用
+			//ApplicationListenerDetector：注册监听器
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
 				return result;
@@ -1439,6 +1451,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
+		//是否开启了有关实例化的后置处理器的标志位
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
@@ -1448,8 +1461,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				pvs = mbd.getPropertyValues();
 			}
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
+				//执行有关实例化过程的后置处理器
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+					//执行目标方法
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
@@ -1522,12 +1537,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByType(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+		//先获得类型转换器
 		TypeConverter converter = getCustomTypeConverter();
 		if (converter == null) {
+			//不然就直接设置BeanWrapper：也是一个转换器
 			converter = bw;
 		}
 
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
+		//不懂
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			try {
@@ -1561,9 +1579,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	/**
-	 * Return an array of non-simple bean properties that are unsatisfied.
-	 * These are probably unsatisfied references to other beans in the
-	 * factory. Does not include simple properties like primitives or Strings.
+	 * 返回一个不满足的非简单bean属性数组。不懂
+	 * 这些可能是对工厂中其他bean的不满意的引用。不包括原语或字符串等简单属性。
 	 * @param mbd the merged bean definition the bean was created with
 	 * @param bw the BeanWrapper the bean was created with
 	 * @return an array of bean property names
