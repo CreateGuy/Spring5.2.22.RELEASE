@@ -36,16 +36,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Contextual descriptor about a type to convert from or to.
- * Capable of representing arrays and generic collection types.
- *
- * @author Keith Donald
- * @author Andy Clement
- * @author Juergen Hoeller
- * @author Phillip Webb
- * @author Sam Brannen
- * @author Stephane Nicoll
- * @since 3.0
+ * 关于要转换的类型的上下文描述符。
+ * 能够表示数组和泛型集合类型。
  * @see ConversionService#canConvert(TypeDescriptor, TypeDescriptor)
  * @see ConversionService#convert(Object, TypeDescriptor, TypeDescriptor)
  */
@@ -54,6 +46,9 @@ public class TypeDescriptor implements Serializable {
 
 	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
+	/**
+	 * 通用类型的TypeDescriptor缓存
+	 */
 	private static final Map<Class<?>, TypeDescriptor> commonTypesCache = new HashMap<>(32);
 
 	private static final Class<?>[] CACHED_COMMON_TYPES = {
@@ -67,11 +62,19 @@ public class TypeDescriptor implements Serializable {
 		}
 	}
 
-
+	/**
+	 * 参数底层的Class
+	 */
 	private final Class<?> type;
 
+	/**
+	 * 泛型参数的封装
+	 */
 	private final ResolvableType resolvableType;
 
+	/**
+	 * 某个地方的注解信息
+	 */
 	private final AnnotatedElementAdapter annotatedElement;
 
 
@@ -130,10 +133,8 @@ public class TypeDescriptor implements Serializable {
 
 
 	/**
-	 * Variation of {@link #getType()} that accounts for a primitive type by
-	 * returning its object wrapper type.
-	 * <p>This is useful for conversion service implementations that wish to
-	 * normalize to object-based types and not work with primitive types directly.
+	 * 如果给定类是八大基本类型或者void类，则解析它，返回相应的包装器类型。
+	 * 	否则就直接返回
 	 */
 	public Class<?> getObjectType() {
 		return ClassUtils.resolvePrimitiveIfNecessary(getType());
@@ -727,15 +728,14 @@ public class TypeDescriptor implements Serializable {
 		return new TypeDescriptor(type, null, source.getAnnotations());
 	}
 
-
 	/**
-	 * Adapter class for exposing a {@code TypeDescriptor}'s annotations as an
-	 * {@link AnnotatedElement}, in particular to {@link AnnotatedElementUtils}.
-	 * @see AnnotatedElementUtils#isAnnotated(AnnotatedElement, Class)
-	 * @see AnnotatedElementUtils#getMergedAnnotation(AnnotatedElement, Class)
+	 * 没太懂具体的作用，貌似只是为了判断是是否有公开的注解
 	 */
 	private class AnnotatedElementAdapter implements AnnotatedElement, Serializable {
 
+		/**
+		 * 某个参数或者方法等等的注解信息
+		 */
 		@Nullable
 		private final Annotation[] annotations;
 
@@ -743,6 +743,11 @@ public class TypeDescriptor implements Serializable {
 			this.annotations = annotations;
 		}
 
+		/**
+		 * 判断指定注解是否存在
+		 * @param annotationClass
+		 * @return
+		 */
 		@Override
 		public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
 			for (Annotation annotation : getAnnotations()) {
@@ -753,6 +758,12 @@ public class TypeDescriptor implements Serializable {
 			return false;
 		}
 
+		/**
+		 * 获得某种注解信息
+		 * @param annotationClass
+		 * @param <T>
+		 * @return
+		 */
 		@Override
 		@Nullable
 		@SuppressWarnings("unchecked")

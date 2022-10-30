@@ -45,7 +45,7 @@ import org.springframework.util.StringUtils;
 /**
  *
  * 是对 Java type 的封装，提供对超类型、接口和泛型参数的访问，以及最终解析为类的能力。
- * type：是指的是java提供的泛型接口
+ * type：是指的是java提供的参数类型接口
  * ResolvableTypes可以从字段、方法参数、方法返回或类中获得
  */
 @SuppressWarnings("serial")
@@ -411,17 +411,10 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return this type as a {@link ResolvableType} of the specified class. Searches
-	 * {@link #getSuperType() supertype} and {@link #getInterfaces() interface}
-	 * hierarchies to find a match, returning {@link #NONE} if this type does not
-	 * implement or extend the specified class.
-	 * @param type the required type (typically narrowed)
-	 * @return a {@link ResolvableType} representing this object as the specified
-	 * type, or {@link #NONE} if not resolvable as that type
-	 * @see #asCollection()
-	 * @see #asMap()
-	 * @see #getSuperType()
-	 * @see #getInterfaces()
+	 * 看当前有没有实现传入的接口
+	 * 搜索超类型和接口层次结构以查找匹配，没找到则返回NONE。
+	 * @param type
+	 * @return
 	 */
 	public ResolvableType as(Class<?> type) {
 		if (this == NONE) {
@@ -431,12 +424,14 @@ public class ResolvableType implements Serializable {
 		if (resolved == null || resolved == type) {
 			return this;
 		}
+		//遍历所有接口进行判断
 		for (ResolvableType interfaceType : getInterfaces()) {
 			ResolvableType interfaceAsType = interfaceType.as(type);
 			if (interfaceAsType != NONE) {
 				return interfaceAsType;
 			}
 		}
+		//尝试从父类上判断
 		return getSuperType().as(type);
 	}
 

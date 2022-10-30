@@ -48,6 +48,13 @@ abstract class ConversionUtils {
 		}
 	}
 
+	/**
+	 * 是否能进行转换
+	 * @param sourceElementType
+	 * @param targetElementType
+	 * @param conversionService
+	 * @return
+	 */
 	public static boolean canConvertElements(@Nullable TypeDescriptor sourceElementType,
 			@Nullable TypeDescriptor targetElementType, ConversionService conversionService) {
 
@@ -63,6 +70,7 @@ abstract class ConversionUtils {
 			// yes
 			return true;
 		}
+		//是否是父子关系
 		if (ClassUtils.isAssignable(sourceElementType.getType(), targetElementType.getType())) {
 			// maybe
 			return true;

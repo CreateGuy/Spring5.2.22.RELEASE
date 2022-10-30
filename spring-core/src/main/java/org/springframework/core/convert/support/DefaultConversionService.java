@@ -79,20 +79,24 @@ public class DefaultConversionService extends GenericConversionService {
 	}
 
 	/**
-	 * Add converters appropriate for most environments.
-	 * @param converterRegistry the registry of converters to add to
-	 * (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
-	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
+	 * 添加适合大多数环境的转换器。
+	 * @param converterRegistry 是转换器工厂同时也是一个转换服务
 	 */
 	public static void addDefaultConverters(ConverterRegistry converterRegistry) {
+		//添加数字相关转换器
 		addScalarConverters(converterRegistry);
+		//添加集合相关转换器
 		addCollectionConverters(converterRegistry);
 
+		//添加对JSR310时间类型支持的转换器
+		//JSR310转换器只看到TimeZone、ZoneId等转换
+		//更为常用的LocalDate、LocalDateTime等这些类型转换,在spring理解中是格式化操作，因此主要由Formatter组件完成
 		converterRegistry.addConverter(new ByteBufferConverter((ConversionService) converterRegistry));
 		converterRegistry.addConverter(new StringToTimeZoneConverter());
 		converterRegistry.addConverter(new ZoneIdToTimeZoneConverter());
 		converterRegistry.addConverter(new ZonedDateTimeToCalendarConverter());
 
+		//添加兜底转换器
 		converterRegistry.addConverter(new ObjectToObjectConverter());
 		converterRegistry.addConverter(new IdToEntityConverter((ConversionService) converterRegistry));
 		converterRegistry.addConverter(new FallbackObjectToStringConverter());
@@ -100,11 +104,8 @@ public class DefaultConversionService extends GenericConversionService {
 	}
 
 	/**
-	 * Add common collection converters.
-	 * @param converterRegistry the registry of converters to add to
-	 * (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
-	 * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
-	 * @since 4.2.3
+	 * 添加集合相关转换器
+	 * @param converterRegistry 转换工厂
 	 */
 	public static void addCollectionConverters(ConverterRegistry converterRegistry) {
 		ConversionService conversionService = (ConversionService) converterRegistry;
@@ -131,6 +132,10 @@ public class DefaultConversionService extends GenericConversionService {
 		converterRegistry.addConverter(new StreamConverter(conversionService));
 	}
 
+	/**
+	 * 添加标量转换器(和数字相关)
+	 * @param converterRegistry 转换工厂(转换服务)
+	 */
 	private static void addScalarConverters(ConverterRegistry converterRegistry) {
 		converterRegistry.addConverterFactory(new NumberToNumberConverterFactory());
 

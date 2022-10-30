@@ -17,12 +17,13 @@
 package org.springframework.core.convert.converter;
 
 /**
- * 转换器：负责将 S 转为 R 的子类
+ * 转换工厂：负责返回将 S 转为 R 的子类的转换器
+ * {@link org.springframework.core.convert.support.StringToNumberConverterFactory}
  */
 public interface ConverterFactory<S, R> {
 
 	/**
-	 * 让转换器从S转换到目标类型T，其中T也是R的一个实例。
+	 * 获得一个能从S转换到目标类型T的转换器，其中T也是R的一个实例。
 	 * @param <T> the target type
 	 * @param targetType the target type to convert to
 	 * @return a converter from S to T

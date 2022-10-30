@@ -45,9 +45,7 @@ public interface ConversionService {
 	boolean canConvert(@Nullable Class<?> sourceType, Class<?> targetType);
 
 	/**
-	 * Return {@code true} if objects of {@code sourceType} can be converted to the {@code targetType}.
-	 * The TypeDescriptors provide additional context about the source and target locations
-	 * where conversion would occur, often object fields or property locations.
+	 * 如果sourceType对象可以转换为targetType则返回true。
 	 * <p>If this method returns {@code true}, it means {@link #convert(Object, TypeDescriptor, TypeDescriptor)}
 	 * is capable of converting an instance of {@code sourceType} to {@code targetType}.
 	 * <p>Special note on collections, arrays, and maps types:

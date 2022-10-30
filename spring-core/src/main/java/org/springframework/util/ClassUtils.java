@@ -91,8 +91,8 @@ public abstract class ClassUtils {
 	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<>(9);
 
 	/**
-	 * Map with primitive type as key and corresponding wrapper
-	 * type as value, for example: int.class -> Integer.class.
+	 * key：基本类型
+	 * value：基本类型对应的包装类
 	 */
 	private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new IdentityHashMap<>(9);
 
@@ -518,11 +518,9 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Resolve the given class if it is a primitive class,
-	 * returning the corresponding primitive wrapper type instead.
-	 * @param clazz the class to check
-	 * @return the original class, or a primitive wrapper for the original primitive type
-	 */
+	 * 如果给定类是八大基本类型或者void类，则解析它，返回相应的包装器类型。
+	 * 否则就直接返回
+	 * */
 	public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
 		return (clazz.isPrimitive() && clazz != void.class ? primitiveTypeToWrapperMap.get(clazz) : clazz);

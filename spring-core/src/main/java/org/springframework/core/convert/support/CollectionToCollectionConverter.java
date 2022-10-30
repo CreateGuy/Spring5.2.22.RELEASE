@@ -16,9 +16,7 @@
 
 package org.springframework.core.convert.support;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
@@ -27,16 +25,7 @@ import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.lang.Nullable;
 
 /**
- * Converts from a Collection to another Collection.
- *
- * <p>First, creates a new Collection of the requested targetType with a size equal to the
- * size of the source Collection. Then copies each element in the source collection to the
- * target collection. Will perform an element conversion from the source collection's
- * parameterized type to the target collection's parameterized type if necessary.
- *
- * @author Keith Donald
- * @author Juergen Hoeller
- * @since 3.0
+ * 负责将一个集合转为另外一个集合
  */
 final class CollectionToCollectionConverter implements ConditionalGenericConverter {
 
@@ -47,12 +36,21 @@ final class CollectionToCollectionConverter implements ConditionalGenericConvert
 		this.conversionService = conversionService;
 	}
 
-
+	/**
+	 * 表明可以转换集合到集合
+	 * @return
+	 */
 	@Override
 	public Set<ConvertiblePair> getConvertibleTypes() {
 		return Collections.singleton(new ConvertiblePair(Collection.class, Collection.class));
 	}
 
+	/**
+	 * 判断是否可以转换
+	 * @param sourceType
+	 * @param targetType
+	 * @return
+	 */
 	@Override
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
 		return ConversionUtils.canConvertElements(

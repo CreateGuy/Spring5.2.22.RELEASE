@@ -22,13 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.NumberUtils;
 
 /**
- * Converts from a String any JDK-standard Number implementation.
- *
- * <p>Support Number classes including Byte, Short, Integer, Float, Double, Long, BigInteger, BigDecimal. This class
- * delegates to {@link NumberUtils#parseNumber(String, Class)} to perform the conversion.
- *
- * @author Keith Donald
- * @since 3.0
+ * 负责将String转为数字类型
  * @see java.lang.Byte
  * @see java.lang.Short
  * @see java.lang.Integer

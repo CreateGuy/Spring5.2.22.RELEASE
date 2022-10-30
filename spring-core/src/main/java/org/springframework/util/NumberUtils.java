@@ -176,24 +176,12 @@ public abstract class NumberUtils {
 	}
 
 	/**
-	 * Parse the given {@code text} into a {@link Number} instance of the given
-	 * target class, using the corresponding {@code decode} / {@code valueOf} method.
-	 * <p>Trims all whitespace (leading, trailing, and in between characters) from
-	 * the input {@code String} before attempting to parse the number.
-	 * <p>Supports numbers in hex format (with leading "0x", "0X", or "#") as well.
-	 * @param text the text to convert
-	 * @param targetClass the target class to parse into
-	 * @return the parsed number
-	 * @throws IllegalArgumentException if the target class is not supported
-	 * (i.e. not a standard Number subclass as included in the JDK)
-	 * @see Byte#decode
-	 * @see Short#decode
-	 * @see Integer#decode
-	 * @see Long#decode
-	 * @see #decodeBigInteger(String)
-	 * @see Float#valueOf
-	 * @see Double#valueOf
-	 * @see java.math.BigDecimal#BigDecimal(String)
+	 * 使用相应的decode / valueOf方法，将给定的文本解析为给定目标类的Number实例。在试图解析数字之前，
+	 * 从输入String中修剪所有空白(前导、末尾和字符之间)。也支持十六进制格式的数字(前导为"Ox"、"Ox"或"#")。
+	 * @param text
+	 * @param targetClass
+	 * @param <T>
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Number> T parseNumber(String text, Class<T> targetClass) {
