@@ -86,7 +86,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Method factoryMethodToIntrospect;
 
-	/** Package-visible field for caching a resolved destroy method name (also for inferred). */
+	/** 通过解析后的，最终的销毁方法 */
 	@Nullable
 	volatile String resolvedDestroyMethodName;
 
@@ -125,13 +125,14 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	private Set<Member> externallyManagedConfigMembers;
 
 	/**
-	 * bean的实例化方法集合
+	 * 外部管理的bean的初始化方法集合
+	 * 例如有@PostConstruct的方法
 	 */
 	@Nullable
 	private Set<String> externallyManagedInitMethods;
 
 	/**
-	 * bean的销毁方法集合
+	 * 外部管理的bean的销毁方法集合
 	 */
 	@Nullable
 	private Set<String> externallyManagedDestroyMethods;
@@ -453,7 +454,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * 将实例化方法注册到相关的集合中
+	 * 将初始化方法注册到相关的集合中
 	 * @param initMethod 实例化方法
 	 */
 	public void registerExternallyManagedInitMethod(String initMethod) {
@@ -466,7 +467,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	/**
-	 * 判断是否在实例化方法集合中
+	 * 判断是否在初始化方法集合中
 	 * @param initMethod
 	 * @return
 	 */

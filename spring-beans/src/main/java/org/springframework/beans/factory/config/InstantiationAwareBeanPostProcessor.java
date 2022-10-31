@@ -47,7 +47,7 @@ import org.springframework.lang.Nullable;
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
 	/**
-	 * 在bean实例化前，创建实例
+	 * 在bean实例化前，尝试创建实例
 	 * {@link #postProcessAfterInitialization} callback from the configured
 	 * {@link BeanPostProcessor BeanPostProcessors}.
 	 * <p>This callback will be applied to bean definitions with their bean class,

@@ -255,18 +255,22 @@ public class InjectionMetadata {
 		protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
 				throws Throwable {
 
+			//是属性就从工厂中获取bean，然后设置值
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
+			//是方法就当成set方法，从工厂获取第一个入参的bean，进行填充，然后执行方法
 			else {
 				if (checkPropertySkipping(pvs)) {
 					return;
 				}
 				try {
 					Method method = (Method) this.member;
+					//确保可以访问
 					ReflectionUtils.makeAccessible(method);
+					//执行目标方法
 					method.invoke(target, getResourceToInject(target, requestingBeanName));
 				}
 				catch (InvocationTargetException ex) {

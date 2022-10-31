@@ -568,10 +568,12 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			autowiredBeanNames = Collections.singleton(name);
 		}
 
+		//依赖关系进行注册
 		if (factory instanceof ConfigurableBeanFactory) {
 			ConfigurableBeanFactory beanFactory = (ConfigurableBeanFactory) factory;
 			for (String autowiredBeanName : autowiredBeanNames) {
 				if (requestingBeanName != null && beanFactory.containsBean(autowiredBeanName)) {
+					//注册依赖关系
 					beanFactory.registerDependentBean(autowiredBeanName, requestingBeanName);
 				}
 			}

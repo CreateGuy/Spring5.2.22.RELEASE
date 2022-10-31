@@ -1292,6 +1292,7 @@ public abstract class ClassUtils {
 	 * @see #getMostSpecificMethod
 	 */
 	public static Method getInterfaceMethodIfPossible(Method method) {
+		//非Public或者是接口，直接返回
 		if (!Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isInterface()) {
 			return method;
 		}

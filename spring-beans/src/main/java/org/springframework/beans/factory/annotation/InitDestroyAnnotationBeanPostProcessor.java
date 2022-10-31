@@ -80,6 +80,9 @@ import org.springframework.util.ReflectionUtils;
 public class InitDestroyAnnotationBeanPostProcessor
 		implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor, PriorityOrdered, Serializable {
 
+	/**
+	 * 空生命周期方法元数据
+	 */
 	private final transient LifecycleMetadata emptyLifecycleMetadata =
 			new LifecycleMetadata(Object.class, Collections.emptyList(), Collections.emptyList()) {
 				@Override
@@ -100,14 +103,23 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	protected transient Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 还没检查后的生命周期方法-@PostConstruct
+	 */
 	@Nullable
 	private Class<? extends Annotation> initAnnotationType;
 
+	/**
+	 * 还没检查后的生命周期方法-@PostConstruct
+	 */
 	@Nullable
 	private Class<? extends Annotation> destroyAnnotationType;
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
+	/**
+	 * 已经检查后的生命周期方法
+	 */
 	@Nullable
 	private final transient Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache = new ConcurrentHashMap<>(256);
 
@@ -158,6 +170,13 @@ public class InitDestroyAnnotationBeanPostProcessor
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
+	/**
+	 * 在bean初始化前执行@PostConstruct方法
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
@@ -178,6 +197,12 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return bean;
 	}
 
+	/**
+	 * 在bean销毁前执行@PostConstruct方法
+	 * @param bean the bean instance to be destroyed
+	 * @param beanName the name of the bean
+	 * @throws BeansException
+	 */
 	@Override
 	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
@@ -298,7 +323,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 
 	/**
-	 * Class representing information about annotated init and destroy methods.
+	 * 类里面关于@PostConstruct和@PostConstruct方法的元数据
 	 */
 	private class LifecycleMetadata {
 
@@ -359,6 +384,12 @@ public class InitDestroyAnnotationBeanPostProcessor
 			this.checkedDestroyMethods = checkedDestroyMethods;
 		}
 
+		/**
+		 * 执行@PostConstruct方法
+		 * @param target
+		 * @param beanName
+		 * @throws Throwable
+		 */
 		public void invokeInitMethods(Object target, String beanName) throws Throwable {
 			Collection<LifecycleElement> checkedInitMethods = this.checkedInitMethods;
 			Collection<LifecycleElement> initMethodsToIterate =
@@ -373,6 +404,12 @@ public class InitDestroyAnnotationBeanPostProcessor
 			}
 		}
 
+		/**
+		 * 执行@PostConstruct方法
+		 * @param target
+		 * @param beanName
+		 * @throws Throwable
+		 */
 		public void invokeDestroyMethods(Object target, String beanName) throws Throwable {
 			Collection<LifecycleElement> checkedDestroyMethods = this.checkedDestroyMethods;
 			Collection<LifecycleElement> destroyMethodsToUse =
@@ -387,6 +424,10 @@ public class InitDestroyAnnotationBeanPostProcessor
 			}
 		}
 
+		/**
+		 * 是否有@PostConstruct方法
+		 * @return
+		 */
 		public boolean hasDestroyMethods() {
 			Collection<LifecycleElement> checkedDestroyMethods = this.checkedDestroyMethods;
 			Collection<LifecycleElement> destroyMethodsToUse =

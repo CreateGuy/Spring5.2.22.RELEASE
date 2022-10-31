@@ -97,14 +97,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Set<String> inCreationCheckExclusions =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-	/** Collection of suppressed Exceptions, available for associating related causes. */
+	/** bean创建过程中的异常 */
 	@Nullable
 	private Set<Exception> suppressedExceptions;
 
 	/** Flag that indicates whether we're currently within destroySingletons. */
 	private boolean singletonsCurrentlyInDestruction = false;
 
-	/** Disposable bean instances: bean name to disposable instance. */
+	/**
+	 * 需要执行销毁前的回调方法的bean
+	 * 是一次性的，使用时是推出来的
+	 * */
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
@@ -142,7 +145,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Add the given singleton object to the singleton cache of this factory.
+	 * 将给定的单例对象添加到一级缓存中，并删除二级和三级的中的相关定义
 	 * <p>To be called for eager registration of singletons.
 	 * @param beanName the name of the bean
 	 * @param singletonObject the singleton object
@@ -152,6 +155,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			this.singletonObjects.put(beanName, singletonObject);
 			this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
+			//表明beanName已经创建
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -252,7 +256,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					//开始创建半成品bean，就是执行传入的lambda表达式
+					//开始单例bean，就是执行传入的lambda表达式
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -273,12 +277,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					throw ex;
 				}
 				finally {
+					//如果执行过程没有抛出异常
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					//添加到单例集合中
 					addSingleton(beanName, singletonObject);
 				}
 			}
@@ -574,8 +580,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Destroy the given bean. Delegates to {@code destroyBean}
-	 * if a corresponding disposable bean instance is found.
+	 * 执行某个bean的销毁方法
 	 * @param beanName the name of the bean
 	 * @see #destroyBean
 	 */

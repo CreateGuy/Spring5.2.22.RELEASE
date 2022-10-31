@@ -159,7 +159,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** 是否开启 实例化前后的后置处理器 */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
 
-	/** Indicates whether any DestructionAwareBeanPostProcessors have been registered. */
+	/** 是否已注册销毁bean的后置处理器*/
 	private volatile boolean hasDestructionAwareBeanPostProcessors;
 
 	/** Map from scope identifier String to corresponding Scope. */
@@ -336,13 +336,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
-							// Explicitly remove instance from singleton cache: It might have been put there
-							// eagerly by the creation process, to allow for circular reference resolution.
-							// Also remove any beans that received a temporary reference to the bean.
+							//创建bean出错，从单例缓存中删除实例:它可能是由创建过程主动放在那里的，以防循环引用解析
+							//还要删除接收到该bean的临时引用的任何bean。
 							destroySingleton(beanName);
 							throw ex;
 						}
 					});
+					//获取bean实例
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
@@ -394,9 +394,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
-		// Check if required type matches the type of the actual bean instance.
+		//检查所需的类型是否与实际bean实例的类型匹配。
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
+				//调用类型转换器进行转换
 				T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
 				if (convertedBean == null) {
 					throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
@@ -1787,8 +1788,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Get the object for the given bean instance, either the bean
-	 * instance itself or its created object in case of a FactoryBean.
+	 * 获取bean实例
 	 * @param beanInstance the shared bean instance
 	 * @param name the name that may include factory dereference prefix
 	 * @param beanName the canonical bean name
@@ -1799,12 +1799,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		//如果bean是FactoryBean，就不解析直接返回
-		//比如：&myObject，可能是工厂bean不需要初始化某些值
+		//比如：&myObject
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
-			//也就说bean名称有了和FactoryBean类型bean名称一样的格式，就直接抛出异常
+			//也就说bean名称有了和FactoryBean类型bean名称一样的格式，但不是FactoryBean就直接抛出异常
 			if (!(beanInstance instanceof FactoryBean)) {
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
@@ -1838,6 +1838,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			//是否是合成的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
+			//从FactoryBean获得bean
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
 		return object;
@@ -1854,25 +1855,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Determine whether the given bean requires destruction on shutdown.
-	 * <p>The default implementation checks the DisposableBean interface as well as
-	 * a specified destroy method and registered DestructionAwareBeanPostProcessors.
+	 * 确定给定的bean在关闭时是否需要执行销毁前的回调方法
 	 * @param bean the bean instance to check
 	 * @param mbd the corresponding bean definition
-	 * @see org.springframework.beans.factory.DisposableBean
-	 * @see AbstractBeanDefinition#getDestroyMethodName()
-	 * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
 	 */
 	protected boolean requiresDestruction(Object bean, RootBeanDefinition mbd) {
 		return (bean.getClass() != NullBean.class &&
-				(DisposableBeanAdapter.hasDestroyMethod(bean, mbd) || (hasDestructionAwareBeanPostProcessors() &&
+				//确定是否有销毁方法
+				(DisposableBeanAdapter.hasDestroyMethod(bean, mbd)
+						//是否有关于销毁的后置处理器，如果有那么就通过后置处理器去判断是否需要执行销毁方法
+						|| (hasDestructionAwareBeanPostProcessors() &&
 						DisposableBeanAdapter.hasApplicableProcessors(bean, getBeanPostProcessors()))));
 	}
 
 	/**
-	 * Add the given bean to the list of disposable beans in this factory,
-	 * registering its DisposableBean interface and/or the given destroy method
-	 * to be called on factory shutdown (if applicable). Only applies to singletons.
+	 * 确定bean是否需要执行销毁前的回调方法，如果需要将其注册到特定集合中
 	 * @param beanName the name of the bean
 	 * @param bean the bean instance
 	 * @param mbd the bean definition for the bean
@@ -1883,16 +1880,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
+		//1：不是原型模式
+		//2：确定给定的bean在关闭时是否需要执行销毁前的回调方法
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+			//是单例模式
 			if (mbd.isSingleton()) {
-				// Register a DisposableBean implementation that performs all destruction
-				// work for the given bean: DestructionAwareBeanPostProcessors,
-				// DisposableBean interface, custom destroy method.
+				//将这种需要执行销毁前回调方法的bean注册到特定的集合中
 				registerDisposableBean(beanName,
 						new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
 			}
 			else {
-				// A bean with a custom scope...
+				//拿到作用域对象
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
 					throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");

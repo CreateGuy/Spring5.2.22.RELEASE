@@ -204,14 +204,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/** 使用了@Lookup的方法 的集合*/
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
-	//初始化完成后方法
+	//初始方法
+	//是通过@Bean(initMethod = "init")设置出来的，下同
 	@Nullable
 	private String initMethodName;
 
-	//销毁时的方法
+	//销毁方法
 	@Nullable
 	private String destroyMethodName;
 
+	/**
+	 * 通过@Bean(initMethod = "init")设置的初始化方法没有找到时候，是否抛出异常，下同
+	 */
 	private boolean enforceInitMethod = true;
 
 	private boolean enforceDestroyMethod = true;
