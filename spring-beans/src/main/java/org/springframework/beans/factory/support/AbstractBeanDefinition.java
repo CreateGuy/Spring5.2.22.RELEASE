@@ -183,11 +183,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean lenientConstructorResolution = true;
 
-	//工厂bean名称：注册此bean的类(是谁包含了@Bean这个方法)
+	//工厂bean名称：声明类(是谁包含了@Bean这个方法)
 	@Nullable
 	private String factoryBeanName;
 
-	//工厂方法名称：是@Bean这个方法的名称，就是一个@Bean方法生成的一个BeanDefinition，然后AbstractBeanDefinition就是方法名称
+	//工厂方法名称：是@Bean这个方法的名称，就是一个@Bean方法生成的一个BeanDefinition，然后factoryMethodName就是方法名称
 	@Nullable
 	private String factoryMethodName;
 
