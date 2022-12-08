@@ -174,7 +174,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	//然后这个qualifiers表示当前BeanDefinition内部需要什么类型的bean
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
-	/** 创建bean实例的回调方法*/
+	/**
+	 * 创建bean实例的回调方法
+	 * 主要是考虑反射调用目标方法不如直接调用目标方法效率高。
+	 * */
 	@Nullable
 	private Supplier<?> instanceSupplier;
 

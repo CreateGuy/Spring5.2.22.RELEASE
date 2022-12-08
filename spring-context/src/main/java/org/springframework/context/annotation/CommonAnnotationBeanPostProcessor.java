@@ -188,6 +188,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	@Nullable
 	private transient StringValueResolver embeddedValueResolver;
 
+	/**
+	 * 查询出来的需要执行的方法元数据，比如说@Resource的方法元数据
+	 */
 	private final transient Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);
 
 

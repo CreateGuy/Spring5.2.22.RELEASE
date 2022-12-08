@@ -19,27 +19,16 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
- * Subinterface of {@link BeanPostProcessor} that adds a before-destruction callback.
- *
- * <p>The typical usage will be to invoke custom destruction callbacks on
- * specific bean types, matching corresponding initialization callbacks.
- *
- * @author Juergen Hoeller
- * @since 1.0.1
+ * 销毁前回调方法的后置处理器。
+ * 典型的用法是对特定bean类型调用自定义销毁回调
  */
 public interface DestructionAwareBeanPostProcessor extends BeanPostProcessor {
 
 	/**
-	 * Apply this BeanPostProcessor to the given bean instance before its
-	 * destruction, e.g. invoking custom destruction callbacks.
-	 * <p>Like DisposableBean's {@code destroy} and a custom destroy method, this
-	 * callback will only apply to beans which the container fully manages the
-	 * lifecycle for. This is usually the case for singletons and scoped beans.
-	 * @param bean the bean instance to be destroyed
-	 * @param beanName the name of the bean
-	 * @throws org.springframework.beans.BeansException in case of errors
-	 * @see org.springframework.beans.factory.DisposableBean#destroy()
-	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#setDestroyMethodName(String)
+	 * 在给定的bean实例销毁之前，执行的回调方法
+	 * @param bean
+	 * @param beanName
+	 * @throws BeansException
 	 */
 	void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException;
 

@@ -28,7 +28,11 @@ import java.util.regex.Pattern;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link PathMatcher} implementation for Ant-style path patterns.
+ * ant模式的请求匹配器
+ * /**或**：值被视为通用匹配，它将匹配任何请求
+ * ?：匹配一个字符
+ * * ：匹配0个及以上字符
+ * ** ：匹配0个及以上目录directories
  *
  * <p>Part of this mapping code has been kindly borrowed from <a href="https://ant.apache.org">Apache Ant</a>.
  *
