@@ -21,7 +21,7 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by objects that can resolve views by name.
+ * 视图解析器
  *
  * <p>View state doesn't change during the running of the application,
  * so implementations are free to cache views.

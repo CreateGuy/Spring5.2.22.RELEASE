@@ -19,6 +19,7 @@ package org.springframework.web.multipart;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 文件解析器
  * A strategy interface for multipart file upload resolution in accordance
  * with <a href="https://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.
  * Implementations are typically usable both within an application context

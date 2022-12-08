@@ -24,9 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for web-based locale resolution strategies that allows for
- * both locale resolution via the request and locale modification via
- * request and response.
+ * 国际化解析器
+ * 基于web的语言环境解析策略接口，允许通过请求进行语言环境解析，也允许通过请求和响应进行语言环境修改。
  *
  * <p>This interface allows for implementations based on request, session,
  * cookies, etc. The default implementation is

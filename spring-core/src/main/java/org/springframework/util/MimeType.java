@@ -34,22 +34,7 @@ import java.util.TreeSet;
 import org.springframework.lang.Nullable;
 
 /**
- * Represents a MIME Type, as originally defined in RFC 2046 and subsequently
- * used in other Internet protocols including HTTP.
- *
- * <p>This class, however, does not contain support for the q-parameters used
- * in HTTP content negotiation. Those can be found in the subclass
- * {@code org.springframework.http.MediaType} in the {@code spring-web} module.
- *
- * <p>Consists of a {@linkplain #getType() type} and a {@linkplain #getSubtype() subtype}.
- * Also has functionality to parse MIME Type values from a {@code String} using
- * {@link #valueOf(String)}. For more parsing options see {@link MimeTypeUtils}.
- *
- * @author Arjen Poutsma
- * @author Juergen Hoeller
- * @author Rossen Stoyanchev
- * @author Sam Brannen
- * @since 4.0
+ * 媒体类型
  * @see MimeTypeUtils
  */
 public class MimeType implements Comparable<MimeType>, Serializable {
@@ -61,6 +46,9 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 
 	private static final String PARAM_CHARSET = "charset";
 
+	/**
+	 * 猜测是媒体类型的字符要求，表明只能出现某些字符
+	 */
 	private static final BitSet TOKEN;
 
 	static {
@@ -98,16 +86,31 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 		TOKEN.andNot(separators);
 	}
 
-
+	/**
+	 * 媒体类型的前半段，比如 application
+	 */
 	private final String type;
 
+	/**
+	 * 媒体类型的后半段，比如 json
+	 */
 	private final String subtype;
 
+	/**
+	 * 媒体类型参数
+	 * <li>
+	 *     实际条数发现只有编码格式参数，是 charset 到 UTF-8 的映射关系
+	 * </li>
+	 *
+	 */
 	private final Map<String, String> parameters;
 
 	@Nullable
 	private transient Charset resolvedCharset;
 
+	/**
+	 * 是媒体类型的字符串格式，比如 application/json
+	 */
 	@Nullable
 	private volatile String toStringValue;
 
@@ -353,13 +356,10 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	}
 
 	/**
-	 * Indicate whether this MIME Type is compatible with the given MIME Type.
-	 * <p>For instance, {@code text/*} is compatible with {@code text/plain},
-	 * {@code text/html}, and vice versa. In effect, this method is similar to
-	 * {@link #includes}, except that it <b>is</b> symmetric.
-	 * @param other the reference MIME Type with which to compare
-	 * @return {@code true} if this MIME Type is compatible with the given MIME Type;
-	 * {@code false} otherwise
+	 * 支持通配符的匹配
+	 * <li>
+	 *     比如说text/* 可以匹配 text/plain, text/html
+	 * </li>
 	 */
 	public boolean isCompatibleWith(@Nullable MimeType other) {
 		if (other == null) {

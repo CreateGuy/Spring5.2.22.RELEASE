@@ -162,6 +162,10 @@ import org.springframework.web.util.WebUtils;
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
 
+	/**
+	 * 下面是MVC九大组件的默认名称
+	 */
+
 	/** Well-known name for the MultipartResolver object in the bean factory for this namespace. */
 	public static final String MULTIPART_RESOLVER_BEAN_NAME = "multipartResolver";
 
@@ -209,81 +213,78 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	public static final String FLASH_MAP_MANAGER_BEAN_NAME = "flashMapManager";
 
+	/***
+	 * -----------------------------------------------------------------------------------------------------------------
+	 */
+
 	/**
-	 * Request attribute to hold the current web application context.
-	 * Otherwise only the global web app context is obtainable by tags etc.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#findWebApplicationContext
+	 * Request attribute 中保存的 WebApplicationContext 的key
 	 */
 	public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = DispatcherServlet.class.getName() + ".CONTEXT";
 
 	/**
-	 * Request attribute to hold the current LocaleResolver, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getLocaleResolver
+	 * Request attribute 中保存的 环境解析器(LocaleResolver) 的key
 	 */
 	public static final String LOCALE_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".LOCALE_RESOLVER";
 
 	/**
-	 * Request attribute to hold the current ThemeResolver, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeResolver
+	 * Request attribute 中保存的 主题解析器(ThemeResolver) 的key
 	 */
 	public static final String THEME_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_RESOLVER";
 
 	/**
-	 * Request attribute to hold the current ThemeSource, retrievable by views.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeSource
+	 * Request attribute 中保存的 主题(ThemeSource) 的key
 	 */
 	public static final String THEME_SOURCE_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_SOURCE";
 
 	/**
-	 * Name of request attribute that holds a read-only {@code Map<String,?>}
-	 * with "input" flash attributes saved by a previous request, if any.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
+	 * Request attribute 中保存的 源请求的FlashMap 的key
+	 * <p>比如说设置了FlashMap然后重定向后，那么就会保存源请求的FlashMap</p>
 	 */
 	public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
 
 	/**
-	 * Name of request attribute that holds the "output" {@link FlashMap} with
-	 * attributes to save for a subsequent request.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getOutputFlashMap(HttpServletRequest)
+	 * Request attribute 中保存的 当前请求的FlashMap 的key
 	 */
 	public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
 
 	/**
-	 * Name of request attribute that holds the {@link FlashMapManager}.
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getFlashMapManager(HttpServletRequest)
+	 * Request attribute 中保存的 FlashMapManager 的key
 	 */
 	public static final String FLASH_MAP_MANAGER_ATTRIBUTE = DispatcherServlet.class.getName() + ".FLASH_MAP_MANAGER";
 
 	/**
-	 * Name of request attribute that exposes an Exception resolved with a
-	 * {@link HandlerExceptionResolver} but where no view was rendered
-	 * (e.g. setting the status code).
+	 * Request attribute 中保存的 异常 的key
+	 * <p>
+	 *     这里的异常是指在执行doDispatch方法过程中抛出的异常
+	 * </p>
 	 */
 	public static final String EXCEPTION_ATTRIBUTE = DispatcherServlet.class.getName() + ".EXCEPTION";
 
-	/** Log category to use when no mapped handler is found for a request. */
+	/** 当没有为请求找到映射的处理程序时使用的日志名称 */
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
 
 	/**
-	 * Name of the class path resource (relative to the DispatcherServlet class)
-	 * that defines DispatcherServlet's default strategy names.
+	 * DispatcherServlet配置类文件的名称
 	 */
 	private static final String DEFAULT_STRATEGIES_PATH = "DispatcherServlet.properties";
 
 	/**
-	 * Common prefix that DispatcherServlet's default strategy attributes start with.
+	 * 有关 DispatcherServlet 的默认属性的开头前缀
 	 */
 	private static final String DEFAULT_STRATEGIES_PREFIX = "org.springframework.web.servlet";
 
-	/** Additional logger to use when no mapped handler is found for a request. */
+	/** 当没有为请求找到映射的处理程序时使用的日志记录器 */
 	protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
 
+	/**
+	 * 从配置文件中加载的有关 DispatcherServlet 的配置
+	 */
 	private static final Properties defaultStrategies;
 
 	static {
-		// Load default strategy implementations from properties file.
-		// This is currently strictly internal and not meant to be customized
-		// by application developers.
+		// 从配置文件中记载有关 DispatcherServlet 的配置
+		// 比如说加载 国际化解析器(LocaleResolver), 主题解析器(ThemeResolver)
 		try {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
@@ -293,7 +294,10 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 	}
 
-	/** Detect all HandlerMappings or just expect "handlerMapping" bean?. */
+	/**
+	 * 是需要容器中所有 HandlerMappings 还是按照名称查找一个
+	 * <p<>下面三个和这个是一样的作用</>
+	 * */
 	private boolean detectAllHandlerMappings = true;
 
 	/** Detect all HandlerAdapters or just expect "handlerAdapter" bean?. */
@@ -305,37 +309,42 @@ public class DispatcherServlet extends FrameworkServlet {
 	/** Detect all ViewResolvers or just expect "viewResolver" bean?. */
 	private boolean detectAllViewResolvers = true;
 
-	/** Throw a NoHandlerFoundException if no Handler was found to process this request? *.*/
+
+	/**
+	 * 没有找到处理器(Handler)是否抛出异常
+	 */
 	private boolean throwExceptionIfNoHandlerFound = false;
 
-	/** Perform cleanup of request attributes after include request?. */
+	/**
+	 * 执行完请求后是否清除 Request Attribute 中所有属性
+	 * */
 	private boolean cleanupAfterInclude = true;
 
-	/** MultipartResolver used by this servlet. */
+	/** 文件解析器 */
 	@Nullable
 	private MultipartResolver multipartResolver;
 
-	/** LocaleResolver used by this servlet. */
+	/** 国际化解析器 */
 	@Nullable
 	private LocaleResolver localeResolver;
 
-	/** ThemeResolver used by this servlet. */
+	/** 主题解析器 */
 	@Nullable
 	private ThemeResolver themeResolver;
 
-	/** List of HandlerMappings used by this servlet. */
+	/** 处理器映射器 */
 	@Nullable
 	private List<HandlerMapping> handlerMappings;
 
-	/** List of HandlerAdapters used by this servlet. */
+	/** 处理器适配器 */
 	@Nullable
 	private List<HandlerAdapter> handlerAdapters;
 
-	/** List of HandlerExceptionResolvers used by this servlet. */
+	/** 异常解析器 */
 	@Nullable
 	private List<HandlerExceptionResolver> handlerExceptionResolvers;
 
-	/** RequestToViewNameTranslator used by this servlet. */
+	/** 视图名称转换器 */
 	@Nullable
 	private RequestToViewNameTranslator viewNameTranslator;
 
@@ -343,7 +352,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	private FlashMapManager flashMapManager;
 
-	/** List of ViewResolvers used by this servlet. */
+	/** 视图解析器 */
 	@Nullable
 	private List<ViewResolver> viewResolvers;
 
@@ -793,11 +802,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Return this servlet's ThemeSource, if any; else return {@code null}.
-	 * <p>Default is to return the WebApplicationContext as ThemeSource,
-	 * provided that it implements the ThemeSource interface.
-	 * @return the ThemeSource, if any
-	 * @see #getWebApplicationContext()
+	 * 尝试从WebApplicationContext中获取主题
+	 * @return
 	 */
 	@Nullable
 	public final ThemeSource getThemeSource() {

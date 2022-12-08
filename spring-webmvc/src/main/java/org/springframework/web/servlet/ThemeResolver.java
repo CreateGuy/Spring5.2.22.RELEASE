@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
+ * 主题解析器
  * Interface for web-based theme resolution strategies that allows for
  * both theme resolution via the request and theme modification via
  * request and response.
