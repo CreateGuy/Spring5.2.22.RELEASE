@@ -24,29 +24,54 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base class for cache operations.
- *
- * @author Costin Leau
- * @author Stephane Nicoll
- * @author Marcin Kamionowski
- * @since 3.1
+ * 缓存操作的基础类
+ * <ul>
+ *     <li>
+ *         {@link CacheableOperation}：用于读取和保存缓存值的，对应 @Cacheable
+ *     </li>
+ *     <li>
+ *         {@link CachePutOperation}：用于更新缓存值的，对应 @CachePut
+ *     </li>
+ *     <li>
+ *         {@link CacheEvictOperation}：用于删除缓存值的，对应 @CacheEvict
+ *     </li>
+ * </ul>
  */
 public abstract class CacheOperation implements BasicOperation {
 
+	/**
+	 * 三个注解标注在类或者方法上的全限定名
+	 * <li>eg：public java.util.List cn.ofs.t3.controller.StatementController.unifiedLog(cn.ofs.t3.model.statement.query.UnifiedLogQuery)</li>
+	 */
 	private final String name;
 
+	/**
+	 * 缓存名称
+	 */
 	private final Set<String> cacheNames;
 
+	/**
+	 * 缓存键
+	 */
 	private final String key;
 
+	/**
+	 * 键生成器
+	 */
 	private final String keyGenerator;
 
 	private final String cacheManager;
 
 	private final String cacheResolver;
 
+	/**
+	 * condition 条件
+	 */
 	private final String condition;
 
+	/**
+	 * 此缓存操作的标识描述
+	 */
 	private final String toString;
 
 
@@ -211,8 +236,7 @@ public abstract class CacheOperation implements BasicOperation {
 		}
 
 		/**
-		 * Return an identifying description for this caching operation.
-		 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
+		 * 返回此缓存操作的标识描述
 		 */
 		protected StringBuilder getOperationDescription() {
 			StringBuilder result = new StringBuilder(getClass().getSimpleName());

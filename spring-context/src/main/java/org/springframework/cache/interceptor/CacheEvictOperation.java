@@ -25,8 +25,14 @@ package org.springframework.cache.interceptor;
  */
 public class CacheEvictOperation extends CacheOperation {
 
+	/**
+	 * 是否应该清除所有缓存，对应的是 @CacheEvict 中的 allEntries 属性
+	 */
 	private final boolean cacheWide;
 
+	/**
+	 * 是否应该在执行方法前清除缓存
+	 */
 	private final boolean beforeInvocation;
 
 

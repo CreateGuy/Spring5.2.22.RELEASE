@@ -61,11 +61,10 @@ public abstract class AbstractCacheInvoker {
 
 
 	/**
-	 * Execute {@link Cache#get(Object)} on the specified {@link Cache} and
-	 * invoke the error handler if an exception occurs. Return {@code null}
-	 * if the handler does not throw any exception, which simulates a cache
-	 * miss in case of error.
-	 * @see Cache#get(Object)
+	 * 从指定的 Cache 中获取缓存的对象
+	 * @param cache
+	 * @param key
+	 * @return
 	 */
 	@Nullable
 	protected Cache.ValueWrapper doGet(Cache cache, Object key) {

@@ -19,18 +19,19 @@ package org.springframework.cache.interceptor;
 import org.springframework.lang.Nullable;
 
 /**
- * Class describing a cache 'cacheable' operation.
- *
- * @author Costin Leau
- * @author Phillip Webb
- * @author Marcin Kamionowski
- * @since 3.1
+ * 用于读取和保存缓存值的，对应 @Cacheable
  */
 public class CacheableOperation extends CacheOperation {
 
+	/**
+	 * 是最终决定是否保存在缓存中的条件
+	 */
 	@Nullable
 	private final String unless;
 
+	/**
+	 * 是否开启同步
+	 */
 	private final boolean sync;
 
 

@@ -59,7 +59,12 @@ import org.springframework.core.annotation.AliasFor;
 public @interface Cacheable {
 
 	/**
-	 * Alias for {@link #cacheNames}.
+	 * 缓存的名称
+	 * <ul>
+	 *     <li>
+	 *         比如说要记录对账单日志，value 是 statementsLog，而 key 是 123，那么就表示记录一条对账单号是123的日志
+	 *     </li>
+	 * </ul>
 	 */
 	@AliasFor("cacheNames")
 	String[] value() default {};
@@ -76,39 +81,25 @@ public @interface Cacheable {
 	String[] cacheNames() default {};
 
 	/**
-	 * Spring Expression Language (SpEL) expression for computing the key dynamically.
-	 * <p>Default is {@code ""}, meaning all method parameters are considered as a key,
-	 * unless a custom {@link #keyGenerator} has been configured.
-	 * <p>The SpEL expression evaluates against a dedicated context that provides the
-	 * following meta-data:
-	 * <ul>
-	 * <li>{@code #root.method}, {@code #root.target}, and {@code #root.caches} for
-	 * references to the {@link java.lang.reflect.Method method}, target object, and
-	 * affected cache(s) respectively.</li>
-	 * <li>Shortcuts for the method name ({@code #root.methodName}) and target class
-	 * ({@code #root.targetClass}) are also available.
-	 * <li>Method arguments can be accessed by index. For instance the second argument
-	 * can be accessed via {@code #root.args[1]}, {@code #p1} or {@code #a1}. Arguments
-	 * can also be accessed by name if that information is available.</li>
-	 * </ul>
+	 * 缓存的键，上面的value有介绍
+	 * @return
 	 */
 	String key() default "";
 
 	/**
-	 * The bean name of the custom {@link org.springframework.cache.interceptor.KeyGenerator}
-	 * to use.
-	 * <p>Mutually exclusive with the {@link #key} attribute.
-	 * @see CacheConfig#keyGenerator
+	 * 键生成器，通常是 key 未指定时
+	 * @return
 	 */
 	String keyGenerator() default "";
 
 	/**
-	 * The bean name of the custom {@link org.springframework.cache.CacheManager} to use to
-	 * create a default {@link org.springframework.cache.interceptor.CacheResolver} if none
-	 * is set already.
-	 * <p>Mutually exclusive with the {@link #cacheResolver}  attribute.
-	 * @see org.springframework.cache.interceptor.SimpleCacheResolver
-	 * @see CacheConfig#cacheManager
+	 * 缓存管理器，主要用于操作缓存的
+	 * <ul>
+	 *     <li>
+	 *         比如说 RedisCacheManager 中会创建 RedisCache，这个就是操作 Redis 的类
+	 *     </li>
+	 * </ul>
+	 * @return
 	 */
 	String cacheManager() default "";
 
@@ -120,52 +111,32 @@ public @interface Cacheable {
 	String cacheResolver() default "";
 
 	/**
-	 * Spring Expression Language (SpEL) expression used for making the method
-	 * caching conditional.
-	 * <p>Default is {@code ""}, meaning the method result is always cached.
-	 * <p>The SpEL expression evaluates against a dedicated context that provides the
-	 * following meta-data:
+	 * 一般是是对入参进行判断
 	 * <ul>
-	 * <li>{@code #root.method}, {@code #root.target}, and {@code #root.caches} for
-	 * references to the {@link java.lang.reflect.Method method}, target object, and
-	 * affected cache(s) respectively.</li>
-	 * <li>Shortcuts for the method name ({@code #root.methodName}) and target class
-	 * ({@code #root.targetClass}) are also available.
-	 * <li>Method arguments can be accessed by index. For instance the second argument
-	 * can be accessed via {@code #root.args[1]}, {@code #p1} or {@code #a1}. Arguments
-	 * can also be accessed by name if that information is available.</li>
+	 *     <li>
+	 *         判断是否会在缓存中
+	 *     </li>
+	 *     <li>
+	 *         判断是否要加入缓存中
+	 *     </li>
 	 * </ul>
+	 *
+	 * @return
 	 */
 	String condition() default "";
 
 	/**
-	 * Spring Expression Language (SpEL) expression used to veto method caching.
-	 * <p>Unlike {@link #condition}, this expression is evaluated after the method
-	 * has been called and can therefore refer to the {@code result}.
-	 * <p>Default is {@code ""}, meaning that caching is never vetoed.
-	 * <p>The SpEL expression evaluates against a dedicated context that provides the
-	 * following meta-data:
+	 * 一般是是对出参进行判断
 	 * <ul>
-	 * <li>{@code #result} for a reference to the result of the method invocation. For
-	 * supported wrappers such as {@code Optional}, {@code #result} refers to the actual
-	 * object, not the wrapper</li>
-	 * <li>{@code #root.method}, {@code #root.target}, and {@code #root.caches} for
-	 * references to the {@link java.lang.reflect.Method method}, target object, and
-	 * affected cache(s) respectively.</li>
-	 * <li>Shortcuts for the method name ({@code #root.methodName}) and target class
-	 * ({@code #root.targetClass}) are also available.
-	 * <li>Method arguments can be accessed by index. For instance the second argument
-	 * can be accessed via {@code #root.args[1]}, {@code #p1} or {@code #a1}. Arguments
-	 * can also be accessed by name if that information is available.</li>
+	 *     <li>
+	 *         判断是否不需要加入到缓存中
+	 *     </li>
 	 * </ul>
-	 * @since 3.2
 	 */
 	String unless() default "";
 
 	/**
-	 * Synchronize the invocation of the underlying method if several threads are
-	 * attempting to load a value for the same key. The synchronization leads to
-	 * a couple of limitations:
+	 * 如果多个线程*试图加载同一个键的值，则同步底层方法的调用，同步会导致一些限制
 	 * <ol>
 	 * <li>{@link #unless()} is not supported</li>
 	 * <li>Only one cache may be specified</li>

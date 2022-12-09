@@ -23,8 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * {@code @CacheConfig} provides a mechanism for sharing common cache-related
- * settings at the class level.
+ * 提供了一种在类级别上共享通用缓存相关设置的机制。
  *
  * <p>When this annotation is present on a given class, it provides a set
  * of default settings for any cache operation defined in that class.

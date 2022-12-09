@@ -129,21 +129,14 @@ public @interface CacheEvict {
 	String condition() default "";
 
 	/**
-	 * Whether all the entries inside the cache(s) are removed.
-	 * <p>By default, only the value under the associated key is removed.
-	 * <p>Note that setting this parameter to {@code true} and specifying a
-	 * {@link #key} is not allowed.
+	 * 是否清除所有缓存
+	 * @return
 	 */
 	boolean allEntries() default false;
 
 	/**
-	 * Whether the eviction should occur before the method is invoked.
-	 * <p>Setting this attribute to {@code true}, causes the eviction to
-	 * occur irrespective of the method outcome (i.e., whether it threw an
-	 * exception or not).
-	 * <p>Defaults to {@code false}, meaning that the cache eviction operation
-	 * will occur <em>after</em> the advised method is invoked successfully (i.e.
-	 * only if the invocation did not throw an exception).
+	 * 是否应该在调用方法之前进行清除缓存
+	 * @return
 	 */
 	boolean beforeInvocation() default false;
 
