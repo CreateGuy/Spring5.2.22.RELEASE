@@ -80,28 +80,22 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
-	 * Invoked <em>after</em> the start of concurrent handling in the async
-	 * thread in which the {@code Callable} is executed and <em>before</em> the
-	 * actual invocation of the {@code Callable}.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @throws Exception in case of errors
+	 * 执行异步方法之前调用
+	 * @param request
+	 * @param task
+	 * @param <T>
+	 * @throws Exception
 	 */
 	default <T> void preProcess(NativeWebRequest request, Callable<T> task) throws Exception {
 	}
 
 	/**
-	 * Invoked <em>after</em> the {@code Callable} has produced a result in the
-	 * async thread in which the {@code Callable} is executed. This method may
-	 * be invoked later than {@code afterTimeout} or {@code afterCompletion}
-	 * depending on when the {@code Callable} finishes processing.
-	 * <p>The default implementation is empty.
-	 * @param request the current request
-	 * @param task the task for the current async request
-	 * @param concurrentResult the result of concurrent processing, which could
-	 * be a {@link Throwable} if the {@code Callable} raised an exception
-	 * @throws Exception in case of errors
+	 * 执行异步方法之后调用
+	 * @param request
+	 * @param task
+	 * @param concurrentResult
+	 * @param <T>
+	 * @throws Exception
 	 */
 	default <T> void postProcess(NativeWebRequest request, Callable<T> task,
 			Object concurrentResult) throws Exception {

@@ -32,19 +32,27 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractRequestAttributes implements RequestAttributes {
 
-	/** Map from attribute name String to destruction callback Runnable. */
+	/**
+	 * 请求已完成的需要执行请求域的回调方法
+	 * Session域的是直接放在Session中的
+	 * */
 	protected final Map<String, Runnable> requestDestructionCallbacks = new LinkedHashMap<>(8);
 
+	/**
+	 * 原始的Session是否处于活跃状态
+	 */
 	private volatile boolean requestActive = true;
 
 
 	/**
-	 * Signal that the request has been completed.
+	 * 发出请求已完成的信号
 	 * <p>Executes all request destruction callbacks and updates the
 	 * session attributes that have been accessed during request processing.
 	 */
 	public void requestCompleted() {
+		// 在请求完成后执行所有已注册的回调
 		executeRequestDestructionCallbacks();
+		// 更新在请求处理期间访问过的所有会话属性
 		updateAccessedSessionAttributes();
 		this.requestActive = false;
 	}
@@ -82,8 +90,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Execute all callbacks that have been registered for execution
-	 * after request completion.
+	 * 在请求完成后执行所有已注册的回调
 	 */
 	private void executeRequestDestructionCallbacks() {
 		synchronized (this.requestDestructionCallbacks) {
@@ -95,8 +102,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Update all session attributes that have been accessed during request processing,
-	 * to expose their potentially updated state to the underlying session manager.
+	 * 更新在请求处理期间访问过的所有会话属性
 	 */
 	protected abstract void updateAccessedSessionAttributes();
 

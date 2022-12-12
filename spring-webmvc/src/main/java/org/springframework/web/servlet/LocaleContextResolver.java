@@ -39,7 +39,7 @@ import org.springframework.lang.Nullable;
 public interface LocaleContextResolver extends LocaleResolver {
 
 	/**
-	 * Resolve the current locale context via the given request.
+	 * 通过给定的请求解析当前的Local
 	 * <p>This is primarily intended for framework-level processing; consider using
 	 * {@link org.springframework.web.servlet.support.RequestContextUtils} or
 	 * {@link org.springframework.web.servlet.support.RequestContext} for
@@ -59,8 +59,7 @@ public interface LocaleContextResolver extends LocaleResolver {
 	LocaleContext resolveLocaleContext(HttpServletRequest request);
 
 	/**
-	 * Set the current locale context to the given one,
-	 * potentially including a locale with associated time zone information.
+	 * 将当前Locale上下文设置为给定的上下文，可能包括带有相关时区信息的区域设置
 	 * @param request the request to be used for locale modification
 	 * @param response the response to be used for locale modification
 	 * @param localeContext the new locale context, or {@code null} to clear the locale

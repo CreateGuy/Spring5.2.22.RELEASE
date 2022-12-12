@@ -61,8 +61,7 @@ import org.springframework.web.util.WebUtils;
 public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 
 	/**
-	 * Name of the session attribute that holds the Locale.
-	 * Only used internally by this implementation.
+	 * 默认保存在Session域中的Locale的属性的名称
 	 * <p>Use {@code RequestContext(Utils).getLocale()}
 	 * to retrieve the current locale in controllers or views.
 	 * @see org.springframework.web.servlet.support.RequestContext#getLocale
@@ -71,18 +70,20 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 	public static final String LOCALE_SESSION_ATTRIBUTE_NAME = SessionLocaleResolver.class.getName() + ".LOCALE";
 
 	/**
-	 * Name of the session attribute that holds the TimeZone.
-	 * Only used internally by this implementation.
-	 * <p>Use {@code RequestContext(Utils).getTimeZone()}
-	 * to retrieve the current time zone in controllers or views.
+	 * 默认保存在Session域中的Time_Zone的属性的名称
 	 * @see org.springframework.web.servlet.support.RequestContext#getTimeZone
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getTimeZone
 	 */
 	public static final String TIME_ZONE_SESSION_ATTRIBUTE_NAME = SessionLocaleResolver.class.getName() + ".TIME_ZONE";
 
-
+	/**
+	 * 最终保存在Session域中的Locale的属性的名称
+	 */
 	private String localeAttributeName = LOCALE_SESSION_ATTRIBUTE_NAME;
 
+	/**
+	 * 最终保存在Session域中的Time_Zone的属性的名称
+	 */
 	private String timeZoneAttributeName = TIME_ZONE_SESSION_ATTRIBUTE_NAME;
 
 
@@ -107,8 +108,14 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 	}
 
 
+	/**
+	 * 从Session解析Locale
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
+		// 从Session解析Locale
 		Locale locale = (Locale) WebUtils.getSessionAttribute(request, this.localeAttributeName);
 		if (locale == null) {
 			locale = determineDefaultLocale(request);
@@ -157,14 +164,9 @@ public class SessionLocaleResolver extends AbstractLocaleContextResolver {
 
 
 	/**
-	 * Determine the default locale for the given request,
-	 * Called if no Locale session attribute has been found.
-	 * <p>The default implementation returns the specified default locale,
-	 * if any, else falls back to the request's accept-header locale.
-	 * @param request the request to resolve the locale for
-	 * @return the default locale (never {@code null})
-	 * @see #setDefaultLocale
-	 * @see javax.servlet.http.HttpServletRequest#getLocale()
+	 * 返回默认的Locale
+	 * @param request
+	 * @return
 	 */
 	protected Locale determineDefaultLocale(HttpServletRequest request) {
 		Locale defaultLocale = getDefaultLocale();

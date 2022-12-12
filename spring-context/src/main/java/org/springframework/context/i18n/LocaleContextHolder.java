@@ -44,6 +44,9 @@ import org.springframework.lang.Nullable;
  */
 public final class LocaleContextHolder {
 
+	/**
+	 * 一般情况都是zh_CN
+	 */
 	private static final ThreadLocal<LocaleContext> localeContextHolder =
 			new NamedThreadLocal<>("LocaleContext");
 
@@ -86,15 +89,9 @@ public final class LocaleContextHolder {
 	}
 
 	/**
-	 * Associate the given LocaleContext with the current thread.
-	 * <p>The given LocaleContext may be a {@link TimeZoneAwareLocaleContext},
-	 * containing a locale with associated time zone information.
-	 * @param localeContext the current LocaleContext,
-	 * or {@code null} to reset the thread-bound context
-	 * @param inheritable whether to expose the LocaleContext as inheritable
-	 * for child threads (using an {@link InheritableThreadLocal})
-	 * @see SimpleLocaleContext
-	 * @see SimpleTimeZoneAwareLocaleContext
+	 * 将给定的LocaleContext绑定到当前线程
+	 * @param localeContext
+	 * @param inheritable 将LocaleContext公开为子线程可使用
 	 */
 	public static void setLocaleContext(@Nullable LocaleContext localeContext, boolean inheritable) {
 		if (localeContext == null) {
@@ -102,10 +99,12 @@ public final class LocaleContextHolder {
 		}
 		else {
 			if (inheritable) {
+				// 设置到InheritableThreadLocal中，并删除ThreadLocal中的
 				inheritableLocaleContextHolder.set(localeContext);
 				localeContextHolder.remove();
 			}
 			else {
+				// 设置到ThreadLocal中，并删除InheritableThreadLocal中的
 				localeContextHolder.set(localeContext);
 				inheritableLocaleContextHolder.remove();
 			}

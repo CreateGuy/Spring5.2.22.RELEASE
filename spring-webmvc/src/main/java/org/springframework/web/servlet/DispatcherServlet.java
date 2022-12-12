@@ -914,12 +914,14 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 打印日志
 		logRequest(request);
 
-		// Keep a snapshot of the request attributes in case of an include,
-		// to be able to restore the original attributes after the include.
 		Map<String, Object> attributesSnapshot = null;
+		// 判断当前请求是否是使用include()出来的
 		if (WebUtils.isIncludeRequest(request)) {
+			// 记录原来请求的请求域参数
+			// 此时没有执行include设置的Url
 			attributesSnapshot = new HashMap<>();
 			Enumeration<?> attrNames = request.getAttributeNames();
 			while (attrNames.hasMoreElements()) {
@@ -950,7 +952,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 		finally {
 			if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
-				// Restore the original attribute snapshot, in case of an include.
+				// 在 include()的情况下还原请求域参数
 				if (attributesSnapshot != null) {
 					restoreAttributesAfterInclude(request, attributesSnapshot);
 				}
@@ -1147,11 +1149,9 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Build a LocaleContext for the given request, exposing the request's primary locale as current locale.
-	 * <p>The default implementation uses the dispatcher's LocaleResolver to obtain the current locale,
-	 * which might change during a request.
+	 * 从国际化解析器中解析Locale
 	 * @param request current HTTP request
-	 * @return the corresponding LocaleContext
+	 * @return
 	 */
 	@Override
 	protected LocaleContext buildLocaleContext(final HttpServletRequest request) {
@@ -1439,14 +1439,13 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Restore the request attributes after an include.
+	 * 在include()之后恢复请求域的参数
 	 * @param request current HTTP request
-	 * @param attributesSnapshot the snapshot of the request attributes before the include
+	 * @param attributesSnapshot include()之前的请求域参数
 	 */
 	@SuppressWarnings("unchecked")
 	private void restoreAttributesAfterInclude(HttpServletRequest request, Map<?, ?> attributesSnapshot) {
-		// Need to copy into separate Collection here, to avoid side effects
-		// on the Enumeration when removing attributes.
+		// 此处需要复制到单独的集合中，以避免在删除属性时对枚举产生副作用
 		Set<String> attrsToCheck = new HashSet<>();
 		Enumeration<?> attrNames = request.getAttributeNames();
 		while (attrNames.hasMoreElements()) {
@@ -1459,13 +1458,15 @@ public class DispatcherServlet extends FrameworkServlet {
 		// Add attributes that may have been removed
 		attrsToCheck.addAll((Set<String>) attributesSnapshot.keySet());
 
-		// Iterate over the attributes to check, restoring the original value
-		// or removing the attribute, respectively, if appropriate.
+		// 还原include()之前的请求域参数
 		for (String attrName : attrsToCheck) {
 			Object attrValue = attributesSnapshot.get(attrName);
+			// 如果include()之前没有此参数，就直接移除
 			if (attrValue == null) {
 				request.removeAttribute(attrName);
 			}
+			// 如果参数值发送了变化，就还原
+			// 如果是复杂对象中的某个属性值发送了变化，就无法判断出来了
 			else if (attrValue != request.getAttribute(attrName)) {
 				request.setAttribute(attrName, attrValue);
 			}

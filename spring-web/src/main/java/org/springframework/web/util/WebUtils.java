@@ -57,16 +57,23 @@ import org.springframework.util.StringUtils;
 public abstract class WebUtils {
 
 	/**
-	 * Standard Servlet 2.3+ spec request attribute for include request URI.
-	 * <p>If included via a {@code RequestDispatcher}, the current resource will see the
-	 * originating request. Its own request URI is exposed as a request attribute.
+	 * 当使用include()会给请求域中注入此键，值是原请求的Url
+	 * <ul>
+	 *     <li>
+	 *			使用include()会通过RequestDispatcher.INCLUDE_REQUEST_URI设置键。和这个是一样的
+	 *     </li>
+	 * </ul>
 	 */
 	public static final String INCLUDE_REQUEST_URI_ATTRIBUTE = "javax.servlet.include.request_uri";
 
 	/**
-	 * Standard Servlet 2.3+ spec request attribute for include context path.
-	 * <p>If included via a {@code RequestDispatcher}, the current resource will see the
-	 * originating context path. Its own context path is exposed as a request attribute.
+	 * 存放当前的context_path
+	 * <ul>
+	 *     <li>
+	 *			使用include()会通过RequestDispatcher.INCLUDE_CONTEXT_PATH设置键。和这个是一样的
+	 *			使用include()后，这里就是include()后的值
+	 *     </li>
+	 * </ul>
 	 */
 	public static final String INCLUDE_CONTEXT_PATH_ATTRIBUTE = "javax.servlet.include.context_path";
 
@@ -490,13 +497,9 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Determine whether the given request is an include request,
-	 * that is, not a top-level HTTP request coming in from the outside.
-	 * <p>Checks the presence of the "javax.servlet.include.request_uri"
-	 * request attribute. Could check any request attribute that is only
-	 * present in an include request.
-	 * @param request current servlet request
-	 * @return whether the given request is an include request
+	 * 判断当前请求是否是使用include()出来的
+	 * @param request
+	 * @return
 	 */
 	public static boolean isIncludeRequest(ServletRequest request) {
 		return (request.getAttribute(INCLUDE_REQUEST_URI_ATTRIBUTE) != null);

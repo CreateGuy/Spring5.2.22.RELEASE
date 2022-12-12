@@ -201,7 +201,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/** Should we publish a ServletRequestHandledEvent at the end of each request?. */
 	private boolean publishEvents = true;
 
-	/** Expose LocaleContext and RequestAttributes as inheritable for child threads?. */
+	/** 将LocaleContext 和 RequestAttributes公开为子线程可使用 */
 	private boolean threadContextInheritable = false;
 
 	/** Should we dispatch an HTTP OPTIONS request to {@link #doService}?. */
@@ -981,7 +981,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
-	 * Process this request, publishing an event regardless of the outcome.
+	 * 处理此请求，不管结果如何，发布一个事件
 	 * <p>The actual event handling is performed by the abstract
 	 * {@link #doService} template method.
 	 */
@@ -991,15 +991,22 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		//获得当前环境，一般是zh_CN
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		// 从国际化解析器解析环境
 		LocaleContext localeContext = buildLocaleContext(request);
 
+		// 获得ServletRequestAttributes
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
+		// 注册一个RequestBindingInterceptor到WebAsyncManager中
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
+		// 初始化 LocaleContextHolder 和 RequestContextHolder
+		// 这样就可以通过 LocaleContextHolder 获取Local
+		// 或者通过 RequestContextHolder 获得请求Request或者Response
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
@@ -1015,6 +1022,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		finally {
+			// 清空LocaleContext和RequestContext
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
@@ -1059,17 +1067,33 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
+	/**
+	 * 初始化 LocaleContextHolder 和 RequestContextHolder
+	 * 这样就可以通过 LocaleContextHolder 获取Local
+	 * 或者通过 RequestContextHolder 获得请求Request或者Response
+	 * @param request
+	 * @param localeContext
+	 * @param requestAttributes
+	 */
 	private void initContextHolders(HttpServletRequest request,
 			@Nullable LocaleContext localeContext, @Nullable RequestAttributes requestAttributes) {
 
 		if (localeContext != null) {
+			// 将给定的LocaleContext绑定到当前线程
 			LocaleContextHolder.setLocaleContext(localeContext, this.threadContextInheritable);
 		}
 		if (requestAttributes != null) {
+			// 将给定的RequestAttributes绑定到当前线程
 			RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
 		}
 	}
 
+	/**
+	 * 清空LocaleContext和RequestContext
+	 * @param request
+	 * @param prevLocaleContext
+	 * @param previousAttributes
+	 */
 	private void resetContextHolders(HttpServletRequest request,
 			@Nullable LocaleContext prevLocaleContext, @Nullable RequestAttributes previousAttributes) {
 
@@ -1193,16 +1217,30 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 
 	/**
-	 * CallableProcessingInterceptor implementation that initializes and resets
-	 * FrameworkServlet's context holders, i.e. LocaleContextHolder and RequestContextHolder.
+	 * 初始化和重置LocaleContextHolder和RequestContextHolder
 	 */
 	private class RequestBindingInterceptor implements CallableProcessingInterceptor {
 
+		/**
+		 * 执行异步方法之前调用
+		 * <ul>
+		 *     <li>
+		 *         请求的线程(处理线程)是将LocaleContextHolder和RequestContextHolder保存在InheritableThreadLocal或者ThreadLocal中
+		 *     </li>
+		 *     <li>
+		 *         但是此时是异步方法所以就没有这两个参数，所以就要设置，方便异步线程中继续使用这两个
+		 *     </li>
+		 * </ul>
+		 * @param webRequest
+		 * @param task the task for the current async request
+		 * @param <T>
+		 */
 		@Override
 		public <T> void preProcess(NativeWebRequest webRequest, Callable<T> task) {
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			if (request != null) {
 				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+				// 初始化 LocaleContextHolder 和 RequestContextHolder
 				initContextHolders(request, buildLocaleContext(request),
 						buildRequestAttributes(request, response, null));
 			}
@@ -1211,6 +1249,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		public <T> void postProcess(NativeWebRequest webRequest, Callable<T> task, Object concurrentResult) {
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			if (request != null) {
+				// 清空 LocaleContextHolder 和 RequestContextHolder
 				resetContextHolders(request, null, null);
 			}
 		}

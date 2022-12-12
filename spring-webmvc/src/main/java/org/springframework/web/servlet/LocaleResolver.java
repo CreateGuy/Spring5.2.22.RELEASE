@@ -53,8 +53,7 @@ import org.springframework.lang.Nullable;
 public interface LocaleResolver {
 
 	/**
-	 * Resolve the current locale via the given request.
-	 * Can return a default locale as fallback in any case.
+	 * 通过给定的请求解析当前区域
 	 * @param request the request to resolve the locale for
 	 * @return the current locale (never {@code null})
 	 */

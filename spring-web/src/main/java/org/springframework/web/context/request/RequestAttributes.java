@@ -33,15 +33,12 @@ import org.springframework.lang.Nullable;
 public interface RequestAttributes {
 
 	/**
-	 * Constant that indicates request scope.
+	 * 表示请求域
 	 */
 	int SCOPE_REQUEST = 0;
 
 	/**
-	 * Constant that indicates session scope.
-	 * <p>This preferably refers to a locally isolated session, if such
-	 * a distinction is available.
-	 * Else, it simply refers to the common session.
+	 * 表示会话域
 	 */
 	int SCOPE_SESSION = 1;
 
@@ -78,7 +75,7 @@ public interface RequestAttributes {
 	void setAttribute(String name, Object value, int scope);
 
 	/**
-	 * Remove the scoped attribute of the given name, if it exists.
+	 * 从某个域，移除某些属性
 	 * <p>Note that an implementation should also remove a registered destruction
 	 * callback for the specified attribute, if any. It does, however, <i>not</i>
 	 * need to <i>execute</i> a registered destruction callback in this case,
@@ -89,15 +86,14 @@ public interface RequestAttributes {
 	void removeAttribute(String name, int scope);
 
 	/**
-	 * Retrieve the names of all attributes in the scope.
+	 * 获得某个域的所有属性名称
 	 * @param scope the scope identifier
 	 * @return the attribute names as String array
 	 */
 	String[] getAttributeNames(int scope);
 
 	/**
-	 * Register a callback to be executed on destruction of the
-	 * specified attribute in the given scope.
+	 * 注册一个回调，在给定范围内的指定属性销毁时执行
 	 * <p>Implementations should do their best to execute the callback
 	 * at the appropriate time: that is, at request completion or session
 	 * termination, respectively. If such a callback is not supported by the
@@ -119,7 +115,7 @@ public interface RequestAttributes {
 	void registerDestructionCallback(String name, Runnable callback, int scope);
 
 	/**
-	 * Resolve the contextual reference for the given key, if any.
+	 * 解析键然后返回具体的域对象，一般是请求域和会话域
 	 * <p>At a minimum: the HttpServletRequest reference for key "request", and
 	 * the HttpSession reference for key "session".
 	 * @param key the contextual key

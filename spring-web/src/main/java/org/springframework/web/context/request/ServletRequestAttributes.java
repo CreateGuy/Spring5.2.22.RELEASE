@@ -32,25 +32,19 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
- * Servlet-based implementation of the {@link RequestAttributes} interface.
- *
- * <p>Accesses objects from servlet request and HTTP session scope,
- * with no distinction between "session" and "global session".
- *
- * @author Juergen Hoeller
- * @since 2.0
- * @see javax.servlet.ServletRequest#getAttribute
- * @see javax.servlet.http.HttpSession#getAttribute
+ * 从请求域和Session域中获取对象
  */
 public class ServletRequestAttributes extends AbstractRequestAttributes {
 
 	/**
-	 * Constant identifying the {@link String} prefixed to the name of a
-	 * destruction callback when it is stored in a {@link HttpSession}.
+	 * 请求完成需要执行的Session级别的回调的键前缀
 	 */
 	public static final String DESTRUCTION_CALLBACK_NAME_PREFIX =
 			ServletRequestAttributes.class.getName() + ".DESTRUCTION_CALLBACK.";
 
+	/**
+	 * 简单变量类型
+	 */
 	protected static final Set<Class<?>> immutableValueTypes = new HashSet<>(16);
 
 	static {
@@ -69,6 +63,9 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	@Nullable
 	private volatile HttpSession session;
 
+	/**
+	 * 要更新的会话属性
+	 */
 	private final Map<String, Object> sessionAttributesToUpdate = new ConcurrentHashMap<>(1);
 
 
@@ -108,8 +105,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	}
 
 	/**
-	 * Exposes the {@link HttpSession} that we're wrapping.
-	 * @param allowCreate whether to allow creation of a new session if none exists yet
+	 * 获得Session
 	 */
 	@Nullable
 	protected final HttpSession getSession(boolean allowCreate) {
@@ -135,6 +131,10 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	/**
+	 * 获得Session
+	 * @return
+	 */
 	private HttpSession obtainSession() {
 		HttpSession session = getSession(true);
 		Assert.state(session != null, "No HttpSession");
@@ -142,6 +142,12 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	}
 
 
+	/**
+	 * 从请求域或者会话域获取属性
+	 * @param name the name of the attribute
+	 * @param scope 从何处获取属性
+	 * @return
+	 */
 	@Override
 	public Object getAttribute(String name, int scope) {
 		if (scope == SCOPE_REQUEST) {
@@ -157,6 +163,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 				try {
 					Object value = session.getAttribute(name);
 					if (value != null) {
+						// 表明此属性是一个要更新的会话信息
 						this.sessionAttributesToUpdate.put(name, value);
 					}
 					return value;
@@ -169,8 +176,14 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	/**
+	 * 在某个域中 设置某个属性
+	 * @param name the name of the attribute
+	 * @param scope the scope identifier
+	 */
 	@Override
 	public void setAttribute(String name, Object value, int scope) {
+		// 请求域
 		if (scope == SCOPE_REQUEST) {
 			if (!isRequestActive()) {
 				throw new IllegalStateException(
@@ -179,14 +192,21 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 			this.request.setAttribute(name, value);
 		}
 		else {
+			// 会话域
 			HttpSession session = obtainSession();
 			this.sessionAttributesToUpdate.remove(name);
 			session.setAttribute(name, value);
 		}
 	}
 
+	/**
+	 * 从某个域，移除某个属性
+	 * @param name the name of the attribute
+	 * @param scope the scope identifier
+	 */
 	@Override
 	public void removeAttribute(String name, int scope) {
+		// 请求域
 		if (scope == SCOPE_REQUEST) {
 			if (isRequestActive()) {
 				removeRequestDestructionCallback(name);
@@ -194,6 +214,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 			}
 		}
 		else {
+			// 会话域
 			HttpSession session = getSession(false);
 			if (session != null) {
 				this.sessionAttributesToUpdate.remove(name);
@@ -208,8 +229,14 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	/**
+	 * 获得某个域的所有属性名称
+	 * @param scope the scope identifier
+	 * @return
+	 */
 	@Override
 	public String[] getAttributeNames(int scope) {
+		// 请求域
 		if (scope == SCOPE_REQUEST) {
 			if (!isRequestActive()) {
 				throw new IllegalStateException(
@@ -218,6 +245,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 			return StringUtils.toStringArray(this.request.getAttributeNames());
 		}
 		else {
+			// 会话域
 			HttpSession session = getSession(false);
 			if (session != null) {
 				try {
@@ -231,16 +259,29 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		}
 	}
 
+	/**
+	 * 注册一个回调，在给定范围内的指定属性销毁时执行
+	 * @param name the name of the attribute to register the callback for
+	 * @param callback the destruction callback to be executed
+	 * @param scope the scope identifier
+	 */
 	@Override
 	public void registerDestructionCallback(String name, Runnable callback, int scope) {
 		if (scope == SCOPE_REQUEST) {
+			// 注册一个当前请求域的回调
 			registerRequestDestructionCallback(name, callback);
 		}
 		else {
+			// 注册一个会话域的回调
 			registerSessionDestructionCallback(name, callback);
 		}
 	}
 
+	/**
+	 * 解析键然后返回具体的域对象，一般是请求域和会话域
+	 * @param key the contextual key
+	 * @return
+	 */
 	@Override
 	public Object resolveReference(String key) {
 		if (REFERENCE_REQUEST.equals(key)) {
@@ -266,8 +307,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 
 
 	/**
-	 * Update all accessed session attributes through {@code session.setAttribute}
-	 * calls, explicitly indicating to the container that they might have been modified.
+	 * 更新复杂对象
 	 */
 	@Override
 	protected void updateAccessedSessionAttributes() {
@@ -280,7 +320,9 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 						String name = entry.getKey();
 						Object newValue = entry.getValue();
 						Object oldValue = session.getAttribute(name);
+						// 新值和旧值要相同，而且要是复杂类型，比如说User对象，将id变了，但是User的地址不会变
 						if (oldValue == newValue && !isImmutableSessionAttribute(name, newValue)) {
+							// 更新这个复杂对象
 							session.setAttribute(name, newValue);
 						}
 					}
@@ -294,25 +336,25 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	}
 
 	/**
-	 * Determine whether the given value is to be considered as an immutable session
-	 * attribute, that is, doesn't have to be re-set via {@code session.setAttribute}
-	 * since its value cannot meaningfully change internally.
-	 * <p>The default implementation returns {@code true} for {@code String},
-	 * {@code Character}, {@code Boolean} and standard {@code Number} values.
-	 * @param name the name of the attribute
-	 * @param value the corresponding value to check
-	 * @return {@code true} if the value is to be considered as immutable for the
-	 * purposes of session attribute management; {@code false} otherwise
-	 * @see #updateAccessedSessionAttributes()
+	 * 确定给定的值是否被认为是不可变的会话属性
+	 * <ul>
+	 *     <li>
+	 *         比如说User对象，将id变了，但是User的地址不会变
+	 *     </li>
+	 * </ul>
+	 * @param name
+	 * @param value
+	 * @return
 	 */
 	protected boolean isImmutableSessionAttribute(String name, @Nullable Object value) {
 		return (value == null || immutableValueTypes.contains(value.getClass()));
 	}
 
 	/**
-	 * Register the given callback as to be executed after session termination.
-	 * <p>Note: The callback object should be serializable in order to survive
-	 * web app restarts.
+	 * 注册一个会话的回调，会在会话终止后执行
+	 * <li>
+	 *     没看到哪里调用了DESTRUCTION_CALLBACK_NAME_PREFIX这个键前缀
+	 * </li>
 	 * @param name the name of the attribute to register the callback for
 	 * @param callback the callback to be executed for destruction
 	 */

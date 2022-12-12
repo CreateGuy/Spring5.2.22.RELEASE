@@ -43,31 +43,46 @@ import org.springframework.util.Assert;
 public class CookieGenerator {
 
 	/**
-	 * Default path that cookies will be visible to: "/", i.e. the entire server.
+	 * * cookie将可见的默认路径:“/”，即整个服务器。
 	 */
 	public static final String DEFAULT_COOKIE_PATH = "/";
 
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 此生成器创建的cookie的名称
+	 */
 	@Nullable
 	private String cookieName;
 
+	/**
+	 * 各个子级域拿到存在父级域中的Cookie值
+	 */
 	@Nullable
 	private String cookieDomain;
 
+	/**
+	 * 访问此Cookie允许的接口
+	 */
 	private String cookiePath = DEFAULT_COOKIE_PATH;
 
 	@Nullable
 	private Integer cookieMaxAge;
 
+	/**
+	 * 只能通过https来进行cookie的传递
+	 */
 	private boolean cookieSecure = false;
 
+	/**
+	 * 客户端脚本将无法访问cookie
+	 */
 	private boolean cookieHttpOnly = false;
 
 
 	/**
-	 * Use the given name for cookies created by this generator.
+	 * 设置此生成器创建的cookie的名称
 	 * @see javax.servlet.http.Cookie#getName()
 	 */
 	public void setCookieName(@Nullable String cookieName) {
@@ -171,8 +186,7 @@ public class CookieGenerator {
 
 
 	/**
-	 * Add a cookie with the given value to the response,
-	 * using the cookie descriptor settings of this generator.
+	 * 使用此生成器的cookie设置，将传入的值添加到响应中的Cookie中
 	 * <p>Delegates to {@link #createCookie} for cookie creation.
 	 * @param response the HTTP response to add the cookie to
 	 * @param cookieValue the value of the cookie to add
@@ -188,9 +202,11 @@ public class CookieGenerator {
 		if (maxAge != null) {
 			cookie.setMaxAge(maxAge);
 		}
+		// 只能通过https来进行cookie的传递
 		if (isCookieSecure()) {
 			cookie.setSecure(true);
 		}
+		// 客户端脚本将无法访问cookie
 		if (isCookieHttpOnly()) {
 			cookie.setHttpOnly(true);
 		}
@@ -201,8 +217,7 @@ public class CookieGenerator {
 	}
 
 	/**
-	 * Remove the cookie that this generator describes from the response.
-	 * Will generate a cookie with empty value and max age 0.
+	 * 从响应中删除此生成器设置的的cookie。将生成一个空值和最大年龄d的cookie。
 	 * <p>Delegates to {@link #createCookie} for cookie creation.
 	 * @param response the HTTP response to remove the cookie from
 	 * @see #setCookieName
@@ -216,6 +231,7 @@ public class CookieGenerator {
 		if (isCookieSecure()) {
 			cookie.setSecure(true);
 		}
+		// 设置客户端脚本将无法访问此cookie
 		if (isCookieHttpOnly()) {
 			cookie.setHttpOnly(true);
 		}
