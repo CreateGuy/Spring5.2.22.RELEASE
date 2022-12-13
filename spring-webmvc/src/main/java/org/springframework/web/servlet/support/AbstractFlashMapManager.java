@@ -92,6 +92,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	@Override
 	@Nullable
 	public final FlashMap retrieveAndUpdate(HttpServletRequest request, HttpServletResponse response) {
+		// 读取已保存的FlashMap实例
 		List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 		if (CollectionUtils.isEmpty(allFlashMaps)) {
 			return null;
@@ -197,6 +198,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 			return;
 		}
 
+		// 解码和规范化路径
 		String path = decodeAndNormalizePath(flashMap.getTargetRequestPath(), request);
 		flashMap.setTargetRequestPath(path);
 
@@ -219,13 +221,24 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 		}
 	}
 
+	/**
+	 * 解码和规范化路径
+	 * @param path
+	 * @param request
+	 * @return
+	 */
 	@Nullable
 	private String decodeAndNormalizePath(@Nullable String path, HttpServletRequest request) {
 		if (path != null && !path.isEmpty()) {
+			// 解码路径，是以请求的编码格式进行编码
 			path = getUrlPathHelper().decodeRequestString(request, path);
+			// 检测路径是否合法，必须以'/'开头
 			if (path.charAt(0) != '/') {
+				// 拿到本次本次请求的Url
 				String requestUri = getUrlPathHelper().getRequestUri(request);
+				// 取Url的第一级路径 + path
 				path = requestUri.substring(0, requestUri.lastIndexOf('/') + 1) + path;
+				// 也是规范化路径
 				path = StringUtils.cleanPath(path);
 			}
 		}
@@ -233,7 +246,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Retrieve saved FlashMap instances from the underlying storage.
+	 * 读取已保存的FlashMap实例
 	 * @param request the current request
 	 * @return a List with FlashMap instances, or {@code null} if none found
 	 */

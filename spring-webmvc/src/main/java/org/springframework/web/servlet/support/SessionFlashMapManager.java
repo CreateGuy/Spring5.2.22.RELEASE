@@ -39,7 +39,7 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 
 
 	/**
-	 * Retrieves saved FlashMap instances from the HTTP session, if any.
+	 * 从HTTP会话中读取保存的FlashMap实例(如果有的话)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
