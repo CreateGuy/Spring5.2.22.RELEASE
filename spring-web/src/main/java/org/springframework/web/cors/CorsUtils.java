@@ -35,10 +35,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class CorsUtils {
 
 	/**
-	 * Returns {@code true} if the request is a valid CORS one by checking {@code Origin}
-	 * header presence and ensuring that origins are different.
+	 * 确定是否是一个跨域请求
+	 * @param request
+	 * @return
 	 */
 	public static boolean isCorsRequest(HttpServletRequest request) {
+		//一般跨域请求就会携带这个请求头
 		String origin = request.getHeader(HttpHeaders.ORIGIN);
 		if (origin == null) {
 			return false;
@@ -66,8 +68,7 @@ public abstract class CorsUtils {
 	}
 
 	/**
-	 * Returns {@code true} if the request is a valid CORS pre-flight one by checking {code OPTIONS} method with
-	 * {@code Origin} and {@code Access-Control-Request-Method} headers presence.
+	 * 如果请求是CORS预检请求，进行检查
 	 */
 	public static boolean isPreFlightRequest(HttpServletRequest request) {
 		return (HttpMethod.OPTIONS.matches(request.getMethod()) &&

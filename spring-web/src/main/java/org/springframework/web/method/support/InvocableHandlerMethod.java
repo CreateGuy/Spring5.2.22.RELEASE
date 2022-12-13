@@ -185,6 +185,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 */
 	@Nullable
 	protected Object doInvoke(Object... args) throws Exception {
+		// 使给定的方法可访问，必要时直接执行setAccessi
 		ReflectionUtils.makeAccessible(getBridgedMethod());
 		try {
 			return getBridgedMethod().invoke(getBean(), args);

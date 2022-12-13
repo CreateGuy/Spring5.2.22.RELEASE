@@ -218,7 +218,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
 
-	/** 已经发布过的应用上下文事件 */
+
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
@@ -375,7 +375,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Publish the given event to all listeners.
+	 * 将指定事件发布给所有监听器
 	 * @param event the event to publish (may be an {@link ApplicationEvent}
 	 * or a payload object to be turned into a {@link PayloadApplicationEvent})
 	 * @param eventType the resolved event type, if known
@@ -384,7 +384,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
 		Assert.notNull(event, "Event must not be null");
 
-		// Decorate event as an ApplicationEvent if necessary
+		// 如有必要，将事件装饰为ApplicationEvent
 		ApplicationEvent applicationEvent;
 		if (event instanceof ApplicationEvent) {
 			applicationEvent = (ApplicationEvent) event;
@@ -397,10 +397,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Multicast right now if possible - or lazily once the multicaster is initialized
+		// 不懂
 		if (this.earlyApplicationEvents != null) {
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
 		else {
+			// 开始多播事件
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 

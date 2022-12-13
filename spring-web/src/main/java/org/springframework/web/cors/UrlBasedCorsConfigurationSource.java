@@ -42,6 +42,9 @@ public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource 
 
 	private final Map<String, CorsConfiguration> corsConfigurations = new LinkedHashMap<>();
 
+	/**
+	 * 请求匹配器，这里用于确定使用哪种Cors配置规则
+	 */
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
@@ -129,10 +132,17 @@ public class UrlBasedCorsConfigurationSource implements CorsConfigurationSource 
 	}
 
 
+	/**
+	 * 返回Cors配置规则
+	 * @param request
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+		//获得请求路径
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request, this.lookupPathAttributeName);
+		//根据路径确定根据哪个规则判断
 		for (Map.Entry<String, CorsConfiguration> entry : this.corsConfigurations.entrySet()) {
 			if (this.pathMatcher.match(entry.getKey(), lookupPath)) {
 				return entry.getValue();

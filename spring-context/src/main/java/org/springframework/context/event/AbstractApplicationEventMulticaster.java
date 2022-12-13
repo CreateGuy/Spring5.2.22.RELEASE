@@ -65,6 +65,9 @@ public abstract class AbstractApplicationEventMulticaster
 
 	private final DefaultListenerRetriever defaultRetriever = new DefaultListenerRetriever();
 
+	/**
+	 * 事件到监听器的映射关系
+	 */
 	final Map<ListenerCacheKey, CachedListenerRetriever> retrieverCache = new ConcurrentHashMap<>(64);
 
 	@Nullable
@@ -159,8 +162,7 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 	/**
-	 * Return a Collection of ApplicationListeners matching the given
-	 * event type. Non-matching listeners get excluded early.
+	 * 返回一个与特定事件类型匹配的监听器集合。不匹配的侦听器会被尽早排除。
 	 * @param event the event to be propagated. Allows for excluding
 	 * non-matching listeners early, based on cached matching information.
 	 * @param eventType the event type
@@ -177,10 +179,11 @@ public abstract class AbstractApplicationEventMulticaster
 		// Potential new retriever to populate
 		CachedListenerRetriever newRetriever = null;
 
-		// Quick check for existing entry on ConcurrentHashMap
+		// 从缓存中获取监听此事件的监听器
+		// ListenerCacheKey的hashCode重写过的
 		CachedListenerRetriever existingRetriever = this.retrieverCache.get(cacheKey);
 		if (existingRetriever == null) {
-			// Caching a new ListenerRetriever if possible
+			// 缓存一个新的 CachedListenerRetriever
 			if (this.beanClassLoader == null ||
 					(ClassUtils.isCacheSafe(event.getClass(), this.beanClassLoader) &&
 							(sourceType == null || ClassUtils.isCacheSafe(sourceType, this.beanClassLoader)))) {
@@ -192,20 +195,20 @@ public abstract class AbstractApplicationEventMulticaster
 			}
 		}
 
+		// 已经存在过了，就直接获取监听器列表，然后返回
 		if (existingRetriever != null) {
 			Collection<ApplicationListener<?>> result = existingRetriever.getApplicationListeners();
 			if (result != null) {
 				return result;
 			}
-			// If result is null, the existing retriever is not fully populated yet by another thread.
-			// Proceed like caching wasn't possible for this current local attempt.
+			// 如果result为空，则现有检索器还没有被另一个线程完全填充。继续进行，就像当前本地尝试不可能进行缓存一样。
 		}
-
+		// 实际查询监听了特定事件的监听器
 		return retrieveApplicationListeners(eventType, sourceType, newRetriever);
 	}
 
 	/**
-	 * Actually retrieve the application listeners for the given event and source type.
+	 * 实际查询监听了特定事件的监听器
 	 * @param eventType the event type
 	 * @param sourceType the event source type
 	 * @param retriever the ListenerRetriever, if supposed to populate one (for caching purposes)
@@ -419,8 +422,7 @@ public abstract class AbstractApplicationEventMulticaster
 
 
 	/**
-	 * Helper class that encapsulates a specific set of target listeners,
-	 * allowing for efficient retrieval of pre-filtered listeners.
+	 * 封装监听了某一个事件的监听器列表
 	 * <p>An instance of this helper gets cached per event type and source type.
 	 */
 	private class CachedListenerRetriever {
@@ -468,8 +470,14 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class DefaultListenerRetriever {
 
+		/**
+		 * 会有容器中的监听器bean，但是也会有通过其他途径进来的，但没有注册到容器中的监听器
+		 */
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
+		/**
+		 * 容器中的监听器bean
+		 */
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
 		public Collection<ApplicationListener<?>> getApplicationListeners() {

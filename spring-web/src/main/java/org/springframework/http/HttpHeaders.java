@@ -285,8 +285,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public static final String MAX_FORWARDS = "Max-Forwards";
 	/**
-	 * The HTTP {@code Origin} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc6454">RFC 6454</a>
+	 * 表明是请求从哪里发起的，是当前请求资源所在页面的协议和域名
 	 */
 	public static final String ORIGIN = "Origin";
 	/**

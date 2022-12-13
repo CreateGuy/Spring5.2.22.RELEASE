@@ -56,11 +56,20 @@ public class DefaultCorsProcessor implements CorsProcessor {
 	private static final Log logger = LogFactory.getLog(DefaultCorsProcessor.class);
 
 
+	/**
+	 * 没懂，估计是校验请求类型，请求头等等的
+	 * @param config
+	 * @param request the current request
+	 * @param response the current response
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	@SuppressWarnings("resource")
 	public boolean processRequest(@Nullable CorsConfiguration config, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
+		//添加一些响应头
 		Collection<String> varyHeaders = response.getHeaders(HttpHeaders.VARY);
 		if (!varyHeaders.contains(HttpHeaders.ORIGIN)) {
 			response.addHeader(HttpHeaders.VARY, HttpHeaders.ORIGIN);
@@ -72,6 +81,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			response.addHeader(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
 		}
 
+		//确定是否是一个跨域请求
 		if (!CorsUtils.isCorsRequest(request)) {
 			return true;
 		}
