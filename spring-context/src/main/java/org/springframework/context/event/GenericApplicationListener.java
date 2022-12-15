@@ -37,7 +37,7 @@ import org.springframework.lang.Nullable;
 public interface GenericApplicationListener extends ApplicationListener<ApplicationEvent>, Ordered {
 
 	/**
-	 * Determine whether this listener actually supports the given event type.
+	 * 判断监听器是否支持此事件类型
 	 * @param eventType the event type (never {@code null})
 	 */
 	boolean supportsEventType(ResolvableType eventType);

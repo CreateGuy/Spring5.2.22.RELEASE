@@ -49,11 +49,20 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public final class FlashMap extends HashMap<String, Object> implements Comparable<FlashMap> {
 
+	/**
+	 * 此FlashMap要给哪个请求路径使用
+	 */
 	@Nullable
 	private String targetRequestPath;
 
+	/**
+	 * 参数
+	 */
 	private final MultiValueMap<String, String> targetRequestParams = new LinkedMultiValueMap<>(4);
 
+	/**
+	 * 过期时间，感觉无用，因为FlashMapManager会重新设置
+	 */
 	private long expirationTime = -1;
 
 
@@ -109,7 +118,7 @@ public final class FlashMap extends HashMap<String, Object> implements Comparabl
 	}
 
 	/**
-	 * Start the expiration period for this instance.
+	 * 此FlashMap的过期时间
 	 * @param timeToLive the number of seconds before expiration
 	 */
 	public void startExpirationPeriod(int timeToLive) {

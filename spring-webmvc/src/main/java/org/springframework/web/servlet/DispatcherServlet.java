@@ -939,7 +939,9 @@ public class DispatcherServlet extends FrameworkServlet {
 		request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
 
 		if (this.flashMapManager != null) {
+			// 查找先前请求保存的与当前请求匹配的FLashMap，将其从底层存储中删除，并删除其他过期的FLashMap实例
 			FlashMap inputFlashMap = this.flashMapManager.retrieveAndUpdate(request, response);
+			// 将符合条件的FlashMap保存在请求域中，方便后面用
 			if (inputFlashMap != null) {
 				request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, Collections.unmodifiableMap(inputFlashMap));
 			}

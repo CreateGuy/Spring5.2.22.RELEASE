@@ -50,7 +50,7 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	}
 
 	/**
-	 * Saves the given FlashMap instances in the HTTP session.
+	 * 在会话域中保存传入的flashMaps
 	 */
 	@Override
 	protected void updateFlashMaps(List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response) {
@@ -58,7 +58,7 @@ public class SessionFlashMapManager extends AbstractFlashMapManager {
 	}
 
 	/**
-	 * Exposes the best available session mutex.
+	 * 返回该会话的互斥锁
 	 * @see org.springframework.web.util.WebUtils#getSessionMutex
 	 * @see org.springframework.web.util.HttpSessionMutexListener
 	 */

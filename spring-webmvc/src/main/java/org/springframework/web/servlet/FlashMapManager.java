@@ -32,9 +32,7 @@ import org.springframework.lang.Nullable;
 public interface FlashMapManager {
 
 	/**
-	 * Find a FlashMap saved by a previous request that matches to the current
-	 * request, remove it from underlying storage, and also remove other
-	 * expired FlashMap instances.
+	 * 查找先前请求保存的与当前请求匹配的FLashMap，将其从底层存储中删除，并删除其他过期的FLashMap实例
 	 * <p>This method is invoked in the beginning of every request in contrast
 	 * to {@link #saveOutputFlashMap}, which is invoked only when there are
 	 * flash attributes to be saved - i.e. before a redirect.
@@ -46,8 +44,7 @@ public interface FlashMapManager {
 	FlashMap retrieveAndUpdate(HttpServletRequest request, HttpServletResponse response);
 
 	/**
-	 * Save the given FlashMap, in some underlying storage and set the start
-	 * of its expiration period.
+	 * 将给定的FlashMap保存在一些底层存储中，并设置其有效期时间
 	 * <p><strong>NOTE:</strong> Invoke this method prior to a redirect in order
 	 * to allow saving the FlashMap in the HTTP session or in a response
 	 * cookie before the response is committed.

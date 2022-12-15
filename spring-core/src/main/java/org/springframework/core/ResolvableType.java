@@ -248,8 +248,7 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Determine whether this {@code ResolvableType} is assignable from the
-	 * specified other type.
+	 * 猜测是判断两者是否存在关系，父子的那种
 	 * <p>Attempts to follow the same rules as the Java compiler, considering
 	 * whether both the {@link #resolve() resolved} {@code Class} is
 	 * {@link Class#isAssignableFrom(Class) assignable from} the given type
@@ -270,7 +269,7 @@ public class ResolvableType implements Serializable {
 			return false;
 		}
 
-		// Deal with array by delegating to the component type
+		// 确定Type是否是数组
 		if (isArray()) {
 			return (other.isArray() && getComponentType().isAssignableFrom(other.getComponentType()));
 		}
@@ -355,7 +354,7 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
-	 * Return {@code true} if this type resolves to a Class that represents an array.
+	 * 确定Type是否是数组
 	 * @see #getComponentType()
 	 */
 	public boolean isArray() {

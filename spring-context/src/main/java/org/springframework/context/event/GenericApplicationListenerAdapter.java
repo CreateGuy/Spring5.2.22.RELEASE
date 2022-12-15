@@ -40,9 +40,14 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 
 	private static final Map<Class<?>, ResolvableType> eventTypeCache = new ConcurrentReferenceHashMap<>();
 
-
+	/**
+	 * 监听器
+	 */
 	private final ApplicationListener<ApplicationEvent> delegate;
 
+	/**
+	 * 监听器的ResolvableType
+	 */
 	@Nullable
 	private final ResolvableType declaredEventType;
 
@@ -55,6 +60,7 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 	public GenericApplicationListenerAdapter(ApplicationListener<?> delegate) {
 		Assert.notNull(delegate, "Delegate listener must not be null");
 		this.delegate = (ApplicationListener<ApplicationEvent>) delegate;
+		// 返回监听器的ResolvableType
 		this.declaredEventType = resolveDeclaredEventType(this.delegate);
 	}
 
@@ -93,9 +99,15 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 	}
 
 
+	/**
+	 * 返回监听器的ResolvableType
+	 * @param listener
+	 * @return
+	 */
 	@Nullable
 	private static ResolvableType resolveDeclaredEventType(ApplicationListener<ApplicationEvent> listener) {
 		ResolvableType declaredEventType = resolveDeclaredEventType(listener.getClass());
+		// 尝试调用父类的ResolvableType
 		if (declaredEventType == null || declaredEventType.isAssignableFrom(ApplicationEvent.class)) {
 			Class<?> targetClass = AopUtils.getTargetClass(listener);
 			if (targetClass != listener.getClass()) {

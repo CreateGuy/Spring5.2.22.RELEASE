@@ -423,24 +423,10 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Return the best available mutex for the given session:
-	 * that is, an object to synchronize on for the given session.
-	 * <p>Returns the session mutex attribute if available; usually,
-	 * this means that the HttpSessionMutexListener needs to be defined
-	 * in {@code web.xml}. Falls back to the HttpSession itself
-	 * if no mutex attribute found.
-	 * <p>The session mutex is guaranteed to be the same object during
-	 * the entire lifetime of the session, available under the key defined
-	 * by the {@code SESSION_MUTEX_ATTRIBUTE} constant. It serves as a
-	 * safe reference to synchronize on for locking on the current session.
-	 * <p>In many cases, the HttpSession reference itself is a safe mutex
-	 * as well, since it will always be the same object reference for the
-	 * same active logical session. However, this is not guaranteed across
-	 * different servlet containers; the only 100% safe way is a session mutex.
-	 * @param session the HttpSession to find a mutex for
-	 * @return the mutex object (never {@code null})
-	 * @see #SESSION_MUTEX_ATTRIBUTE
-	 * @see HttpSessionMutexListener
+	 * 返回该会话的互斥锁
+	 * <li>会由 {@link HttpSessionMutexListener} 自动创建</li>
+	 * @param session
+	 * @return
 	 */
 	public static Object getSessionMutex(HttpSession session) {
 		Assert.notNull(session, "Session must not be null");

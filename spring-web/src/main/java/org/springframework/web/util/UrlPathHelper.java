@@ -51,7 +51,7 @@ import org.springframework.util.StringUtils;
 public class UrlPathHelper {
 
 	/**
-	 * Special WebSphere request attribute, indicating the original request URI.
+	 * 特殊的请求属性，指示原始请求URI
 	 * Preferable over the standard Servlet 2.4 forward attribute on WebSphere,
 	 * simply because we need the very first URI in the request forwarding chain.
 	 */
@@ -425,8 +425,7 @@ public class UrlPathHelper {
 
 
 	/**
-	 * Return the request URI for the given request. If this is a forwarded request,
-	 * correctly resolves to the request URI of the original request.
+	 * 返回给定请求的请求URI。如果这是一个转发请求，那么将解析为原始URI
 	 */
 	public String getOriginatingRequestUri(HttpServletRequest request) {
 		String uri = (String) request.getAttribute(WEBSPHERE_URI_ATTRIBUTE);
@@ -470,17 +469,18 @@ public class UrlPathHelper {
 	}
 
 	/**
-	 * Return the query string part of the given request's URL. If this is a forwarded request,
-	 * correctly resolves to the query string of the original request.
+	 * 返回给定请求URL后的参数。如果这是一个转发请求，则正确解析为原始请求URL后的参数
 	 * @param request current HTTP request
 	 * @return the query string
 	 */
 	public String getOriginatingQueryString(HttpServletRequest request) {
+		// 当使用了转发后，会填充WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE，那么一定会有FORWARD_QUERY_STRING_ATTRIBUTE
 		if ((request.getAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE) != null) ||
 			(request.getAttribute(WebUtils.ERROR_REQUEST_URI_ATTRIBUTE) != null)) {
 			return (String) request.getAttribute(WebUtils.FORWARD_QUERY_STRING_ATTRIBUTE);
 		}
 		else {
+			// 拿到本次请求Url后面的参数
 			return request.getQueryString();
 		}
 	}

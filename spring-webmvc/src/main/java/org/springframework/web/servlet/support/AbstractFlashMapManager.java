@@ -89,6 +89,12 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 
+	/**
+	 * 查找先前请求保存的与当前请求匹配的FLashMap，将其从底层存储中删除，并删除其他过期的FLashMap实例
+	 * @param request the current request
+	 * @param response the current response
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public final FlashMap retrieveAndUpdate(HttpServletRequest request, HttpServletResponse response) {
@@ -98,8 +104,12 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 			return null;
 		}
 
+		// 返回过期的FlashMap
 		List<FlashMap> mapsToRemove = getExpiredFlashMaps(allFlashMaps);
+		// 返回与请求匹配的给定列表中包含的FlashMap
 		FlashMap match = getMatchingFlashMap(allFlashMaps, request);
+
+		// 无论的过期还是匹配成功的都要删除，所以放在一起了
 		if (match != null) {
 			mapsToRemove.add(match);
 		}
@@ -108,14 +118,18 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 			Object mutex = getFlashMapsMutex(request);
 			if (mutex != null) {
 				synchronized (mutex) {
+					// 拿到保存的所有FlashMap
 					allFlashMaps = retrieveFlashMaps(request);
 					if (allFlashMaps != null) {
+						// 删除
 						allFlashMaps.removeAll(mapsToRemove);
+						// 更新
 						updateFlashMaps(allFlashMaps, request, response);
 					}
 				}
 			}
 			else {
+				// 上同
 				allFlashMaps.removeAll(mapsToRemove);
 				updateFlashMaps(allFlashMaps, request, response);
 			}
@@ -125,7 +139,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Return a list of expired FlashMap instances contained in the given list.
+	 * 返回过期的FlashMap
 	 */
 	private List<FlashMap> getExpiredFlashMaps(List<FlashMap> allMaps) {
 		List<FlashMap> result = new LinkedList<>();
@@ -138,13 +152,14 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	}
 
 	/**
-	 * Return a FlashMap contained in the given list that matches the request.
+	 * 返回与请求匹配的给定列表中包含的FlashMap
 	 * @return a matching FlashMap or {@code null}
 	 */
 	@Nullable
 	private FlashMap getMatchingFlashMap(List<FlashMap> allMaps, HttpServletRequest request) {
 		List<FlashMap> result = new LinkedList<>();
 		for (FlashMap flashMap : allMaps) {
+			// 给定的FlashMap是否与当前请求匹配
 			if (isFlashMapForRequest(flashMap, request)) {
 				result.add(flashMap);
 			}
@@ -154,30 +169,39 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Found " + result.get(0));
 			}
+			// 正常来说，只能有一个FlashMap
 			return result.get(0);
 		}
 		return null;
 	}
 
 	/**
-	 * Whether the given FlashMap matches the current request.
-	 * Uses the expected request path and query parameters saved in the FlashMap.
+	 * 给定的FlashMap是否与当前请求匹配
 	 */
 	protected boolean isFlashMapForRequest(FlashMap flashMap, HttpServletRequest request) {
+		// 拿到此FlashMap要给哪个请求使用
 		String expectedPath = flashMap.getTargetRequestPath();
 		if (expectedPath != null) {
+			// 判断请求路径是否匹配
 			String requestUri = getUrlPathHelper().getOriginatingRequestUri(request);
 			if (!requestUri.equals(expectedPath) && !requestUri.equals(expectedPath + "/")) {
 				return false;
 			}
 		}
+		// 返回给定请求URL后的参数，如果这是一个转发请求，则正确解析为原始请求URL后的参数
+		// 换言之只能用于转发这种不会改变Request的
 		MultiValueMap<String, String> actualParams = getOriginatingRequestParams(request);
+		// 拿到FlashMap中的参数
 		MultiValueMap<String, String> expectedParams = flashMap.getTargetRequestParams();
+
+		// 进行严格的比较
 		for (Map.Entry<String, List<String>> entry : expectedParams.entrySet()) {
 			List<String> actualValues = actualParams.get(entry.getKey());
+			// 必须要包含参数
 			if (actualValues == null) {
 				return false;
 			}
+			// 参数值必须一样
 			for (String expectedValue : entry.getValue()) {
 				if (!actualValues.contains(expectedValue)) {
 					return false;
@@ -187,6 +211,11 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 		return true;
 	}
 
+	/**
+	 * 返回给定请求URL后的参数。如果这是一个转发请求，则正确解析为原始请求URL后的参数
+	 * @param request
+	 * @return
+	 */
 	private MultiValueMap<String, String> getOriginatingRequestParams(HttpServletRequest request) {
 		String query = getUrlPathHelper().getOriginatingQueryString(request);
 		return ServletUriComponentsBuilder.fromPath("/").query(query).build().getQueryParams();
@@ -202,18 +231,24 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 		String path = decodeAndNormalizePath(flashMap.getTargetRequestPath(), request);
 		flashMap.setTargetRequestPath(path);
 
+		// 设置过期时间的开始时间
 		flashMap.startExpirationPeriod(getFlashMapTimeout());
 
+		// 获得此会话的互斥锁
 		Object mutex = getFlashMapsMutex(request);
 		if (mutex != null) {
 			synchronized (mutex) {
+				// 读取已保存的FlashMap实例
 				List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 				allFlashMaps = (allFlashMaps != null ? allFlashMaps : new CopyOnWriteArrayList<>());
+				// 新增才传入的
 				allFlashMaps.add(flashMap);
+				// 在会话域中保存传入的flashMaps
 				updateFlashMaps(allFlashMaps, request, response);
 			}
 		}
 		else {
+			// 和上面的一样，只是没了锁的限制
 			List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 			allFlashMaps = (allFlashMaps != null ? allFlashMaps : new LinkedList<>());
 			allFlashMaps.add(flashMap);
@@ -254,7 +289,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 	protected abstract List<FlashMap> retrieveFlashMaps(HttpServletRequest request);
 
 	/**
-	 * Update the FlashMap instances in the underlying storage.
+	 * 更新底层存储中的FlashMaps实例
 	 * @param flashMaps a (potentially empty) list of FlashMap instances to save
 	 * @param request the current request
 	 * @param response the current response
