@@ -195,9 +195,12 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 
 	/**
-	 * Combines "this" request mapping info (i.e. the current instance) with another request mapping info instance.
-	 * <p>Example: combine type- and method-level request mappings.
-	 * @return a new request mapping info instance; never {@code null}
+	 * 将两个RequestMappingInfo进行结合
+	 * <ul>
+	 *     <li>
+	 *        比如说类和方法上的结合
+	 *     </li>
+	 * </ul>
 	 */
 	@Override
 	public RequestMappingInfo combine(RequestMappingInfo other) {

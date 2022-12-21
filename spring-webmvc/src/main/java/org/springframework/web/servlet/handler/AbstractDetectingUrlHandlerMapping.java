@@ -23,9 +23,7 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Abstract implementation of the {@link org.springframework.web.servlet.HandlerMapping}
- * interface, detecting URL mappings for handler beans through introspection of all
- * defined beans in the application context.
+ * 通过应用程序上下文中所有已定义的bean来检测处理程序bean的URL映射
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -56,11 +54,12 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	@Override
 	public void initApplicationContext() throws ApplicationContextException {
 		super.initApplicationContext();
+		// 注册当前ApplicationContext中找到的所有处理程序
 		detectHandlers();
 	}
 
 	/**
-	 * Register all handlers found in the current ApplicationContext.
+	 * 注册当前ApplicationContext中找到的所有处理程序
 	 * <p>The actual URL determination for a handler is up to the concrete
 	 * {@link #determineUrlsForHandler(String)} implementation. A bean for
 	 * which no such URLs could be determined is simply not considered a handler.
@@ -69,15 +68,17 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	 */
 	protected void detectHandlers() throws BeansException {
 		ApplicationContext applicationContext = obtainApplicationContext();
+		// 拿到容器中的所有bean名称
 		String[] beanNames = (this.detectHandlersInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, Object.class) :
 				applicationContext.getBeanNamesForType(Object.class));
 
 		// Take any bean name that we can determine URLs for.
 		for (String beanName : beanNames) {
+			// 确定给定处理程序bean的url
 			String[] urls = determineUrlsForHandler(beanName);
 			if (!ObjectUtils.isEmpty(urls)) {
-				// URL paths found: Let's consider it a handler.
+				// 把bean当成一个处理方法，bean名称就是Url路径
 				registerHandler(urls, beanName);
 			}
 		}
@@ -89,7 +90,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 
 
 	/**
-	 * Determine the URLs for the given handler bean.
+	 * 确定给定处理程序bean的url
 	 * @param beanName the name of the candidate bean
 	 * @return the URLs determined for the bean, or an empty array if none
 	 */

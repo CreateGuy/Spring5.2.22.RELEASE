@@ -71,8 +71,7 @@ import org.springframework.web.servlet.HandlerMapping;
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
 
 	/**
-	 * Bean name prefix for target beans behind scoped proxies. Used to exclude those
-	 * targets from handler method detection, in favor of the corresponding proxies.
+	 * 作用域代理后面的目标Bean的Bean名称前缀。用于从处理程序方法检测中排除这些目标，以支持相应的代理。
 	 * <p>We're not checking the autowire-candidate status here, which is how the
 	 * proxy target filtering problem is being handled at the autowiring level,
 	 * since autowire-candidate may have been turned to {@code false} for other
@@ -206,7 +205,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 	/**
-	 * Scan beans in the ApplicationContext, detect and register handler methods.
+	 * 在Applicationcontext中扫描bean，检测并注册处理程序方法
 	 * @see #getCandidateBeanNames()
 	 * @see #processCandidateBean
 	 * @see #handlerMethodsInitialized
@@ -221,7 +220,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 	/**
-	 * Determine the names of candidate beans in the application context.
+	 * 确定应用程序上下文中候选bean的名称
 	 * @since 5.1
 	 * @see #setDetectHandlerMethodsInAncestorContexts
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors
@@ -229,11 +228,12 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected String[] getCandidateBeanNames() {
 		return (this.detectHandlerMethodsInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(obtainApplicationContext(), Object.class) :
+				// 返回所有的bean
 				obtainApplicationContext().getBeanNamesForType(Object.class));
 	}
 
 	/**
-	 * Determine the type of the specified candidate bean and call
+	 * 确定是否是指定的候选bean的类型并调用
 	 * {@link #detectHandlerMethods} if identified as a handler type.
 	 * <p>This implementation avoids bean creation through checking
 	 * {@link org.springframework.beans.factory.BeanFactory#getType}
@@ -254,22 +254,26 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace("Could not resolve type for bean '" + beanName + "'", ex);
 			}
 		}
+		// 判断给定的Class是处理器
 		if (beanType != null && isHandler(beanType)) {
 			detectHandlerMethods(beanName);
 		}
 	}
 
 	/**
-	 * Look for handler methods in the specified handler bean.
+	 * 检查Controller中的处理方法
 	 * @param handler either a bean name or an actual handler instance
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
+		// 获得处理器的类型
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
+			// 返回的类的通常是传入的类，但如果是cglib生成的子类则返回原始类。
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			// 选择符合条件的方法
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
@@ -285,6 +289,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				//注册
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}
@@ -368,6 +373,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		//
 		this.mappingRegistry.acquireReadLock();
 		try {
+			// 查找处理方法
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
@@ -388,6 +394,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Nullable
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<>();
+		// 找到对应的处理器
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
 		if (directPathMatches != null) {
 			addMatchingMappings(directPathMatches, matches, request);
@@ -486,7 +493,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	// Abstract template methods
 
 	/**
-	 * Whether the given type is a handler with handler methods.
+	 * 判断给定的Class是处理器
 	 * @param beanType the type of the bean being checked
 	 * @return "true" if this a handler type, "false" otherwise.
 	 */
@@ -614,7 +621,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
 				// 校验HandlerMethod
 				validateMethodMapping(handlerMethod, mapping);
-				this.mappingLookup.put(mapping, handlerMethod);
+					this.mappingLookup.put(mapping, handlerMethod);
 
 				List<String> directUrls = getDirectUrls(mapping);
 				for (String url : directUrls) {

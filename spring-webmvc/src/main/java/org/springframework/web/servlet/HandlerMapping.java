@@ -56,9 +56,7 @@ import org.springframework.lang.Nullable;
 public interface HandlerMapping {
 
 	/**
-	 * Name of the {@link HttpServletRequest} attribute that contains the mapped
-	 * handler for the best matching pattern.
-	 * @since 4.3.21
+	 * 最匹配的处理利的键
 	 */
 	String BEST_MATCHING_HANDLER_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingHandler";
 

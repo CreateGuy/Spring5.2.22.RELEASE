@@ -148,12 +148,18 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+		// 通过方法上的注解创建 RequestMappingInfo
 		RequestMappingInfo info = createRequestMappingInfo(method);
 		if (info != null) {
+			// 拿到类上的 RequestMappingInfo
 			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
 			if (typeInfo != null) {
+				// 将类和方法上的结合
+				// 也就是为什么类上的路径会被加到方法的Url上
 				info = typeInfo.combine(info);
 			}
+
+			// 看不懂
 			for (Map.Entry<String, Predicate<Class<?>>> entry : this.pathPrefixes.entrySet()) {
 				if (entry.getValue().test(handlerType)) {
 					String prefix = entry.getKey();
@@ -169,7 +175,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Delegates to {@link #createRequestMappingInfo(RequestMapping, RequestCondition)},
+	 * 创建 {@link RequestMappingInfo}
 	 * supplying the appropriate custom {@link RequestCondition} depending on whether
 	 * the supplied {@code annotatedElement} is a class or method.
 	 * @see #getCustomTypeCondition(Class)
@@ -222,7 +228,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	}
 
 	/**
-	 * Create a {@link RequestMappingInfo} from the supplied
+	 * 创建 {@link RequestMappingInfo}
 	 * {@link RequestMapping @RequestMapping} annotation, which is either
 	 * a directly declared annotation, a meta-annotation, or the synthesized
 	 * result of merging annotation attributes within an annotation hierarchy.

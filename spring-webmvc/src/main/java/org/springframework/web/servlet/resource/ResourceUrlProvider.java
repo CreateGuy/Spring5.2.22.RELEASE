@@ -42,8 +42,7 @@ import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * A central component to use to obtain the public URL path that clients should
- * use to access a static resource.
+ * 用于获取客户端应该用来访问静态资源的公共URL路径的中心组件。
  *
  * <p>This class is aware of Spring MVC handler mappings used to serve static
  * resources and uses the {@code ResourceResolver} chains of the configured

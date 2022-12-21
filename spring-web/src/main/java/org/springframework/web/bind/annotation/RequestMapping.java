@@ -75,17 +75,15 @@ import org.springframework.core.annotation.AliasFor;
 public @interface RequestMapping {
 
 	/**
-	 * Assign a name to this mapping.
-	 * <p><b>Supported at the type level as well as at the method level!</b>
-	 * When used on both levels, a combined name is derived by concatenation
-	 * with "#" as separator.
+	 * 为这个映射分配一个名称
+	 * 貌似只是用作名称
 	 * @see org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 	 * @see org.springframework.web.servlet.handler.HandlerMethodMappingNamingStrategy
 	 */
 	String name() default "";
 
 	/**
-	 * The primary mapping expressed by this annotation.
+	 * 处理的Url
 	 * <p>This is an alias for {@link #path}. For example,
 	 * {@code @RequestMapping("/foo")} is equivalent to
 	 * {@code @RequestMapping(path="/foo")}.
@@ -99,7 +97,7 @@ public @interface RequestMapping {
 	String[] value() default {};
 
 	/**
-	 * The path mapping URIs (e.g. {@code "/profile"}).
+	 * 处理的Url
 	 * <p>Ant-style path patterns are also supported (e.g. {@code "/profile/**"}).
 	 * At the method level, relative paths (e.g. {@code "edit"}) are supported
 	 * within the primary mapping expressed at the type level.
@@ -115,16 +113,13 @@ public @interface RequestMapping {
 	String[] path() default {};
 
 	/**
-	 * The HTTP request methods to map to, narrowing the primary mapping:
-	 * GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE, TRACE.
-	 * <p><b>Supported at the type level as well as at the method level!</b>
-	 * When used at the type level, all method-level mappings inherit this
-	 * HTTP method restriction.
+	 * 要映射的请求方式
+	 * GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE, TRACE
 	 */
 	RequestMethod[] method() default {};
 
 	/**
-	 * The parameters of the mapped request, narrowing the primary mapping.
+	 * 方法入参必须包含某些参数，缩小主映射
 	 * <p>Same format for any environment: a sequence of "myParam=myValue" style
 	 * expressions, with a request only mapped if each such parameter is found
 	 * to have the given value. Expressions can be negated by using the "!=" operator,
@@ -139,7 +134,7 @@ public @interface RequestMapping {
 	String[] params() default {};
 
 	/**
-	 * The headers of the mapped request, narrowing the primary mapping.
+	 * 要求必须有什么请求头，缩小主映射。
 	 * <p>Same format for any environment: a sequence of "My-Header=myValue" style
 	 * expressions, with a request only mapped if each such header is found
 	 * to have the given value. Expressions can be negated by using the "!=" operator,
@@ -161,9 +156,7 @@ public @interface RequestMapping {
 	String[] headers() default {};
 
 	/**
-	 * Narrows the primary mapping by media types that can be consumed by the
-	 * mapped handler. Consists of one or more media types one of which must
-	 * match to the request {@code Content-Type} header. Examples:
+	 * 方法接受的媒体类型
 	 * <pre class="code">
 	 * consumes = "text/plain"
 	 * consumes = {"text/plain", "application/*"}
@@ -181,11 +174,7 @@ public @interface RequestMapping {
 	String[] consumes() default {};
 
 	/**
-	 * Narrows the primary mapping by media types that can be produced by the
-	 * mapped handler. Consists of one or more media types one of which must
-	 * be chosen via content negotiation against the "acceptable" media types
-	 * of the request. Typically those are extracted from the {@code "Accept"}
-	 * header but may be derived from query parameters, or other. Examples:
+	 * 返回的返回的媒体类型
 	 * <pre class="code">
 	 * produces = "text/plain"
 	 * produces = {"text/plain", "application/*"}

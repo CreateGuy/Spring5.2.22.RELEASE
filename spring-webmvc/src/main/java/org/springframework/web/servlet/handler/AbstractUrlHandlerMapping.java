@@ -60,14 +60,19 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 
 	private boolean useTrailingSlashMatch = false;
 
+	/**
+	 * 懒加载处理器
+	 */
 	private boolean lazyInitHandlers = false;
 
+	/**
+	 * Url到处理器的映射
+	 */
 	private final Map<String, Object> handlerMap = new LinkedHashMap<>();
 
 
 	/**
-	 * Set the root handler for this handler mapping, that is,
-	 * the handler to be registered for the root path ("/").
+	 * 为这个处理程序映射设置根处理程序，即为根路径(“/”)注册的处理程序。
 	 * <p>Default is {@code null}, indicating no root handler.
 	 */
 	public void setRootHandler(@Nullable Object rootHandler) {
@@ -307,7 +312,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	}
 
 	/**
-	 * Register the specified handler for the given URL paths.
+	 * 为给定的URL路径注册指定的处理期
 	 * @param urlPaths the URLs that the bean should be mapped to
 	 * @param beanName the name of the handler bean
 	 * @throws BeansException if the handler couldn't be registered
@@ -321,7 +326,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	}
 
 	/**
-	 * Register the specified handler for the given URL path.
+	 * 为给定的URL路径注册指定的处理期
 	 * @param urlPath the URL the bean should be mapped to
 	 * @param handler the handler instance or handler bean name String
 	 * (a bean name will automatically be resolved into the corresponding handler bean)
@@ -333,11 +338,13 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		Assert.notNull(handler, "Handler object must not be null");
 		Object resolvedHandler = handler;
 
-		// Eagerly resolve handler if referencing singleton via name.
+		// 如果通过bean名称引用单例，则马上的解析处理程序。
 		if (!this.lazyInitHandlers && handler instanceof String) {
 			String handlerName = (String) handler;
 			ApplicationContext applicationContext = obtainApplicationContext();
+			// 是单例的情况
 			if (applicationContext.isSingleton(handlerName)) {
+				// 获得bean
 				resolvedHandler = applicationContext.getBean(handlerName);
 			}
 		}
@@ -355,15 +362,18 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 				if (logger.isTraceEnabled()) {
 					logger.trace("Root mapping to " + getHandlerDescription(handler));
 				}
+				// 设置根处理器
 				setRootHandler(resolvedHandler);
 			}
 			else if (urlPath.equals("/*")) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Default mapping to " + getHandlerDescription(handler));
 				}
+				// /**当成默认处理器
 				setDefaultHandler(resolvedHandler);
 			}
 			else {
+				// 注册处理器
 				this.handlerMap.put(urlPath, resolvedHandler);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Mapped [" + urlPath + "] onto " + getHandlerDescription(handler));
