@@ -73,6 +73,9 @@ import org.springframework.web.util.UrlPathHelper;
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		implements HandlerMapping, Ordered, BeanNameAware {
 
+	/**
+	 *  默认处理器
+	 */
 	@Nullable
 	private Object defaultHandler;
 

@@ -173,8 +173,7 @@ public class UrlPathHelper {
 
 
 	/**
-	 * Return the mapping lookup path for the given request, within the current
-	 * servlet mapping if applicable, else within the web application.
+	 * 返回给定请求的映射查找路径，如果适用，在当前servlet映射中，否则在web应用程序中。
 	 * <p>Detects include request URL if called within a RequestDispatcher include.
 	 * @param request current HTTP request
 	 * @return the lookup path
@@ -286,7 +285,7 @@ public class UrlPathHelper {
 	}
 
 	/**
-	 * Return the path within the web application for the given request.
+	 * 返回web应用程序中给定请求的路径
 	 * <p>Detects include request URL if called within a RequestDispatcher include.
 	 * @param request current HTTP request
 	 * @return the path within the web application

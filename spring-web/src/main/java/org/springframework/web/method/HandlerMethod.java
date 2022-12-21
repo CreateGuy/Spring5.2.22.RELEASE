@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
+ * 是具体的处理方法和参数的类
  * Encapsulates information about a handler method consisting of a
  * {@linkplain #getMethod() method} and a {@linkplain #getBean() bean}.
  * Provides convenient access to method parameters, the method return value,
@@ -64,22 +65,46 @@ public class HandlerMethod {
 	/** Logger that is available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 方法包含的对象
+	 */
 	private final Object bean;
 
+	/**
+	 * bean工厂，一般是{@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 */
 	@Nullable
 	private final BeanFactory beanFactory;
 
+	/**
+	 * 方法包含的对象的Class
+	 */
 	private final Class<?> beanType;
 
+	/**
+	 * 具体的方法
+	 */
 	private final Method method;
 
+	/**
+	 * 桥接方法，如果不是桥接方法那就是原方法
+	 */
 	private final Method bridgedMethod;
 
+	/**
+	 * 方法的入参
+	 */
 	private final MethodParameter[] parameters;
 
+	/**
+	 * 方法上包含的@HttpStatus的Code
+	 */
 	@Nullable
 	private HttpStatus responseStatus;
 
+	/**
+	 * 方法上包含的@HttpStatus的reason
+	 */
 	@Nullable
 	private String responseStatusReason;
 
@@ -89,6 +114,9 @@ public class HandlerMethod {
 	@Nullable
 	private volatile List<Annotation[][]> interfaceParameterAnnotations;
 
+	/**
+	 * 方法的具体描述，一般都是全限名
+	 */
 	private final String description;
 
 
@@ -183,6 +211,10 @@ public class HandlerMethod {
 		this.description = handlerMethod.description;
 	}
 
+	/**
+	 * 初始化入参
+	 * @return
+	 */
 	private MethodParameter[] initMethodParameters() {
 		int count = this.bridgedMethod.getParameterCount();
 		MethodParameter[] result = new MethodParameter[count];
@@ -192,6 +224,9 @@ public class HandlerMethod {
 		return result;
 	}
 
+	/**
+	 * 解析@ResponseStatus参数
+	 */
 	private void evaluateResponseStatus() {
 		ResponseStatus annotation = getMethodAnnotation(ResponseStatus.class);
 		if (annotation == null) {
@@ -203,6 +238,12 @@ public class HandlerMethod {
 		}
 	}
 
+	/**
+	 * 初始化描述信息
+	 * @param beanType
+	 * @param method
+	 * @return
+	 */
 	private static String initDescription(Class<?> beanType, Method method) {
 		StringJoiner joiner = new StringJoiner(", ", "(", ")");
 		for (Class<?> paramType : method.getParameterTypes()) {
@@ -325,8 +366,7 @@ public class HandlerMethod {
 	}
 
 	/**
-	 * If the provided instance contains a bean name rather than an object instance,
-	 * the bean name is resolved before a {@link HandlerMethod} is created and returned.
+	 * 如果提供的实例是String，那么就当成Bean名称重新获取
 	 */
 	public HandlerMethod createWithResolvedBean() {
 		Object handler = this.bean;
@@ -392,6 +432,7 @@ public class HandlerMethod {
 			return false;
 		}
 		HandlerMethod otherMethod = (HandlerMethod) other;
+		// 要求一个Handle不能注册多次
 		return (this.bean.equals(otherMethod.bean) && this.method.equals(otherMethod.method));
 	}
 
@@ -426,11 +467,11 @@ public class HandlerMethod {
 	}
 
 	/**
-	 * Assert that the target bean class is an instance of the class where the given
-	 * method is declared. In some cases the actual controller instance at request-
-	 * processing time may be a JDK dynamic proxy (lazy initialization, prototype
-	 * beans, and others). {@code @Controller}'s that require proxying should prefer
-	 * class-based proxy mechanisms.
+	 * 断言目标bean类是声明给定方法的类的实例
+	 * 在某些情况下，请求处理时的实际控制器实例可能是JDK动态代理(延迟初始化、原型bean等)
+	 * @param method
+	 * @param targetBean
+	 * @param args
 	 */
 	protected void assertTargetBean(Method method, Object targetBean, Object[] args) {
 		Class<?> methodDeclaringClass = method.getDeclaringClass();
@@ -488,6 +529,10 @@ public class HandlerMethod {
 			return HandlerMethod.this.hasMethodAnnotation(annotationType);
 		}
 
+		/**
+		 * 返回与特定方法/构造方法参数上的注解
+		 * @return
+		 */
 		@Override
 		public Annotation[] getParameterAnnotations() {
 			Annotation[] anns = this.combinedAnnotations;

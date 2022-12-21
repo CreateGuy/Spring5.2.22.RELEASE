@@ -86,7 +86,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface MultipartResolver {
 
 	/**
-	 * Determine if the given request contains multipart content.
+	 * 确定给定的request是否包含文件
 	 * <p>Will typically check for content type "multipart/form-data", but the actually
 	 * accepted requests might depend on the capabilities of the resolver implementation.
 	 * @param request the servlet request to be evaluated
@@ -95,8 +95,7 @@ public interface MultipartResolver {
 	boolean isMultipart(HttpServletRequest request);
 
 	/**
-	 * Parse the given HTTP request into multipart files and parameters,
-	 * and wrap the request inside a
+	 * 将文件数据解析成 MultipartFile 并封装在 request 中
 	 * {@link org.springframework.web.multipart.MultipartHttpServletRequest}
 	 * object that provides access to file descriptors and makes contained
 	 * parameters accessible via the standard ServletRequest methods.

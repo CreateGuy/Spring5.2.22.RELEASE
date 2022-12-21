@@ -63,11 +63,7 @@ public interface HandlerMapping {
 	String BEST_MATCHING_HANDLER_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingHandler";
 
 	/**
-	 * Name of the {@link HttpServletRequest} attribute that contains the path
-	 * used to look up the matching handler, which depending on the configured
-	 * {@link org.springframework.web.util.UrlPathHelper} could be the full path
-	 * or without the context path, decoded or not, etc.
-	 * @since 5.2
+	 * 该属性包含用于查找匹配处理程序的路径
 	 */
 	String LOOKUP_PATH = HandlerMapping.class.getName() + ".lookupPath";
 
@@ -121,8 +117,7 @@ public interface HandlerMapping {
 	String MATRIX_VARIABLES_ATTRIBUTE = HandlerMapping.class.getName() + ".matrixVariables";
 
 	/**
-	 * Name of the {@link HttpServletRequest} attribute that contains the set of
-	 * producible MediaTypes applicable to the mapped handler.
+	 * 应该是此处理器可以生产的媒体类型
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. Handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.

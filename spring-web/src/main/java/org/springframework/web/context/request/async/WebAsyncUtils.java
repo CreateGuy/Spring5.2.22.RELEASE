@@ -24,7 +24,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
 /**
- * Utility methods related to processing asynchronous web requests.
+ * 与处理异步web请求相关工具类
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -40,8 +40,9 @@ public abstract class WebAsyncUtils {
 
 
 	/**
-	 * Obtain the {@link WebAsyncManager} for the current request, or if not
-	 * found, create and associate it with the request.
+	 * 获得WebAsyncManager
+	 * @param servletRequest
+	 * @return
 	 */
 	public static WebAsyncManager getAsyncManager(ServletRequest servletRequest) {
 		WebAsyncManager asyncManager = null;
