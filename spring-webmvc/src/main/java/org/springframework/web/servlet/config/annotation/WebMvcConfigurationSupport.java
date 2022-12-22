@@ -401,8 +401,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Return a {@link ContentNegotiationManager} instance to use to determine
-	 * requested {@linkplain MediaType media types} in a given request.
+	 * 注入内容协商管理器
 	 */
 	@Bean
 	public ContentNegotiationManager mvcContentNegotiationManager() {

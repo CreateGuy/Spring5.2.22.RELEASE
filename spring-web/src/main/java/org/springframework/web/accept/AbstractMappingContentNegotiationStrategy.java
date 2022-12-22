@@ -54,8 +54,14 @@ public abstract class AbstractMappingContentNegotiationStrategy extends MappingM
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 仅使用已经注册的文件扩展名
+	 */
 	private boolean useRegisteredExtensionsOnly = false;
 
+	/**
+	 * 忽略未知的文件扩展名
+	 */
 	private boolean ignoreUnknownExtensions = false;
 
 
@@ -98,26 +104,31 @@ public abstract class AbstractMappingContentNegotiationStrategy extends MappingM
 	@Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest)
 			throws HttpMediaTypeNotAcceptableException {
-
+		// 通过文件扩展名解析媒体类型
 		return resolveMediaTypeKey(webRequest, getMediaTypeKey(webRequest));
 	}
 
 	/**
-	 * An alternative to {@link #resolveMediaTypes(NativeWebRequest)} that accepts
-	 * an already extracted key.
-	 * @since 3.2.16
+	 * 通过文件扩展名解析媒体类型
+	 * @param webRequest
+	 * @param key 文件扩展名
+	 * @return
+	 * @throws HttpMediaTypeNotAcceptableException
 	 */
 	public List<MediaType> resolveMediaTypeKey(NativeWebRequest webRequest, @Nullable String key)
 			throws HttpMediaTypeNotAcceptableException {
 
 		if (StringUtils.hasText(key)) {
+			// 通过文件扩展名获得媒体类型
 			MediaType mediaType = lookupMediaType(key);
 			if (mediaType != null) {
 				handleMatch(key, mediaType);
 				return Collections.singletonList(mediaType);
 			}
+			// 处理通过文件扩展名没有找到媒体类型的情况
 			mediaType = handleNoMatch(webRequest, key);
 			if (mediaType != null) {
+				// 添加新的文件扩展名和媒体类型的映射
 				addMapping(key, mediaType);
 				return Collections.singletonList(mediaType);
 			}
@@ -125,10 +136,10 @@ public abstract class AbstractMappingContentNegotiationStrategy extends MappingM
 		return MEDIA_TYPE_ALL_LIST;
 	}
 
-
 	/**
-	 * Extract a key from the request to use to look up media types.
-	 * @return the lookup key, or {@code null} if none
+	 * 从请求中提取一个文件扩展名，用于查找媒体类型
+	 * @param request
+	 * @return 查询出来的文件扩展名
 	 */
 	@Nullable
 	protected abstract String getMediaTypeKey(NativeWebRequest request);
@@ -141,21 +152,25 @@ public abstract class AbstractMappingContentNegotiationStrategy extends MappingM
 	}
 
 	/**
-	 * Override to provide handling when a key is not resolved via.
-	 * {@link #lookupMediaType}. Sub-classes can take further steps to
-	 * determine the media type(s). If a MediaType is returned from
-	 * this method it will be added to the cache in the base class.
+	 * 处理通过文件扩展名没有找到媒体类型的情况
+	 * @param request
+	 * @param key 文件扩展名
+	 * @return
+	 * @throws HttpMediaTypeNotAcceptableException
 	 */
 	@Nullable
 	protected MediaType handleNoMatch(NativeWebRequest request, String key)
 			throws HttpMediaTypeNotAcceptableException {
 
+		// 是否允许未知扩展名的存在
 		if (!isUseRegisteredExtensionsOnly()) {
+			// 创建新的扩展名
 			Optional<MediaType> mediaType = MediaTypeFactory.getMediaType("file." + key);
 			if (mediaType.isPresent()) {
 				return mediaType.get();
 			}
 		}
+		// 是否忽略未知的文件扩展名
 		if (isIgnoreUnknownExtensions()) {
 			return null;
 		}

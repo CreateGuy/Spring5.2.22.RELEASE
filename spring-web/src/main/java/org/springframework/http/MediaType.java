@@ -616,9 +616,8 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Parse the given list of (potentially) comma-separated strings into a
-	 * list of {@code MediaType} objects.
-	 * <p>This method can be used to parse an Accept or Content-Type header.
+	 * 将媒体类型进行切分
+	 * <p>比如说请求方的将媒体类型放入Accept中，是用逗号分隔的
 	 * @param mediaTypes the string to parse
 	 * @return the list of media types
 	 * @throws InvalidMediaTypeException if the media type value cannot be parsed
@@ -735,8 +734,7 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Sorts the given list of {@code MediaType} objects by specificity as the
-	 * primary criteria and quality value the secondary.
+	 * 对媒体类型进行排序
 	 * @see MediaType#sortBySpecificity(List)
 	 * @see MediaType#sortByQualityValue(List)
 	 */

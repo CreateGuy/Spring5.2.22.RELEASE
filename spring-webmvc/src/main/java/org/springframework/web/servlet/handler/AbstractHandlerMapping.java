@@ -74,7 +74,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		implements HandlerMapping, Ordered, BeanNameAware {
 
 	/**
-	 *  默认处理器
+	 *  默认处理程序
 	 */
 	@Nullable
 	private Object defaultHandler;
@@ -93,6 +93,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 
+	/**
+	 * Cors数据源
+	 */
 	@Nullable
 	private CorsConfigurationSource corsConfigurationSource;
 

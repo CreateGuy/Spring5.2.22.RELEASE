@@ -56,7 +56,7 @@ import org.springframework.lang.Nullable;
 public interface HandlerMapping {
 
 	/**
-	 * 最匹配的处理利的键
+	 * 最匹配的处理器的键
 	 */
 	String BEST_MATCHING_HANDLER_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingHandler";
 
@@ -66,6 +66,7 @@ public interface HandlerMapping {
 	String LOOKUP_PATH = HandlerMapping.class.getName() + ".lookupPath";
 
 	/**
+	 * 通常来说是请求Url
 	 * Name of the {@link HttpServletRequest} attribute that contains the path
 	 * within the handler mapping, in case of a pattern match, or the full
 	 * relevant URI (typically within the DispatcherServlet's mapping) else.
@@ -77,6 +78,7 @@ public interface HandlerMapping {
 	String PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE = HandlerMapping.class.getName() + ".pathWithinHandlerMapping";
 
 	/**
+	 * 通常来说是请求Url
 	 * Name of the {@link HttpServletRequest} attribute that contains the
 	 * best matching pattern within the handler mapping.
 	 * <p>Note: This attribute is not required to be supported by all

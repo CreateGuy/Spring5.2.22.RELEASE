@@ -58,6 +58,9 @@ import org.springframework.util.CollectionUtils;
  */
 public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
+	/**
+	 * 值为 /webjars/**和 /**的，没看到有具体的操作代码
+	 */
 	private final Map<String, Object> urlMap = new LinkedHashMap<>();
 
 
@@ -140,7 +143,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	}
 
 	/**
-	 * Register all handlers specified in the URL map for the corresponding paths.
+	 * 为URL注册对应的处理程序
 	 * @param urlMap a Map with URL paths as keys and handler beans or bean names as values
 	 * @throws BeansException if a handler couldn't be registered
 	 * @throws IllegalStateException if there is a conflicting handler registered
@@ -151,14 +154,15 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 		}
 		else {
 			urlMap.forEach((url, handler) -> {
-				// Prepend with slash if not already present.
+				// 加上斜杠
 				if (!url.startsWith("/")) {
 					url = "/" + url;
 				}
-				// Remove whitespace from handler bean name.
+				// 删除两边的空格
 				if (handler instanceof String) {
 					handler = ((String) handler).trim();
 				}
+				// 进行注册
 				registerHandler(url, handler);
 			});
 			if (logger.isDebugEnabled()) {

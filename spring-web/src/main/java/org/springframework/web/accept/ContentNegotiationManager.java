@@ -49,8 +49,14 @@ import org.springframework.web.context.request.NativeWebRequest;
  */
 public class ContentNegotiationManager implements ContentNegotiationStrategy, MediaTypeFileExtensionResolver {
 
+	/**
+	 * 返回的媒体类型的解析策略
+	 */
 	private final List<ContentNegotiationStrategy> strategies = new ArrayList<>();
 
+	/**
+	 * 将给定的媒体类型解析为文件扩展名列表的策略
+	 */
 	private final Set<MediaTypeFileExtensionResolver> resolvers = new LinkedHashSet<>();
 
 
@@ -122,6 +128,12 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 		Collections.addAll(this.resolvers, resolvers);
 	}
 
+	/**
+	 * 解析可以返回的媒体类型列表
+	 * @param request
+	 * @return
+	 * @throws HttpMediaTypeNotAcceptableException
+	 */
 	@Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest request) throws HttpMediaTypeNotAcceptableException {
 		for (ContentNegotiationStrategy strategy : this.strategies) {
@@ -155,6 +167,11 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 		return doResolveExtensions(MediaTypeFileExtensionResolver::getAllFileExtensions);
 	}
 
+	/**
+	 * 将给定的媒体类型解析为文件扩展名列表
+	 * @param extractor
+	 * @return
+	 */
 	private List<String> doResolveExtensions(Function<MediaTypeFileExtensionResolver, List<String>> extractor) {
 		List<String> result = null;
 		for (MediaTypeFileExtensionResolver resolver : this.resolvers) {
@@ -173,13 +190,14 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 	}
 
 	/**
-	 * Return all registered lookup key to media type mappings by iterating
+	 * 返回所有的文件扩展名到媒体类型的映射
 	 * {@link MediaTypeFileExtensionResolver}s.
 	 * @since 5.2.4
 	 */
 	public Map<String, MediaType> getMediaTypeMappings() {
 		Map<String, MediaType> result = null;
 		for (MediaTypeFileExtensionResolver resolver : this.resolvers) {
+			// 只有MappingMediaTypeFileExtensionResolver这种类型才支持
 			if (resolver instanceof MappingMediaTypeFileExtensionResolver) {
 				Map<String, MediaType> map = ((MappingMediaTypeFileExtensionResolver) resolver).getMediaTypes();
 				if (CollectionUtils.isEmpty(map)) {

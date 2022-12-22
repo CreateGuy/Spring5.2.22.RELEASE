@@ -24,9 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Strategy that resolves the requested content type from a query parameter.
- * The default query parameter name is {@literal "format"}.
- *
+ * 从queryString中解析所请求的媒体类型
  * <p>You can register static mappings between keys (i.e. the expected value of
  * the query parameter) and MediaType's via {@link #addMapping(String, MediaType)}.
  * As of 5.0 this strategy also supports dynamic lookups of keys via
@@ -37,6 +35,9 @@ import org.springframework.web.context.request.NativeWebRequest;
  */
 public class ParameterContentNegotiationStrategy extends AbstractMappingContentNegotiationStrategy {
 
+	/**
+	 * 从queryString获得文件扩展名的参数名称
+	 */
 	private String parameterName = "format";
 
 

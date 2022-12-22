@@ -34,8 +34,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * Helper class for URL path matching. Provides support for URL paths in
- * {@code RequestDispatcher} includes and support for consistent URL decoding.
+ * URL路径匹配的帮助类。在f@code RequestDispatcher include中提供对uRL路径的支持，并支持一致的uRL解码。
  *
  * <p>Used by {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}
  * and {@link org.springframework.web.servlet.support.RequestContext} for path matching

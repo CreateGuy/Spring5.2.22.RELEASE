@@ -30,25 +30,32 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Handler execution chain, consisting of handler object and any handler interceptors.
- * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
- *
- * @author Juergen Hoeller
- * @since 20.06.2003
- * @see HandlerInterceptor
+ * 处理方法执行链，由处理程序对象和任何拦截器组成
  */
 public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	/**
+	 * 具体的处理方法
+	 */
 	private final Object handler;
 
+	/**
+	 * 作用不知，老版本没有
+	 */
 	@Nullable
 	private HandlerInterceptor[] interceptors;
 
+	/**
+	 * 需要执行的拦截器
+	 */
 	@Nullable
 	private List<HandlerInterceptor> interceptorList;
 
+	/**
+	 * 指示当前拦截器执行的位置
+	 */
 	private int interceptorIndex = -1;
 
 
@@ -61,12 +68,13 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Create a new HandlerExecutionChain.
+	 * 创建拦截器链
 	 * @param handler the handler object to execute
 	 * @param interceptors the array of interceptors to apply
 	 * (in the given order) before the handler itself executes
 	 */
 	public HandlerExecutionChain(Object handler, @Nullable HandlerInterceptor... interceptors) {
+		// 如果传入的本身就是一个拦截器链
 		if (handler instanceof HandlerExecutionChain) {
 			HandlerExecutionChain originalChain = (HandlerExecutionChain) handler;
 			this.handler = originalChain.getHandler();
@@ -138,7 +146,7 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Apply preHandle methods of registered interceptors.
+	 * 执行拦截器的 preHandle 方法
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
 	 * that this interceptor has already dealt with the response itself.
@@ -159,7 +167,7 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Apply postHandle methods of registered interceptors.
+	 * 执行拦截器的 postHandle 方法
 	 */
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)
 			throws Exception {
@@ -174,9 +182,15 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Trigger afterCompletion callbacks on the mapped HandlerInterceptors.
-	 * Will just invoke afterCompletion for all interceptors whose preHandle invocation
-	 * has successfully completed and returned true.
+	 * 执行拦截器的 afterCompletion 方法
+	 * <ul>
+	 *     <li>
+	 *         比如说拦截器的 preHandle 方法返回了false，执行
+	 *     </li>
+	 *     <li>
+	 *         比如说拦截器的 postHandle 方法执行完毕后，执行
+	 *     </li>
+	 * </ul>
 	 */
 	void triggerAfterCompletion(HttpServletRequest request, HttpServletResponse response, @Nullable Exception ex)
 			throws Exception {
@@ -196,13 +210,19 @@ public class HandlerExecutionChain {
 	}
 
 	/**
-	 * Apply afterConcurrentHandlerStarted callback on mapped AsyncHandlerInterceptors.
+	 * 执行异步拦截器的 afterConcurrentHandlingStarted 方法
+	 * <ul>
+	 *     <li>
+	 *         当Controller返回值是异步任务的时候，执行
+	 *     </li>
+	 * </ul>
 	 */
 	void applyAfterConcurrentHandlingStarted(HttpServletRequest request, HttpServletResponse response) {
 		HandlerInterceptor[] interceptors = getInterceptors();
 		if (!ObjectUtils.isEmpty(interceptors)) {
 			for (int i = interceptors.length - 1; i >= 0; i--) {
 				HandlerInterceptor interceptor = interceptors[i];
+				// 判断是否是异步任务
 				if (interceptor instanceof AsyncHandlerInterceptor) {
 					try {
 						AsyncHandlerInterceptor asyncInterceptor = (AsyncHandlerInterceptor) interceptor;

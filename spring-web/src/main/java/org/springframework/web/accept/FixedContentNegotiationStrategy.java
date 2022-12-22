@@ -24,13 +24,13 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * A {@code ContentNegotiationStrategy} that returns a fixed content type.
- *
- * @author Rossen Stoyanchev
- * @since 3.2
+ * 返回固定媒体类型的内容协商策略
  */
 public class FixedContentNegotiationStrategy implements ContentNegotiationStrategy {
 
+	/**
+	 * 固定的媒体类型策略
+	 */
 	private final List<MediaType> contentTypes;
 
 

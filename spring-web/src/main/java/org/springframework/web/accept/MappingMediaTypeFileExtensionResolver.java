@@ -31,37 +31,41 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
 /**
- * An implementation of {@code MediaTypeFileExtensionResolver} that maintains
- * lookups between file extensions and MediaTypes in both directions.
- *
- * <p>Initially created with a map of file extensions and media types.
- * Subsequently subclasses can use {@link #addMapping} to add more mappings.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.2
+ * 提供文件扩展名和媒体类型(MediaTypes)之间双向查找
  */
 public class MappingMediaTypeFileExtensionResolver implements MediaTypeFileExtensionResolver {
 
+	/**
+	 * 文件扩展名和媒体类型的映射关系
+	 */
 	private final ConcurrentMap<String, MediaType> mediaTypes = new ConcurrentHashMap<>(64);
 
+	/**
+	 * 媒体类型和文件扩展名的映射关系
+	 */
 	private final ConcurrentMap<MediaType, List<String>> fileExtensions = new ConcurrentHashMap<>(64);
 
+	/**
+	 * 此对象维护的所有的文件扩展名；ol
+	 */
 	private final List<String> allFileExtensions = new CopyOnWriteArrayList<>();
 
 
 	/**
-	 * Create an instance with the given map of file extensions and media types.
+	 * 用给定的文件扩展名和媒体类型映射创建一个实例
 	 */
 	public MappingMediaTypeFileExtensionResolver(@Nullable Map<String, MediaType> mediaTypes) {
 		if (mediaTypes != null) {
+			// 文件扩展名
 			Set<String> allFileExtensions = new HashSet<>(mediaTypes.size());
 			mediaTypes.forEach((extension, mediaType) -> {
+				// 文件扩展名都取小写
 				String lowerCaseExtension = extension.toLowerCase(Locale.ENGLISH);
 				this.mediaTypes.put(lowerCaseExtension, mediaType);
 				addFileExtension(mediaType, lowerCaseExtension);
 				allFileExtensions.add(lowerCaseExtension);
 			});
+			// 将文件扩展名加入 allFileExtensions 中
 			this.allFileExtensions.addAll(allFileExtensions);
 		}
 	}
@@ -76,7 +80,7 @@ public class MappingMediaTypeFileExtensionResolver implements MediaTypeFileExten
 	}
 
 	/**
-	 * Map an extension to a MediaType. Ignore if extension already mapped.
+	 * 将文件扩展名映射到媒体类型，忽略已映射的扩展名
 	 */
 	protected void addMapping(String extension, MediaType mediaType) {
 		MediaType previous = this.mediaTypes.putIfAbsent(extension, mediaType);
@@ -87,25 +91,34 @@ public class MappingMediaTypeFileExtensionResolver implements MediaTypeFileExten
 	}
 
 	private void addFileExtension(MediaType mediaType, String extension) {
+		// 不存在的才加入
 		this.fileExtensions.computeIfAbsent(mediaType, key -> new CopyOnWriteArrayList<>())
 				.add(extension);
 	}
 
 
+	/**
+	 * 将给定的媒体类型解析为文件扩展名列表
+	 * @param mediaType the media type to resolve
+	 * @return
+	 */
 	@Override
 	public List<String> resolveFileExtensions(MediaType mediaType) {
 		List<String> fileExtensions = this.fileExtensions.get(mediaType);
 		return (fileExtensions != null ? fileExtensions : Collections.emptyList());
 	}
 
+	/**
+	 * 获取所有已注册的文件扩展名
+	 * @return
+	 */
 	@Override
 	public List<String> getAllFileExtensions() {
 		return Collections.unmodifiableList(this.allFileExtensions);
 	}
 
 	/**
-	 * Use this method for a reverse lookup from extension to MediaType.
-	 * @return a MediaType for the extension, or {@code null} if none found
+	 * 使用此方法进行从文件扩展名到媒体类型的反向查找
 	 */
 	@Nullable
 	protected MediaType lookupMediaType(String extension) {

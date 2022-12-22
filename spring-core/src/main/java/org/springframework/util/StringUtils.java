@@ -333,10 +333,10 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Test if the given {@code String} matches the given single character.
-	 * @param str the {@code String} to check
-	 * @param singleCharacter the character to compare to
-	 * @since 5.2.9
+	 * 检查传入的str是否与单个字符匹配
+	 * @param str
+	 * @param singleCharacter
+	 * @return
 	 */
 	public static boolean matchesCharacter(@Nullable String str, char singleCharacter) {
 		return (str != null && str.length() == 1 && str.charAt(0) == singleCharacter);

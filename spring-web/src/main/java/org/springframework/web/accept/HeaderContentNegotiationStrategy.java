@@ -27,11 +27,7 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * A {@code ContentNegotiationStrategy} that checks the 'Accept' request header.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.2
+ * 从请求头中获取ACCEPT作为媒体类型的解析策略
  */
 public class HeaderContentNegotiationStrategy implements ContentNegotiationStrategy {
 
@@ -43,14 +39,18 @@ public class HeaderContentNegotiationStrategy implements ContentNegotiationStrat
 	public List<MediaType> resolveMediaTypes(NativeWebRequest request)
 			throws HttpMediaTypeNotAcceptableException {
 
+		// 获得ACCEPT的值
 		String[] headerValueArray = request.getHeaderValues(HttpHeaders.ACCEPT);
+		// 没有设置ACCEPT那么就认为请求方可以接受任何媒体类型
 		if (headerValueArray == null) {
 			return MEDIA_TYPE_ALL_LIST;
 		}
 
 		List<String> headerValues = Arrays.asList(headerValueArray);
 		try {
+			// 将媒体类型进行切分
 			List<MediaType> mediaTypes = MediaType.parseMediaTypes(headerValues);
+			// 对媒体类型进行排序
 			MediaType.sortBySpecificityAndQuality(mediaTypes);
 			return !CollectionUtils.isEmpty(mediaTypes) ? mediaTypes : MEDIA_TYPE_ALL_LIST;
 		}
