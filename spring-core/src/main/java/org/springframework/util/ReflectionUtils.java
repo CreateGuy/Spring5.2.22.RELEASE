@@ -46,9 +46,7 @@ import org.springframework.lang.Nullable;
 public abstract class ReflectionUtils {
 
 	/**
-	 * Pre-built MethodFilter that matches all non-bridge non-synthetic methods
-	 * which are not declared on {@code java.lang.Object}.
-	 * @since 3.0.5
+	 * 排查所有非桥接非合成的方法
 	 */
 	public static final MethodFilter USER_DECLARED_METHODS =
 			(method -> !method.isBridge() && !method.isSynthetic());

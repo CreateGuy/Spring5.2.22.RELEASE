@@ -93,41 +93,42 @@ public class DefaultFormattingConversionService extends FormattingConversionServ
 		if (embeddedValueResolver != null) {
 			setEmbeddedValueResolver(embeddedValueResolver);
 		}
+		// 添加适合大多数环境的转换器
 		DefaultConversionService.addDefaultConverters(this);
 		if (registerDefaultFormatters) {
+			// 添加默认的 Formatters，适用于绝大多数
 			addDefaultFormatters(this);
 		}
 	}
 
 
 	/**
-	 * Add formatters appropriate for most environments: including number formatters,
-	 * JSR-354 Money & Currency formatters, JSR-310 Date-Time and/or Joda-Time formatters,
-	 * depending on the presence of the corresponding API on the classpath.
-	 * @param formatterRegistry the service to register default formatters with
+	 * 添加默认的 Formatters，适用于绝大多数
+	 * @param formatterRegistry
 	 */
 	public static void addDefaultFormatters(FormatterRegistry formatterRegistry) {
-		// Default handling of number values
+		// 注册数字相关处理
 		formatterRegistry.addFormatterForFieldAnnotation(new NumberFormatAnnotationFormatterFactory());
 
-		// Default handling of monetary values
+		// 货币值的默认处理
 		if (jsr354Present) {
+			// 添加将字符串转为货币类型的格式化程序
 			formatterRegistry.addFormatter(new CurrencyUnitFormatter());
 			formatterRegistry.addFormatter(new MonetaryAmountFormatter());
 			formatterRegistry.addFormatterForFieldAnnotation(new Jsr354NumberFormatAnnotationFormatterFactory());
 		}
 
-		// Default handling of date-time values
+		// 日期-时间值的默认处理
 
-		// just handling JSR-310 specific date and time types
+		// 只处理JsR-310特定的日期和时间类型
 		new DateTimeFormatterRegistrar().registerFormatters(formatterRegistry);
 
 		if (jodaTimePresent) {
-			// handles Joda-specific types as well as Date, Calendar, Long
+			// 处理特定的类型 Date, Calendar, Long
 			new JodaTimeFormatterRegistrar().registerFormatters(formatterRegistry);
 		}
 		else {
-			// regular DateFormat-based Date, Calendar, Long converters
+			// 常规的基于日期格式的日期，日历，长转换器
 			new DateFormatterRegistrar().registerFormatters(formatterRegistry);
 		}
 	}

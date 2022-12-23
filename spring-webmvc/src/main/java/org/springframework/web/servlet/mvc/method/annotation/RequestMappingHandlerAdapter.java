@@ -116,13 +116,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
 
 	/**
-	 * MethodFilter that matches {@link InitBinder @InitBinder} methods.
+	 * 筛选 {@link InitBinder @InitBinder} 方法的
 	 */
 	public static final MethodFilter INIT_BINDER_METHODS = method ->
 			AnnotatedElementUtils.hasAnnotation(method, InitBinder.class);
 
 	/**
-	 * MethodFilter that matches {@link ModelAttribute @ModelAttribute} methods.
+	 * 筛选 {@link ModelAttribute @ModelAttribute} 方法 的
 	 */
 	public static final MethodFilter MODEL_ATTRIBUTE_METHODS = method ->
 			(!AnnotatedElementUtils.hasAnnotation(method, RequestMapping.class) &&
@@ -135,6 +135,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private HandlerMethodArgumentResolverComposite argumentResolvers;
 
+	/**
+	 * 默认的参数解析器
+	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
 
@@ -171,6 +174,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private int cacheSecondsForSessionAttributeHandlers = 0;
 
+	/**
+	 * 是否需要在同步代码块中执行代码
+	 */
 	private boolean synchronizeOnSession = false;
 
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
@@ -182,6 +188,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private final Map<Class<?>, SessionAttributesHandler> sessionAttributesHandlerCache = new ConcurrentHashMap<>(64);
 
+	/**
+	 * Class和Class中标志了@InitBinder注解方法的映射关系
+	 */
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
@@ -771,24 +780,26 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
 		ModelAndView mav;
+		// 检查请求方式和会话
 		checkRequest(request);
 
-		// Execute invokeHandlerMethod in synchronized block if required.
+		// 如果需要，在同步代码块中执行 invokeHandlerMethod 方法
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
+				// 返回该会话的互斥锁
 				Object mutex = WebUtils.getSessionMutex(session);
 				synchronized (mutex) {
 					mav = invokeHandlerMethod(request, response, handlerMethod);
 				}
 			}
 			else {
-				// No HttpSession available -> no mutex necessary
+				// 没有会话，无法使用互斥锁
 				mav = invokeHandlerMethod(request, response, handlerMethod);
 			}
 		}
 		else {
-			// No synchronization on session demanded at all...
+			// 没有同步的要求
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
@@ -826,7 +837,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * Invoke the {@link RequestMapping} handler method preparing a {@link ModelAndView}
+	 * 执行处理程序，并返回 {@link ModelAndView}
 	 * if view resolution is required.
 	 * @since 4.2
 	 * @see #createInvocableHandlerMethod(HandlerMethod)
@@ -835,6 +846,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
+		// 包装请求
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		try {
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
@@ -933,9 +945,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
+		// 获得bean的类型
 		Class<?> handlerType = handlerMethod.getBeanType();
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
+			// 选择标注了@InitBinder注解的方法
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}
@@ -956,8 +970,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return createDataBinderFactory(initBinderMethods);
 	}
 
+	/**
+	 * 创建 {@link InvocableHandlerMethod}
+	 * @param bean
+	 * @param method
+	 * @return
+	 */
 	private InvocableHandlerMethod createInitBinderMethod(Object bean, Method method) {
 		InvocableHandlerMethod binderMethod = new InvocableHandlerMethod(bean, method);
+		// 设置参数解析器
 		if (this.initBinderArgumentResolvers != null) {
 			binderMethod.setHandlerMethodArgumentResolvers(this.initBinderArgumentResolvers);
 		}

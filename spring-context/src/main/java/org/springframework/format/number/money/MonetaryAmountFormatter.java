@@ -26,6 +26,7 @@ import org.springframework.format.Formatter;
 import org.springframework.lang.Nullable;
 
 /**
+ * 将字符串转为货币类型
  * Formatter for JSR-354 {@link javax.money.MonetaryAmount} values,
  * delegating to {@link javax.money.format.MonetaryAmountFormat#format}
  * and {@link javax.money.format.MonetaryAmountFormat#parse}.

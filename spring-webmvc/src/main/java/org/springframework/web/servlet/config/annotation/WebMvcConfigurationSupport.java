@@ -176,6 +176,9 @@ import org.springframework.web.util.UrlPathHelper;
  */
 public class WebMvcConfigurationSupport implements ApplicationContextAware, ServletContextAware {
 
+	/**
+	 * 下面的参数都是有关媒体类型映射关系的标志位
+	 */
 	private static final boolean romePresent;
 
 	private static final boolean jaxb2Present;
@@ -192,6 +195,9 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 
 	private static final boolean jsonbPresent;
 
+	/**
+	 * 确定媒体类型映射关系用
+	 */
 	static {
 		ClassLoader classLoader = WebMvcConfigurationSupport.class.getClassLoader();
 		romePresent = ClassUtils.isPresent("com.rometools.rome.feed.WireFeed", classLoader);
@@ -212,6 +218,9 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	@Nullable
 	private ServletContext servletContext;
 
+	/**
+	 * 拦截器列表
+	 */
 	@Nullable
 	private List<Object> interceptors;
 
@@ -282,9 +291,13 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			@Qualifier("mvcResourceUrlProvider") ResourceUrlProvider resourceUrlProvider) {
 
 		RequestMappingHandlerMapping mapping = createRequestMappingHandlerMapping();
+		// 表明当前HandlerMapping是在最前面的
 		mapping.setOrder(0);
+		// 注册能拦截器
 		mapping.setInterceptors(getInterceptors(conversionService, resourceUrlProvider));
+		// 设置内容协商管理器
 		mapping.setContentNegotiationManager(contentNegotiationManager);
+		// 设置Cors配置源
 		mapping.setCorsConfigurations(getCorsConfigurations());
 
 		PathMatchConfigurer configurer = getPathMatchConfigurer();
@@ -328,7 +341,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Provide access to the shared handler interceptors used to configure
+	 * 注册能拦截器
 	 * {@link HandlerMapping} instances with.
 	 * <p>This method cannot be overridden; use {@link #addInterceptors} instead.
 	 */
@@ -337,7 +350,9 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			ResourceUrlProvider mvcResourceUrlProvider) {
 		if (this.interceptors == null) {
 			InterceptorRegistry registry = new InterceptorRegistry();
+			// 添加自定义拦截器
 			addInterceptors(registry);
+			// 默认的拦截器
 			registry.addInterceptor(new ConversionServiceExposingInterceptor(mvcConversionService));
 			registry.addInterceptor(new ResourceUrlProviderExposingInterceptor(mvcResourceUrlProvider));
 			this.interceptors = registry.getInterceptors();
@@ -407,13 +422,23 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	public ContentNegotiationManager mvcContentNegotiationManager() {
 		if (this.contentNegotiationManager == null) {
 			ContentNegotiationConfigurer configurer = new ContentNegotiationConfigurer(this.servletContext);
+			// 设置默认的媒体类型映射关系
 			configurer.mediaTypes(getDefaultMediaTypes());
+			// 自定义配置
 			configureContentNegotiation(configurer);
+			// 创建内容协商策略
 			this.contentNegotiationManager = configurer.buildContentNegotiationManager();
 		}
 		return this.contentNegotiationManager;
 	}
 
+	/**
+	 * 获得默认的文件扩展名到媒体类型的映射关系
+	 * <ul>
+	 *     <li>默认也只有xml和json</li>
+	 * </ul>
+	 * @return
+	 */
 	protected Map<String, MediaType> getDefaultMediaTypes() {
 		Map<String, MediaType> map = new HashMap<>(4);
 		if (romePresent) {
@@ -476,8 +501,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Return a {@link BeanNameUrlHandlerMapping} ordered at 2 to map URL
-	 * paths to controller bean names.
+	 * 注入一个 {@link BeanNameUrlHandlerMapping}
 	 */
 	@Bean
 	public BeanNameUrlHandlerMapping beanNameHandlerMapping(
@@ -485,14 +509,17 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			@Qualifier("mvcResourceUrlProvider") ResourceUrlProvider resourceUrlProvider) {
 
 		BeanNameUrlHandlerMapping mapping = new BeanNameUrlHandlerMapping();
+		// 指定位置
 		mapping.setOrder(2);
+		// 注册能拦截器
 		mapping.setInterceptors(getInterceptors(conversionService, resourceUrlProvider));
+		// 注册Cors配置源
 		mapping.setCorsConfigurations(getCorsConfigurations());
 		return mapping;
 	}
 
 	/**
-	 * Return a {@link RouterFunctionMapping} ordered at 3 to map
+	 * 注入 {@link RouterFunctionMapping} 实例
 	 * {@linkplain org.springframework.web.servlet.function.RouterFunction router functions}.
 	 * Consider overriding one of these other more fine-grained methods:
 	 * <ul>
@@ -508,17 +535,19 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			@Qualifier("mvcResourceUrlProvider") ResourceUrlProvider resourceUrlProvider) {
 
 		RouterFunctionMapping mapping = new RouterFunctionMapping();
+		// 确定此 HandlerMapping 的顺序
 		mapping.setOrder(3);
+		// 注册拦截器
 		mapping.setInterceptors(getInterceptors(conversionService, resourceUrlProvider));
+		// 注册Cors数据源
 		mapping.setCorsConfigurations(getCorsConfigurations());
+		// 注册消息转换器
 		mapping.setMessageConverters(getMessageConverters());
 		return mapping;
 	}
 
 	/**
-	 * Return a handler mapping ordered at Integer.MAX_VALUE-1 with mapped
-	 * resource handlers. To configure resource handling, override
-	 * {@link #addResourceHandlers}.
+	 * 注入一个 SimpleUrlHandlerMapping
 	 */
 	@Bean
 	@Nullable
@@ -796,7 +825,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Provides access to the shared {@link HttpMessageConverter HttpMessageConverters}
+	 * 返回 {@link HttpMessageConverter}
 	 * used by the {@link RequestMappingHandlerAdapter} and the
 	 * {@link ExceptionHandlerExceptionResolver}.
 	 * <p>This method cannot be overridden; use {@link #configureMessageConverters} instead.
@@ -805,8 +834,10 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	protected final List<HttpMessageConverter<?>> getMessageConverters() {
 		if (this.messageConverters == null) {
 			this.messageConverters = new ArrayList<>();
+			// 自定义配置
 			configureMessageConverters(this.messageConverters);
 			if (this.messageConverters.isEmpty()) {
+				// 添加默认的
 				addDefaultHttpMessageConverters(this.messageConverters);
 			}
 			extendMessageConverters(this.messageConverters);
@@ -837,7 +868,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Adds a set of default HttpMessageConverter instances to the given list.
+	 * 添加默认 HttpMessageConverter 实例添加到给定列表
 	 * Subclasses can call this method from {@link #configureMessageConverters}.
 	 * @param messageConverters the list to add the default message converters to
 	 */
@@ -1069,9 +1100,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Return the registered {@link CorsConfiguration} objects,
-	 * keyed by path pattern.
-	 * @since 4.2
+	 * 返回Cors配置源
 	 */
 	protected final Map<String, CorsConfiguration> getCorsConfigurations() {
 		if (this.corsConfigurations == null) {

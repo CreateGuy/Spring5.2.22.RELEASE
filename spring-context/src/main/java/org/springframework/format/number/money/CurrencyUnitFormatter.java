@@ -24,11 +24,7 @@ import javax.money.Monetary;
 import org.springframework.format.Formatter;
 
 /**
- * Formatter for JSR-354 {@link javax.money.CurrencyUnit} values,
- * from and to currency code Strings.
- *
- * @author Juergen Hoeller
- * @since 4.2
+ * 将字符串转为货币类型
  */
 public class CurrencyUnitFormatter implements Formatter<CurrencyUnit> {
 

@@ -147,8 +147,7 @@ public class ResourceHandlerRegistry {
 	}
 
 	/**
-	 * Return a handler mapping with the mapped resource handlers; or {@code null} in case
-	 * of no registrations.
+	 * 创建一个 SimpleUrlHandlerMapping
 	 */
 	@Nullable
 	@SuppressWarnings("deprecation")

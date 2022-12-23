@@ -365,7 +365,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check whether the given class is visible in the given ClassLoader.
+	 * 判断传入的 ClassLoader 能否加载指定的 Class
 	 * @param clazz the class to check (typically an interface)
 	 * @param classLoader the ClassLoader to check against
 	 * (may be {@code null} in which case this method will always return {@code true})
@@ -375,6 +375,7 @@ public abstract class ClassUtils {
 			return true;
 		}
 		try {
+			// 使用同一个ClassLoader自然能够加载指定的Class
 			if (clazz.getClassLoader() == classLoader) {
 				return true;
 			}
@@ -383,7 +384,7 @@ public abstract class ClassUtils {
 			// Fall through to loadable check below
 		}
 
-		// Visible if same Class can be loaded from given ClassLoader
+		// 判断传入的 ClassLoader 能否加载指定的 Class
 		return isLoadable(clazz, classLoader);
 	}
 
@@ -431,7 +432,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Check whether the given class is loadable in the given ClassLoader.
+	 * 判断传入的 ClassLoader 能否加载指定的 Class
 	 * @param clazz the class to check (typically an interface)
 	 * @param classLoader the ClassLoader to check against
 	 * @since 5.0.6
@@ -727,8 +728,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return all interfaces that the given class implements as a Set,
-	 * including ones implemented by superclasses.
+	 * 返回传入的Class能够加载 继承的父类和实现的接口 的集合
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyze for interfaces
 	 * @return all interfaces that the given object implements as a Set
@@ -738,8 +738,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return all interfaces that the given class implements as a Set,
-	 * including ones implemented by superclasses.
+	 * 返回传入的Class能够加载 继承的父类和实现的接口 的集合
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyze for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in
@@ -754,8 +753,10 @@ public abstract class ClassUtils {
 		Set<Class<?>> interfaces = new LinkedHashSet<>();
 		Class<?> current = clazz;
 		while (current != null) {
+			// 获得此类继承的父类和实现的接口
 			Class<?>[] ifcs = current.getInterfaces();
 			for (Class<?> ifc : ifcs) {
+				// 判断传入的 ClassLoader 能否加载指定的 Class
 				if (isVisible(ifc, classLoader)) {
 					interfaces.add(ifc);
 				}

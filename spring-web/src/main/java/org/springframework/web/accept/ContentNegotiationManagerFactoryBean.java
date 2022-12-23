@@ -35,8 +35,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.ServletContextAware;
 
 /**
- * Factory to create a {@code ContentNegotiationManager} and configure it with
- * {@link ContentNegotiationStrategy} instances.
+ * 用于创建 {@link ContentNegotiationStrategy} 实例的 FactoryBean
  *
  * <p>This factory offers properties that in turn result in configuring the
  * underlying strategies. The table below shows the property names, their
@@ -100,28 +99,57 @@ import org.springframework.web.context.ServletContextAware;
 public class ContentNegotiationManagerFactoryBean
 		implements FactoryBean<ContentNegotiationManager>, ServletContextAware, InitializingBean {
 
+	/**
+	 * 自定义内容协商策略
+	 */
 	@Nullable
 	private List<ContentNegotiationStrategy> strategies;
 
-
+	/**
+	 * 媒体类型映射是否可用
+	 */
 	private boolean favorPathExtension = true;
 
+	/**
+	 * 媒体类型映射是否可用
+	 */
 	private boolean favorParameter = false;
 
+	/**
+	 * 是否忽略从请求头获取媒体类型的标志位
+	 */
 	private boolean ignoreAcceptHeader = false;
 
+	/**
+	 * 文件扩展名到媒体类型的映射
+	 */
 	private Map<String, MediaType> mediaTypes = new HashMap<>();
 
+	/**
+	 * 是否忽略未知的文件扩展名
+	 */
 	private boolean ignoreUnknownPathExtensions = true;
 
+	/**
+	 * 仅使用已经注册的文件扩展名
+	 */
 	@Nullable
 	private Boolean useRegisteredExtensionsOnly;
 
+	/**
+	 * 从queryString获得文件扩展名的参数名称
+	 */
 	private String parameterName = "format";
 
+	/**
+	 * 默认的内容协商策略
+	 */
 	@Nullable
 	private ContentNegotiationStrategy defaultNegotiationStrategy;
 
+	/**
+	 * 内容协商管理器
+	 */
 	@Nullable
 	private ContentNegotiationManager contentNegotiationManager;
 
@@ -320,18 +348,20 @@ public class ContentNegotiationManagerFactoryBean
 	}
 
 	/**
-	 * Create and initialize a {@link ContentNegotiationManager} instance.
+	 * 创建 {@link ContentNegotiationManager} 实例
 	 * @since 5.0
 	 */
 	@SuppressWarnings("deprecation")
 	public ContentNegotiationManager build() {
 		List<ContentNegotiationStrategy> strategies = new ArrayList<>();
 
+		// 当用户设置过内容协商策略的时候
 		if (this.strategies != null) {
 			strategies.addAll(this.strategies);
 		}
 		else {
 			if (this.favorPathExtension) {
+				// 此类已经被弃用，不看
 				PathExtensionContentNegotiationStrategy strategy;
 				if (this.servletContext != null && !useRegisteredExtensionsOnly()) {
 					strategy = new ServletPathExtensionContentNegotiationStrategy(this.servletContext, this.mediaTypes);
@@ -345,7 +375,9 @@ public class ContentNegotiationManagerFactoryBean
 				}
 				strategies.add(strategy);
 			}
+			// 媒体类型映射是否可用
 			if (this.favorParameter) {
+				// 从queryString中解析所请求的媒体类型
 				ParameterContentNegotiationStrategy strategy = new ParameterContentNegotiationStrategy(this.mediaTypes);
 				strategy.setParameterName(this.parameterName);
 				if (this.useRegisteredExtensionsOnly != null) {
@@ -356,9 +388,11 @@ public class ContentNegotiationManagerFactoryBean
 				}
 				strategies.add(strategy);
 			}
+			// 是否从请求头获取媒体类型的策略
 			if (!this.ignoreAcceptHeader) {
 				strategies.add(new HeaderContentNegotiationStrategy());
 			}
+			// 添加默认的内容协商策略
 			if (this.defaultNegotiationStrategy != null) {
 				strategies.add(this.defaultNegotiationStrategy);
 			}
@@ -369,6 +403,7 @@ public class ContentNegotiationManagerFactoryBean
 		// Ensure media type mappings are available via ContentNegotiationManager#getMediaTypeMappings()
 		// independent of path extension or parameter strategies.
 
+		// 添加一个可以从文件扩展名和媒体类型(MediaTypes)之间双向查找的策略，并不是内容协商策略
 		if (!CollectionUtils.isEmpty(this.mediaTypes) && !this.favorPathExtension && !this.favorParameter) {
 			this.contentNegotiationManager.addFileExtensionResolvers(
 					new MappingMediaTypeFileExtensionResolver(this.mediaTypes));

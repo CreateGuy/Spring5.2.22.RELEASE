@@ -33,13 +33,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
 
 /**
- * Extension of {@link HandlerMethod} that invokes the underlying method with
- * argument values resolved from the current HTTP request through a list of
- * {@link HandlerMethodArgumentResolver}.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.1
+ * HandlerMethod的扩展，负责如何绑定方法入参中的参数值
  */
 public class InvocableHandlerMethod extends HandlerMethod {
 

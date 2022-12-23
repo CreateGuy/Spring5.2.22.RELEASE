@@ -82,13 +82,18 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	protected static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
 
-	/** Set of supported HTTP methods. */
+	/**
+	 * 支持的请求方式
+	 * */
 	@Nullable
 	private Set<String> supportedMethods;
 
 	@Nullable
 	private String allowHeader;
 
+	/**
+	 * 是否检查会话
+	 */
 	private boolean requireSession = false;
 
 	@Nullable
@@ -369,19 +374,19 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 
 	/**
-	 * Check the given request for supported methods and a required session, if any.
+	 * 检查请求方式和会话
 	 * @param request current HTTP request
 	 * @throws ServletException if the request cannot be handled because a check failed
 	 * @since 4.2
 	 */
 	protected final void checkRequest(HttpServletRequest request) throws ServletException {
-		// Check whether we should support the request method.
+		// 检查是否支持请求方式
 		String method = request.getMethod();
 		if (this.supportedMethods != null && !this.supportedMethods.contains(method)) {
 			throw new HttpRequestMethodNotSupportedException(method, this.supportedMethods);
 		}
 
-		// Check whether a session is required.
+		// 检查会话是否存在
 		if (this.requireSession && request.getSession(false) == null) {
 			throw new HttpSessionRequiredException("Pre-existing session required but none found");
 		}

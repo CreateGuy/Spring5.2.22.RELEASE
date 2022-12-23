@@ -23,12 +23,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Strategy interface for resolving method parameters into argument values in
- * the context of a given request.
- *
- * @author Arjen Poutsma
- * @since 3.1
- * @see HandlerMethodReturnValueHandler
+ * 参数解析器
  */
 public interface HandlerMethodArgumentResolver {
 

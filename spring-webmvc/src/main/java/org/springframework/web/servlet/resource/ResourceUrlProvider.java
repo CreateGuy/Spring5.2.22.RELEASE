@@ -63,6 +63,9 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
+	/**
+	 * 默认就只有 /webjars/**和 /**
+	 */
 	private final Map<String, ResourceHttpRequestHandler> handlerMap = new LinkedHashMap<>();
 
 	private boolean autodetect = true;
@@ -210,6 +213,7 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 	}
 
 	/**
+	 * 使用传入的资源路径进行查询，如果能找到就返回路径
 	 * Compare the given path against configured resource handler mappings and
 	 * if a match is found use the {@code ResourceResolver} chain of the matched
 	 * {@code ResourceHttpRequestHandler} to resolve the URL path to expose for
@@ -223,13 +227,14 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 	 */
 	@Nullable
 	public final String getForLookupPath(String lookupPath) {
-		// Clean duplicate slashes or pathWithinPattern won't match lookupPath
+		// 清除重复的斜杠
 		String previous;
 		do {
 			previous = lookupPath;
 			lookupPath = StringUtils.replace(lookupPath, "//", "/");
 		} while (!lookupPath.equals(previous));
 
+		// 确定资源位置能够匹配
 		List<String> matchingPatterns = new ArrayList<>();
 		for (String pattern : this.handlerMap.keySet()) {
 			if (getPathMatcher().match(pattern, lookupPath)) {
@@ -241,10 +246,12 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 			Comparator<String> patternComparator = getPathMatcher().getPatternComparator(lookupPath);
 			matchingPatterns.sort(patternComparator);
 			for (String pattern : matchingPatterns) {
+				//  给定一个模式和一个完整路径，确定模式映射部分
 				String pathWithinMapping = getPathMatcher().extractPathWithinPattern(pattern, lookupPath);
 				String pathMapping = lookupPath.substring(0, lookupPath.indexOf(pathWithinMapping));
 				ResourceHttpRequestHandler handler = this.handlerMap.get(pattern);
 				ResourceResolverChain chain = new DefaultResourceResolverChain(handler.getResourceResolvers());
+				// 解析面向外部的公共uRL路径，供客户端用于访问所定位的资源
 				String resolved = chain.resolveUrlPath(pathWithinMapping, handler.getLocations());
 				if (resolved == null) {
 					continue;

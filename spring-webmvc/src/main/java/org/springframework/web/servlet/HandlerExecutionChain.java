@@ -157,6 +157,7 @@ public class HandlerExecutionChain {
 			for (int i = 0; i < interceptors.length; i++) {
 				HandlerInterceptor interceptor = interceptors[i];
 				if (!interceptor.preHandle(request, response, this.handler)) {
+					// 如果执行 preHandle 方法失败，则执行拦截器的 afterCompletion 方法
 					triggerAfterCompletion(request, response, null);
 					return false;
 				}

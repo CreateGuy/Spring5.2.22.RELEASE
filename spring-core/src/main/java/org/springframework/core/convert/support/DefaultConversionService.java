@@ -26,9 +26,7 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.lang.Nullable;
 
 /**
- * A specialization of {@link GenericConversionService} configured by default
- * with converters appropriate for most environments.
- *
+ * 配置默认的转换服务，适用于大多数情况
  * <p>Designed for direct instantiation but also exposes the static
  * {@link #addDefaultConverters(ConverterRegistry)} utility method for ad-hoc
  * use against any {@code ConverterRegistry} instance.

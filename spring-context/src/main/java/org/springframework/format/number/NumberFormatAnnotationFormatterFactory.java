@@ -29,7 +29,7 @@ import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Formats fields annotated with the {@link NumberFormat} annotation.
+ * 用于格式化 {@link NumberFormat} 注解的
  *
  * @author Keith Donald
  * @author Juergen Hoeller

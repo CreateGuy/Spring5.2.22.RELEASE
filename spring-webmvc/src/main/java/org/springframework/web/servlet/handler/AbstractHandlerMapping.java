@@ -101,6 +101,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	private CorsProcessor corsProcessor = new DefaultCorsProcessor();
 
+	/**
+	 * 当前 HandlerMapping 的顺序
+	 */
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
 
 	@Nullable

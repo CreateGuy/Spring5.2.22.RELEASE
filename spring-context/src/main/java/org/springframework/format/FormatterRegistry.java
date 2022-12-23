@@ -48,7 +48,7 @@ public interface FormatterRegistry extends ConverterRegistry {
 	void addParser(Parser<?> parser);
 
 	/**
-	 * Adds a Formatter to format fields of a specific type.
+	 * 添加格式化程序来格式化特定类型的字段
 	 * The field type is implied by the parameterized Formatter instance.
 	 * @param formatter the formatter to add
 	 * @since 3.1
@@ -82,7 +82,7 @@ public interface FormatterRegistry extends ConverterRegistry {
 	void addFormatterForFieldType(Class<?> fieldType, Printer<?> printer, Parser<?> parser);
 
 	/**
-	 * Adds a Formatter to format fields annotated with a specific format annotation.
+	 * 添加一个Formatter来格式化带有特定注解的字段。
 	 * @param annotationFormatterFactory the annotation formatter factory to add
 	 */
 	void addFormatterForFieldAnnotation(AnnotationFormatterFactory<? extends Annotation> annotationFormatterFactory);

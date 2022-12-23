@@ -43,12 +43,18 @@ import org.springframework.web.util.UrlPathHelper;
  */
 public class PathMatchConfigurer {
 
+	/**
+	 * 使用后缀模式匹配，比如说hello.do可以匹配到hello
+	 */
 	@Nullable
 	private Boolean suffixPatternMatch;
 
 	@Nullable
 	private Boolean registeredSuffixPatternMatch;
 
+	/**
+	 * 是否匹配url，而不考虑后面是否有斜杠
+	 */
 	@Nullable
 	private Boolean trailingSlashMatch;
 

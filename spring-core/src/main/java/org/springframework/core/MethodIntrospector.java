@@ -45,35 +45,39 @@ public final class MethodIntrospector {
 
 
 	/**
-	 * Select methods on the given target type based on the lookup of associated metadata.
-	 * <p>Callers define methods of interest through the {@link MetadataLookup} parameter,
-	 * allowing to collect the associated metadata into the result map.
-	 * @param targetType the target type to search methods on
-	 * @param metadataLookup a {@link MetadataLookup} callback to inspect methods of interest,
-	 * returning non-null metadata to be associated with a given method if there is a match,
-	 * or {@code null} for no match
-	 * @return the selected methods associated with their metadata (in the order of retrieval),
-	 * or an empty map in case of no match
+	 * 通过传入的Class对象，获得符合条件的方法
+	 * @param targetType
+	 * @param metadataLookup 排查符合条件的方法
+	 * @param <T>
+	 * @return
 	 */
 	public static <T> Map<Method, T> selectMethods(Class<?> targetType, final MetadataLookup<T> metadataLookup) {
+		// 符合条件的方法
 		final Map<Method, T> methodMap = new LinkedHashMap<>();
 		Set<Class<?>> handlerTypes = new LinkedHashSet<>();
 		Class<?> specificHandlerType = null;
 
+		// 如果Class不是一个代理类
 		if (!Proxy.isProxyClass(targetType)) {
+			// 返回的类的通常是传入的类，但如果是cglib生成的子类则返回原始类。
 			specificHandlerType = ClassUtils.getUserClass(targetType);
 			handlerTypes.add(specificHandlerType);
 		}
+		// 返回传入的Class能够加载 继承的父类和实现的接口 的集合
 		handlerTypes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetType));
 
 		for (Class<?> currentHandlerType : handlerTypes) {
 			final Class<?> targetClass = (specificHandlerType != null ? specificHandlerType : currentHandlerType);
 
+			// 遍历所有方法，然后找到符合条件的方法
 			ReflectionUtils.doWithMethods(currentHandlerType, method -> {
 				Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
+				// 筛选符合条件的方法
 				T result = metadataLookup.inspect(specificMethod);
 				if (result != null) {
+					// 由于方法可能是桥接方法，那么就找到真实方法
 					Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
+					// 如果是符合条件的方法，或者真实方法符合条件
 					if (bridgedMethod == specificMethod || metadataLookup.inspect(bridgedMethod) == null) {
 						methodMap.put(specificMethod, result);
 					}
@@ -85,7 +89,7 @@ public final class MethodIntrospector {
 	}
 
 	/**
-	 * Select methods on the given target type based on a filter.
+	 * 基于筛选器选择方法
 	 * <p>Callers define methods of interest through the {@code MethodFilter} parameter.
 	 * @param targetType the target type to search methods on
 	 * @param methodFilter a {@code MethodFilter} to help

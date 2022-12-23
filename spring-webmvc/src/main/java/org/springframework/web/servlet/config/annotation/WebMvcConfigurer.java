@@ -165,11 +165,8 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * A hook for extending or modifying the list of converters after it has been
-	 * configured. This may be useful for example to allow default converters to
-	 * be registered and then insert a custom converter through this method.
-	 * @param converters the list of configured converters to extend.
-	 * @since 4.1.3
+	 * 钩子方法，用于在配置后扩展或修改 HttpMessageConverter 列表
+	 * @param converters 已经注册好的 HttpMessageConverter 列表
 	 */
 	default void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 	}

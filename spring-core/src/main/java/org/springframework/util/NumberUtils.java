@@ -43,11 +43,14 @@ public abstract class NumberUtils {
 	private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
 	/**
-	 * Standard number types (all immutable):
+	 * 标准的数字类型:
 	 * Byte, Short, Integer, Long, BigInteger, Float, Double, BigDecimal.
 	 */
 	public static final Set<Class<?>> STANDARD_NUMBER_TYPES;
 
+	/**
+	 * 初始化标准的数字类型
+	 */
 	static {
 		Set<Class<?>> numberTypes = new HashSet<>(8);
 		numberTypes.add(Byte.class);

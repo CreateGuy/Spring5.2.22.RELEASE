@@ -42,8 +42,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
- * A central component to use to obtain the public URL path that clients should
- * use to access a static resource.
+ * 一个中心组件，用来获取客户端用来访问静态资源的公共URL路径
  *
  * <p>This class is aware of Spring WebFlux handler mappings used to serve static
  * resources and uses the {@code ResourceResolver} chains of the configured

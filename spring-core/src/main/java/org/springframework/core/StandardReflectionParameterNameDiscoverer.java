@@ -23,9 +23,7 @@ import java.lang.reflect.Parameter;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link ParameterNameDiscoverer} implementation which uses JDK 8's reflection facilities
- * for introspecting parameter names (based on the "-parameters" compiler flag).
- *
+ * 直接利用Method.getParameter.getName获得参数名称
  * @author Juergen Hoeller
  * @since 4.0
  * @see java.lang.reflect.Method#getParameters()

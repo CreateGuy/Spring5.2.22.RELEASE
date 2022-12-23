@@ -35,10 +35,7 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Central class to determine requested {@linkplain MediaType media types}
- * for a request. This is done by delegating to a list of configured
- * {@code ContentNegotiationStrategy} instances.
- *
+ * 用于确定媒体类型的管理类
  * <p>Also provides methods to look up file extensions for a media type.
  * This is done by delegating to the list of configured
  * {@code MediaTypeFileExtensionResolver} instances.

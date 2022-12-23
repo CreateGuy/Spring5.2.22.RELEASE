@@ -39,9 +39,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Implementation of {@link ParameterNameDiscoverer} that uses the LocalVariableTable
- * information in the method attributes to discover parameter names. Returns
- * {@code null} if the class file was compiled without debug information.
+ * 利用ASM字节码的局部变量表(LocalVariableTable)获得参数名称
  *
  * <p>Uses ObjectWeb's ASM library for analyzing class files. Each discoverer instance
  * caches the ASM discovered information for each introspected Class, in a thread-safe

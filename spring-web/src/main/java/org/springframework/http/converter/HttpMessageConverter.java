@@ -25,7 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for converting from and to HTTP requests and responses.
+ * 用于从HTTP请求和响应转换到HTTP请求和响应的策略接口。
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller

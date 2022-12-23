@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Declares that a field or method parameter should be formatted as a number.
+ * 声明字段或方法参数应格式化为数字
  *
  * <p>Supports formatting by style or custom pattern string. Can be applied
  * to any JDK {@code Number} type such as {@code Double} and {@code Long}.
@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
 public @interface NumberFormat {
 
 	/**
-	 * The style pattern to use to format the field.
+	 * 用于格式化字段的样式模式
 	 * <p>Defaults to {@link Style#DEFAULT} for general-purpose number formatting
 	 * for most annotated types, except for money types which default to currency
 	 * formatting. Set this attribute when you wish to format your field in
@@ -59,38 +59,38 @@ public @interface NumberFormat {
 	Style style() default Style.DEFAULT;
 
 	/**
-	 * The custom pattern to use to format the field.
-	 * <p>Defaults to empty String, indicating no custom pattern String has been specified.
-	 * Set this attribute when you wish to format your field in accordance with a
-	 * custom number pattern not represented by a style.
+	 * 用于格式化字段的自定义模式
+	 * <ul>
+	 *     <li>
+	 *         比如说 ‘#,###’，那么传入的 5000 就会变成 5,000
+	 *     </li>
+	 * </ul>
 	 */
 	String pattern() default "";
 
 
 	/**
-	 * Common number format styles.
+	 * 常见的数字格式样式。
 	 */
 	enum Style {
 
 		/**
-		 * The default format for the annotated type: typically 'number' but possibly
-		 * 'currency' for a money type (e.g. {@code javax.money.MonetaryAmount)}.
-		 * @since 4.2
+		 * 带注释类型的默认格式, 不懂
 		 */
 		DEFAULT,
 
 		/**
-		 * The general-purpose number format for the current locale.
+		 * 当前Local设置的通用数字格式
 		 */
 		NUMBER,
 
 		/**
-		 * The percent format for the current locale.
+		 * 当前Local设置的百分比格式
 		 */
 		PERCENT,
 
 		/**
-		 * The currency format for the current locale.
+		 * 当前Local设置的货币格式
 		 */
 		CURRENCY
 	}

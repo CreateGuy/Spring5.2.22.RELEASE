@@ -1031,15 +1031,17 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 确定当前请求的处理器拦截链
 				mappedHandler = getHandler(processedRequest);
+				// 没有找到处理器是抛出异常还是设置异常状态
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
-				// Determine handler adapter for the current request.
+				// 拿到处理器适配器
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
-				// Process last-modified header, if supported by the handler.
+				// 如果处理器支持，则处理上次修改的报头，没懂
+				// 获得请求方式
 				String method = request.getMethod();
 				boolean isGet = "GET".equals(method);
 				if (isGet || "HEAD".equals(method)) {
@@ -1049,11 +1051,12 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				// 执行拦截器的 preHandle 方法
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
-				// Actually invoke the handler.
+				// 调用处理器
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1061,6 +1064,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+				// 执行拦截器的 postHandle 方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1258,7 +1262,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * No handler found -> set appropriate HTTP response status.
+	 * 没有找到处理器是抛出异常还是设置异常状态
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @throws Exception if preparing the response failed
@@ -1267,11 +1271,13 @@ public class DispatcherServlet extends FrameworkServlet {
 		if (pageNotFoundLogger.isWarnEnabled()) {
 			pageNotFoundLogger.warn("No mapping for " + request.getMethod() + " " + getRequestUri(request));
 		}
+		// 抛出异常
 		if (this.throwExceptionIfNoHandlerFound) {
 			throw new NoHandlerFoundException(request.getMethod(), getRequestUri(request),
 					new ServletServerHttpRequest(request).getHeaders());
 		}
 		else {
+			// 设置 404
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}

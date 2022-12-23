@@ -96,8 +96,14 @@ import org.springframework.web.accept.ParameterContentNegotiationStrategy;
  */
 public class ContentNegotiationConfigurer {
 
+	/**
+	 * 用于创建 {@link ContentNegotiationStrategy} 实例的 FactoryBean
+	 */
 	private final ContentNegotiationManagerFactoryBean factory = new ContentNegotiationManagerFactoryBean();
 
+	/**
+	 * 文件扩展名到媒体类型的映射关系
+	 */
 	private final Map<String, MediaType> mediaTypes = new HashMap<>();
 
 
