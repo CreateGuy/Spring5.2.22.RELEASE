@@ -51,8 +51,7 @@ import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Binder that allows for setting property values on a target object, including
- * support for validation and binding result analysis.
+ * 参数绑定器，允许在目标对象上设置属性值，包括支持验证和绑定结果分析
  *
  * <p>The binding process can be customized by specifying allowed field patterns,
  * required fields, custom editors, etc.
@@ -124,9 +123,15 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	 */
 	protected static final Log logger = LogFactory.getLog(DataBinder.class);
 
+	/**
+	 * 要绑定属性的对象
+	 */
 	@Nullable
 	private final Object target;
 
+	/**
+	 * 返回绑定对象的名称
+	 */
 	private final String objectName;
 
 	@Nullable
@@ -135,20 +140,38 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	@Nullable
 	private SimpleTypeConverter typeConverter;
 
+	/**
+	 * 是否允许设置未知字段，即设置不存在的属性是否抛出异常
+	 */
 	private boolean ignoreUnknownFields = true;
 
+	/**
+	 * 是否允许设置非法字段，即属性类似设置错误是否抛出异常，比如日期类型设置字符串
+	 */
 	private boolean ignoreInvalidFields = false;
 
+	/**
+	 * 是否允许设置嵌套属性，即对象中的对象的属性
+	 */
 	private boolean autoGrowNestedPaths = true;
 
 	private int autoGrowCollectionLimit = DEFAULT_AUTO_GROW_COLLECTION_LIMIT;
 
+	/**
+	 * 允许设置的字段
+	 */
 	@Nullable
 	private String[] allowedFields;
 
+	/**
+	 * 不允许设置的字段
+	 */
 	@Nullable
 	private String[] disallowedFields;
 
+	/**
+	 * 必须设置的字段
+	 */
 	@Nullable
 	private String[] requiredFields;
 
@@ -160,6 +183,9 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 
 	private BindingErrorProcessor bindingErrorProcessor = new DefaultBindingErrorProcessor();
 
+	/**
+	 * 负责进行参数校验
+	 */
 	private final List<Validator> validators = new ArrayList<>();
 
 
@@ -275,7 +301,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Initialize direct field access for this DataBinder,
+	 * 初始化此DataBinder的直接字段访问
 	 * as alternative to the default bean property access.
 	 * @see #initBeanPropertyAccess()
 	 * @see #createDirectFieldBindingResult()

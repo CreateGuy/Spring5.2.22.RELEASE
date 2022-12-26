@@ -193,6 +193,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 
+	/**
+	 * 标注了@ControllerAdvice的bean和内部标注了@InitBinder的方法
+	 */
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
 	private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
@@ -949,15 +952,19 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		Class<?> handlerType = handlerMethod.getBeanType();
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
-			// 选择标注了@InitBinder注解的方法
+			// 处理程序的类中中标注了@InitBinder注解的方法
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> initBinderMethods = new ArrayList<>();
-		// Global methods first
+
+		// 处理 ControllerAdvice 中包含@InitBinder注解方法的情况
 		this.initBinderAdviceCache.forEach((controllerAdviceBean, methodSet) -> {
+			// 检查给定的类是否满足切入规则
 			if (controllerAdviceBean.isApplicableToBeanType(handlerType)) {
+				// 获取这个ControllerAdviseBean的bean实例
 				Object bean = controllerAdviceBean.resolveBean();
+				//
 				for (Method method : methodSet) {
 					initBinderMethods.add(createInitBinderMethod(bean, method));
 				}
@@ -983,6 +990,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			binderMethod.setHandlerMethodArgumentResolvers(this.initBinderArgumentResolvers);
 		}
 		binderMethod.setDataBinderFactory(new DefaultDataBinderFactory(this.webBindingInitializer));
+		// 设置参数名发现器
 		binderMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
 		return binderMethod;
 	}

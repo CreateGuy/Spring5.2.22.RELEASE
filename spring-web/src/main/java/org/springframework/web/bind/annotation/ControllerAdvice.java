@@ -27,11 +27,18 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
 /**
- * Specialization of {@link Component @Component} for classes that declare
- * {@link ExceptionHandler @ExceptionHandler}, {@link InitBinder @InitBinder}, or
- * {@link ModelAttribute @ModelAttribute} methods to be shared across
- * multiple {@code @Controller} classes.
- *
+ * 特殊的 {@link Component @Component}，是配合下面三个注解使用的，实现切入的功能，切入的是Controller的情况
+ * <ul>
+ *     <li>
+ *         {@link ExceptionHandler}：实现全局异常处理
+ *     </li>
+ *     <li>
+ *         {@link InitBinder}：实现参数处理和参数绑定
+ *     </li>
+ *     <li>
+ *         {@link ModelAttribute}：全局参数绑定
+ *     </li>
+ * </ul>
  * <p>Classes annotated with {@code @ControllerAdvice} can be declared explicitly
  * as Spring beans or auto-detected via classpath scanning. All such beans are
  * sorted based on {@link org.springframework.core.Ordered Ordered} semantics or
@@ -79,6 +86,7 @@ import org.springframework.stereotype.Component;
 public @interface ControllerAdvice {
 
 	/**
+	 * 要切入的路径
 	 * Alias for the {@link #basePackages} attribute.
 	 * <p>Allows for more concise annotation declarations &mdash; for example,
 	 * {@code @ControllerAdvice("org.my.pkg")} is equivalent to
@@ -105,17 +113,12 @@ public @interface ControllerAdvice {
 	String[] basePackages() default {};
 
 	/**
-	 * Type-safe alternative to {@link #basePackages} for specifying the packages
-	 * in which to select controllers to be advised by the {@code @ControllerAdvice}
-	 * annotated class.
-	 * <p>Consider creating a special no-op marker class or interface in each package
-	 * that serves no purpose other than being referenced by this attribute.
-	 * @since 4.0
+	 * 指定要从哪些类的路径进行切入
 	 */
 	Class<?>[] basePackageClasses() default {};
 
 	/**
-	 * Array of classes.
+	 * 指定切入哪些Controller
 	 * <p>Controllers that are assignable to at least one of the given types
 	 * will be advised by the {@code @ControllerAdvice} annotated class.
 	 * @since 4.0
@@ -123,7 +126,7 @@ public @interface ControllerAdvice {
 	Class<?>[] assignableTypes() default {};
 
 	/**
-	 * Array of annotation types.
+	 * 切入包含了某些注解的类
 	 * <p>Controllers that are annotated with at least one of the supplied annotation
 	 * types will be advised by the {@code @ControllerAdvice} annotated class.
 	 * <p>Consider creating a custom composed annotation or use a predefined one,

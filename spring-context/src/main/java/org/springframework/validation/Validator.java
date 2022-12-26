@@ -17,7 +17,7 @@
 package org.springframework.validation;
 
 /**
- * A validator for application-specific objects.
+ * 参数校验器
  *
  * <p>This interface is totally divorced from any infrastructure
  * or context; that is to say it is not coupled to validating

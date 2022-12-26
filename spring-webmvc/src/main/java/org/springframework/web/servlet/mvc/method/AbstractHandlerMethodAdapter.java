@@ -88,7 +88,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	}
 
 	/**
-	 * Use the given handler method to handle the request.
+	 * 使用给定的处理器来处理请求
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handlerMethod handler method to use. This object must have previously been passed to the

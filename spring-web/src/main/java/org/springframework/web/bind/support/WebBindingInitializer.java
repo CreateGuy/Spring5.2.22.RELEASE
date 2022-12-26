@@ -30,7 +30,7 @@ import org.springframework.web.context.request.WebRequest;
 public interface WebBindingInitializer {
 
 	/**
-	 * Initialize the given DataBinder.
+	 * 初始化数据绑定器
 	 * @param binder the DataBinder to initialize
 	 * @since 5.0
 	 */

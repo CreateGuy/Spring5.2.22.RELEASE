@@ -31,29 +31,28 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * A {@code Predicate} to match request handling component types if
- * <strong>any</strong> of the following selectors match:
+ * 是有关@ControllerAdvice的，如果下面设置的任意规则都能匹配，则返回true
  * <ul>
- * <li>Base packages -- for selecting handlers by their package.
- * <li>Assignable types -- for selecting handlers by super type.
- * <li>Annotations -- for selecting handlers annotated in a specific way.
+ * <li>Base packages
+ * <li>Assignable
+ * <li>Annotations
  * </ul>
- * <p>Composability methods on {@link Predicate} can be used :
- * <pre class="code">
- * Predicate&lt;Class&lt;?&gt;&gt; predicate =
- * 		HandlerTypePredicate.forAnnotation(RestController.class)
- * 				.and(HandlerTypePredicate.forBasePackage("org.example"));
- * </pre>
- *
- * @author Rossen Stoyanchev
- * @since 5.1
  */
 public final class HandlerTypePredicate implements Predicate<Class<?>> {
 
+	/**
+	 * {@link org.springframework.web.bind.annotation.ControllerAdvice} 中设置的 basePackages
+	 */
 	private final Set<String> basePackages;
 
+	/**
+	 * {@link org.springframework.web.bind.annotation.ControllerAdvice} 中设置的 assignableTypes
+	 */
 	private final List<Class<?>> assignableTypes;
 
+	/**
+	 * {@link org.springframework.web.bind.annotation.ControllerAdvice} 中设置的 annotations
+	 */
 	private final List<Class<? extends Annotation>> annotations;
 
 
@@ -69,31 +68,45 @@ public final class HandlerTypePredicate implements Predicate<Class<?>> {
 	}
 
 
+	/**
+	 * 计算是否符合切入规则
+	 * @param controllerType
+	 * @return
+	 */
 	@Override
 	public boolean test(@Nullable Class<?> controllerType) {
+		// 判断是否设置了指定切入的路径
 		if (!hasSelectors()) {
 			return true;
 		}
 		else if (controllerType != null) {
+			// 使用basePackages确定是否切入
 			for (String basePackage : this.basePackages) {
 				if (controllerType.getName().startsWith(basePackage)) {
 					return true;
 				}
 			}
+			// 使用assignableTypes确定是否切入
 			for (Class<?> clazz : this.assignableTypes) {
 				if (ClassUtils.isAssignable(clazz, controllerType)) {
 					return true;
 				}
 			}
+			// 使用annotations确定是否切入
 			for (Class<? extends Annotation> annotationClass : this.annotations) {
 				if (AnnotationUtils.findAnnotation(controllerType, annotationClass) != null) {
 					return true;
 				}
 			}
 		}
+		// 不在切入的规则内
 		return false;
 	}
 
+	/**
+	 * 判断是否设置了指定切入的路径
+	 * @return
+	 */
 	private boolean hasSelectors() {
 		return (!this.basePackages.isEmpty() || !this.assignableTypes.isEmpty() || !this.annotations.isEmpty());
 	}

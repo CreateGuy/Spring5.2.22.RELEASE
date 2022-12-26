@@ -33,8 +33,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
- * Encapsulates information about an {@link ControllerAdvice @ControllerAdvice}
- * Spring-managed bean without necessarily requiring it to be instantiated.
+ * 封装关于 @controllerAdvice 这种spring管理bean的信息，而不需要实例化它。
  *
  * <p>The {@link #findAnnotatedBeans(ApplicationContext)} method can be used to
  * discover such beans. However, a {@code ControllerAdviceBean} may be created
@@ -49,28 +48,41 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 public class ControllerAdviceBean implements Ordered {
 
 	/**
-	 * Reference to the actual bean instance or a {@code String} representing
-	 * the bean name.
+	 * 标注了@controllerAdvice注解的bean的名称
 	 */
 	private final Object beanOrName;
 
+	/**
+	 * 是否单例
+	 */
 	private final boolean isSingleton;
 
 	/**
-	 * Reference to the resolved bean instance, potentially lazily retrieved
-	 * via the {@code BeanFactory}.
+	 * 标注了@controllerAdvice注解的bean的实例
 	 */
 	@Nullable
 	private Object resolvedBean;
 
+	/**
+	 * 标注了@controllerAdvice注解的bean的Class
+	 */
 	@Nullable
 	private final Class<?> beanType;
 
+	/**
+	 * 是有关@ControllerAdvice的切入规则的
+	 */
 	private final HandlerTypePredicate beanTypePredicate;
 
+	/**
+	 * bean工厂，一般是{@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 */
 	@Nullable
 	private final BeanFactory beanFactory;
 
+	/**
+	 * 排序值
+	 */
 	@Nullable
 	private Integer order;
 
@@ -189,18 +201,13 @@ public class ControllerAdviceBean implements Ordered {
 	}
 
 	/**
-	 * Get the bean instance for this {@code ControllerAdviceBean}, if necessary
-	 * resolving the bean name through the {@link BeanFactory}.
-	 * <p>As of Spring Framework 5.2, once the bean instance has been resolved it
-	 * will be cached if it is a singleton, thereby avoiding repeated lookups in
-	 * the {@code BeanFactory}.
+	 * 获取这个ControllerAdviseBean的bean实例，如果需要，可以通过BeanFactory解析bean名称。
 	 */
 	public Object resolveBean() {
 		if (this.resolvedBean == null) {
-			// this.beanOrName must be a String representing the bean name if
-			// this.resolvedBean is null.
+			// 从容器中获取ControllerAdvise的实例对象
 			Object resolvedBean = obtainBeanFactory().getBean((String) this.beanOrName);
-			// Don't cache non-singletons (e.g., prototypes).
+			// 不要缓存非单例对象(例如，原型)
 			if (!this.isSingleton) {
 				return resolvedBean;
 			}
@@ -215,7 +222,7 @@ public class ControllerAdviceBean implements Ordered {
 	}
 
 	/**
-	 * Check whether the given bean type should be advised by this
+	 * 检查给定的类是否满足切入规则
 	 * {@code ControllerAdviceBean}.
 	 * @param beanType the type of the bean to check
 	 * @since 4.0

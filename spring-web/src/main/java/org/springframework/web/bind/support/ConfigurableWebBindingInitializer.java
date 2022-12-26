@@ -40,6 +40,9 @@ import org.springframework.web.bind.WebDataBinder;
  */
 public class ConfigurableWebBindingInitializer implements WebBindingInitializer {
 
+	/**
+	 * 是否允许设置嵌套属性，即对象中的对象的属性
+	 */
 	private boolean autoGrowNestedPaths = true;
 
 	private boolean directFieldAccess = false;
@@ -50,6 +53,9 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	@Nullable
 	private BindingErrorProcessor bindingErrorProcessor;
 
+	/**
+	 * 参数校验器
+	 */
 	@Nullable
 	private Validator validator;
 
@@ -191,6 +197,10 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	}
 
 
+	/**
+	 * 初始化数据绑定器
+	 * @param binder the DataBinder to initialize
+	 */
 	@Override
 	public void initBinder(WebDataBinder binder) {
 		binder.setAutoGrowNestedPaths(this.autoGrowNestedPaths);
@@ -210,6 +220,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 		if (this.conversionService != null) {
 			binder.setConversionService(this.conversionService);
 		}
+		// 注册属性编辑器(转换服务)
 		if (this.propertyEditorRegistrars != null) {
 			for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
 				propertyEditorRegistrar.registerCustomEditors(binder);
