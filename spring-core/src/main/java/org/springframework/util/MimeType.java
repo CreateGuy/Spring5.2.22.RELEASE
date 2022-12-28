@@ -261,8 +261,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	}
 
 	/**
-	 * Indicates whether this MIME Type is concrete, i.e. whether neither the type
-	 * nor the subtype is a wildcard character <code>&#42;</code>.
+	 * 指示此 MIME 和 TYPE 是否是具体的，即都不是通配符 *
 	 * @return whether this MIME Type is concrete
 	 */
 	public boolean isConcrete() {

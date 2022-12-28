@@ -23,11 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation that identifies methods that initialize the
- * {@link org.springframework.web.bind.WebDataBinder} which
- * will be used for populating command and form object arguments
- * of annotated handler methods.
- *
+ * 可以操作 WebDataBinder 的注解
  * <p><strong>WARNING</strong>: Data binding can lead to security issues by exposing
  * parts of the object graph that are not meant to be accessed or modified by
  * external clients. Therefore the design and use of data binding should be considered
@@ -58,6 +54,7 @@ import java.lang.annotation.Target;
 public @interface InitBinder {
 
 	/**
+	 * 某个参数名称的才可以执行方法
 	 * The names of command/form attributes and/or request parameters
 	 * that this init-binder method is supposed to apply to.
 	 * <p>Default is to apply to all command/form attributes and all request parameters

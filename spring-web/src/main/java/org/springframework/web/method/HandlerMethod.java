@@ -575,10 +575,13 @@ public class HandlerMethod {
 
 
 	/**
-	 * A MethodParameter for a HandlerMethod return type based on an actual return value.
+	 * 基于实际返回值的HandlerMethod
 	 */
 	private class ReturnValueMethodParameter extends HandlerMethodParameter {
 
+		/**
+		 * 实际返回值类型
+		 */
 		@Nullable
 		private final Class<?> returnValueType;
 

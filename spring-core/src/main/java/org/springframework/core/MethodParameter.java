@@ -76,7 +76,7 @@ public class MethodParameter {
 	@Nullable
 	Map<Integer, Integer> typeIndexesPerLevel;
 
-	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()} */
+	/** 此参数的包含类 */
 	@Nullable
 	private volatile Class<?> containingClass;
 
@@ -422,12 +422,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return a variant of this {@code MethodParameter} which points to
-	 * the same parameter but one nesting level deeper in case of a
-	 * {@link java.util.Optional} declaration.
-	 * @since 4.3
-	 * @see #isOptional()
-	 * @see #nested()
+	 * 返回参数类型的一个包装类
 	 */
 	public MethodParameter nestedIfOptional() {
 		return (getParameterType() == Optional.class ? nested() : this);
@@ -458,7 +453,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the containing class for this method parameter.
+	 * 返回此方法参数的包含类
 	 * @return a specific containing class (potentially a subclass of the
 	 * declaring class), or otherwise simply the declaring class itself
 	 * @see #getDeclaringClass()
@@ -576,7 +571,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the nested generic type of the method/constructor parameter.
+	 * 返回方法/构造方法参数的嵌套泛型类型
 	 * @return the parameter type (never {@code null})
 	 * @since 4.2
 	 * @see #getNestingLevel()

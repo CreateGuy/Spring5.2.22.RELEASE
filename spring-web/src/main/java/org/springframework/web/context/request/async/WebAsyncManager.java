@@ -79,6 +79,9 @@ public final class WebAsyncManager {
 
 	private AsyncTaskExecutor taskExecutor = DEFAULT_TASK_EXECUTOR;
 
+	/**
+	 * 如果非默认值就代表，异步任务执行完毕设置为返回值，或者是出现了异常而设置的异常
+	 */
 	private volatile Object concurrentResult = RESULT_NONE;
 
 	private volatile Object[] concurrentResultContext;
@@ -141,7 +144,7 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * Whether a result value exists as a result of concurrent handling.
+	 * 否存在一个结果值作为并发处理的结果
 	 */
 	public boolean hasConcurrentResult() {
 		return (this.concurrentResult != RESULT_NONE);

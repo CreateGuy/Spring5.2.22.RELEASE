@@ -165,8 +165,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private WebBindingInitializer webBindingInitializer;
 
+	/**
+	 * 支持异步任务的线程池
+	 */
 	private AsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor("MvcAsync");
 
+	/**
+	 * 指定并发处理超时的时间量(以毫秒为单位)
+	 * 在Servlet 3中，超时开始于主请求处理线程退出后，结束于请求再次被分派，以进一步处理并发产生的结果。如果未设置此值，则使用底层实现的默认超时。
+	 */
 	@Nullable
 	private Long asyncRequestTimeout;
 
@@ -176,6 +183,17 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private ReactiveAdapterRegistry reactiveAdapterRegistry = ReactiveAdapterRegistry.getSharedInstance();
 
+	/**
+	 * 默认情况下，默认模型的内容在渲染和重定向场景中都使用
+	 * <ul>
+	 *     <li>
+	 *         将此标志设置为true可以确保在重定向场景中永远不会使用默认模型，即使没有声明RedirectAttributes参数
+	 *     </li>
+	 *     <li>
+	 *         将其设置为false意味着如果控制器方法没有声明RedirectAttributes参数，则在重定向中使用默认模型
+	 *     </li>
+	 * </ul>
+	 */
 	private boolean ignoreDefaultModelOnRedirect = false;
 
 	private int cacheSecondsForSessionAttributeHandlers = 0;
@@ -892,18 +910,22 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			ModelAndViewContainer mavContainer = new ModelAndViewContainer();
 			// 设置InputFlashMap参数值
 			mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
+			// 初始化Model
 			modelFactory.initModel(webRequest, mavContainer, invocableMethod);
 			mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
 
+			// 将请求包装为 AsyncWebRequest
 			AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
 			asyncWebRequest.setTimeout(this.asyncRequestTimeout);
 
+			// 初始化 WebAsyncManager
 			WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 			asyncManager.setTaskExecutor(this.taskExecutor);
 			asyncManager.setAsyncWebRequest(asyncWebRequest);
 			asyncManager.registerCallableInterceptors(this.callableInterceptors);
 			asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);
 
+			// 异步任务已经有了返回值了？，此时不应该还没有开始吗，不懂
 			if (asyncManager.hasConcurrentResult()) {
 				Object result = asyncManager.getConcurrentResult();
 				mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
@@ -915,7 +937,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
 
+			// 调用方法并处理返回值
 			invocableMethod.invokeAndHandle(webRequest, mavContainer);
+			// 判断是否是异步任务
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
@@ -1067,6 +1091,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
+		//
 		modelFactory.updateModel(webRequest, mavContainer);
 		if (mavContainer.isRequestHandled()) {
 			return null;

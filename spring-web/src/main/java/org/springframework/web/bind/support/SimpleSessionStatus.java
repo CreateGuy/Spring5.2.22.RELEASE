@@ -28,6 +28,9 @@ public class SimpleSessionStatus implements SessionStatus {
 	private boolean complete = false;
 
 
+	/**
+	 * 没有发现有调用此方法的情况
+	 */
 	@Override
 	public void setComplete() {
 		this.complete = true;

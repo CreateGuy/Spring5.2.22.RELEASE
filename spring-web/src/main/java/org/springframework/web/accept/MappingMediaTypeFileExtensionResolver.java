@@ -46,7 +46,7 @@ public class MappingMediaTypeFileExtensionResolver implements MediaTypeFileExten
 	private final ConcurrentMap<MediaType, List<String>> fileExtensions = new ConcurrentHashMap<>(64);
 
 	/**
-	 * 此对象维护的所有的文件扩展名；ol
+	 * 此对象维护的所有的文件扩展名
 	 */
 	private final List<String> allFileExtensions = new CopyOnWriteArrayList<>();
 

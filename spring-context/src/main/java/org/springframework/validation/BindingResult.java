@@ -45,8 +45,7 @@ import org.springframework.lang.Nullable;
 public interface BindingResult extends Errors {
 
 	/**
-	 * Prefix for the name of the BindingResult instance in a model,
-	 * followed by the object name.
+	 * model中BindingResult实例名称的前缀，后跟对象名称
 	 */
 	String MODEL_KEY_PREFIX = BindingResult.class.getName() + ".";
 

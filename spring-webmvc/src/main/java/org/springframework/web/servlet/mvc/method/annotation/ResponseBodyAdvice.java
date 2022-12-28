@@ -24,18 +24,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * Allows customizing the response after the execution of an {@code @ResponseBody}
- * or a {@code ResponseEntity} controller method but before the body is written
- * with an {@code HttpMessageConverter}.
- *
- * <p>Implementations may be registered directly with
- * {@code RequestMappingHandlerAdapter} and {@code ExceptionHandlerExceptionResolver}
- * or more likely annotated with {@code @ControllerAdvice} in which case they
- * will be auto-detected by both.
- *
- * @author Rossen Stoyanchev
- * @since 4.1
- * @param <T> the body type
+ * 负责写入响应体之前调用
+ * @param <T>
  */
 public interface ResponseBodyAdvice<T> {
 

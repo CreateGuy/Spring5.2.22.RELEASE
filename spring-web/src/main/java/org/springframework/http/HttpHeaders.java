@@ -174,9 +174,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.2.2">Section 3.1.2.2 of RFC 7231</a>
 	 */
 	public static final String CONTENT_ENCODING = "Content-Encoding";
+
 	/**
-	 * The HTTP {@code Content-Disposition} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc6266">RFC 6266</a>
+	 * 表示客户端应该如果处理响应内容
+	 * <ol>
+	 *     <li>
+	 *         response.setHeader("Content-disposition", "attachment;filename=" +filename)：以附件的情况进行下载
+	 *     </li>
+	 *     <li>
+	 *         response.setHeader("Content-disposition", "inline;filename=" +filename)：直接展示在页面上
+	 *     </li>
+	 * </ol>
 	 */
 	public static final String CONTENT_DISPOSITION = "Content-Disposition";
 	/**

@@ -117,7 +117,7 @@ public interface HandlerMapping {
 	String MATRIX_VARIABLES_ATTRIBUTE = HandlerMapping.class.getName() + ".matrixVariables";
 
 	/**
-	 * 应该是此处理器可以生产的媒体类型
+	 * 应该是服务器可以生成的媒体类型
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. Handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.

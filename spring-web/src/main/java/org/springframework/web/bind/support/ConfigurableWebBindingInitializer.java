@@ -207,6 +207,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 		if (this.directFieldAccess) {
 			binder.initDirectFieldAccess();
 		}
+		// 设置错误消息解析器
 		if (this.messageCodesResolver != null) {
 			binder.setMessageCodesResolver(this.messageCodesResolver);
 		}

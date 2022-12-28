@@ -144,8 +144,7 @@ public final class GenericTypeResolver {
 	}
 
 	/**
-	 * Resolve the given generic type against the given context class,
-	 * substituting type variables as far as possible.
+	 * 根据给定的上下文类解析给定的泛型类型
 	 * @param genericType the (potentially) generic type
 	 * @param contextClass a context class for the target type, for example a class
 	 * in which the target type appears in a method signature (can be {@code null})
@@ -154,6 +153,7 @@ public final class GenericTypeResolver {
 	 */
 	public static Type resolveType(Type genericType, @Nullable Class<?> contextClass) {
 		if (contextClass != null) {
+			// 是TypeVariable
 			if (genericType instanceof TypeVariable) {
 				ResolvableType resolvedTypeVariable = resolveVariable(
 						(TypeVariable<?>) genericType, ResolvableType.forClass(contextClass));
@@ -164,6 +164,7 @@ public final class GenericTypeResolver {
 					}
 				}
 			}
+			// 是ParameterizedType
 			else if (genericType instanceof ParameterizedType) {
 				ResolvableType resolvedType = ResolvableType.forType(genericType);
 				if (resolvedType.hasUnresolvableGenerics()) {

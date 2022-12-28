@@ -84,20 +84,22 @@ public class ModelAndViewContainer {
 
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
 
+	/**
+	 * 请求是否在处理程序中被完全处理
+	 */
 	private boolean requestHandled = false;
 
 
 	/**
-	 * By default the content of the "default" model is used both during
-	 * rendering and redirect scenarios. Alternatively controller methods
-	 * can declare an argument of type {@code RedirectAttributes} and use
-	 * it to provide attributes to prepare the redirect URL.
-	 * <p>Setting this flag to {@code true} guarantees the "default" model is
-	 * never used in a redirect scenario even if a RedirectAttributes argument
-	 * is not declared. Setting it to {@code false} means the "default" model
-	 * may be used in a redirect if the controller method doesn't declare a
-	 * RedirectAttributes argument.
-	 * <p>The default setting is {@code false}.
+	 * 默认情况下，默认模型的内容在渲染和重定向场景中都使用
+	 * <ul>
+	 *     <li>
+	 *         将此标志设置为true可以确保在重定向场景中永远不会使用默认模型，即使没有声明RedirectAttributes参数
+	 *     </li>
+	 *     <li>
+	 *         将其设置为false意味着如果控制器方法没有声明RedirectAttributes参数，则在重定向中使用默认模型
+	 *     </li>
+	 * </ul>
 	 */
 	public void setIgnoreDefaultModelOnRedirect(boolean ignoreDefaultModelOnRedirect) {
 		this.ignoreDefaultModelOnRedirect = ignoreDefaultModelOnRedirect;
@@ -273,7 +275,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
-	 * Whether the request has been handled fully within the handler.
+	 * 请求是否在处理程序中被完全处理
 	 */
 	public boolean isRequestHandled() {
 		return this.requestHandled;

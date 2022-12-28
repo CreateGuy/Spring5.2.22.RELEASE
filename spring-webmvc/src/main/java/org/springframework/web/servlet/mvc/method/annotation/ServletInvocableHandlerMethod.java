@@ -90,7 +90,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 
 	/**
-	 * Invoke the method and handle the return value through one of the
+	 * 调用方法并处理返回值
 	 * configured {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}.
 	 * @param webRequest the current request
 	 * @param mavContainer the ModelAndViewContainer for this request
@@ -99,12 +99,16 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	public void invokeAndHandle(ServletWebRequest webRequest, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 解析方法的参数，并执行目标方法，获得返回值
 		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
+		// 基于 ResponseStatus 注解设置响应状态
 		setResponseStatus(webRequest);
 
+		// 不懂
 		if (returnValue == null) {
 			if (isRequestNotModified(webRequest) || getResponseStatus() != null || mavContainer.isRequestHandled()) {
 				disableContentCachingIfNecessary(webRequest);
+				// 标记为处理程序已经处理完毕
 				mavContainer.setRequestHandled(true);
 				return;
 			}
@@ -114,6 +118,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 			return;
 		}
 
+		// 标记为处理程序还没有处理完毕
 		mavContainer.setRequestHandled(false);
 		Assert.state(this.returnValueHandlers != null, "No return value handlers");
 		try {
@@ -129,7 +134,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	}
 
 	/**
-	 * Set the response status according to the {@link ResponseStatus} annotation.
+	 * 基于 {@link ResponseStatus} 注解设置响应状态
 	 */
 	private void setResponseStatus(ServletWebRequest webRequest) throws IOException {
 		HttpStatus status = getResponseStatus();
@@ -148,12 +153,12 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 			}
 		}
 
-		// To be picked up by RedirectView
+		// 此属性会由 RedirectView 操作
 		webRequest.getRequest().setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, status);
 	}
 
 	/**
-	 * Does the given request qualify as "not modified"?
+	 * 请求是否满足未修改的条件，不懂
 	 * @see ServletWebRequest#checkNotModified(long)
 	 * @see ServletWebRequest#checkNotModified(String)
 	 */

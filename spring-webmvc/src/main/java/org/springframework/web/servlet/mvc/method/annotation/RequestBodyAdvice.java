@@ -25,22 +25,12 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
 
 /**
- * Allows customizing the request before its body is read and converted into an
- * Object and also allows for processing of the resulting Object before it is
- * passed into a controller method as an {@code @RequestBody} or an
- * {@code HttpEntity} method argument.
- *
- * <p>Implementations of this contract may be registered directly with the
- * {@code RequestMappingHandlerAdapter} or more likely annotated with
- * {@code @ControllerAdvice} in which case they are auto-detected.
- *
- * @author Rossen Stoyanchev
- * @since 4.2
+ * 负责在读取和转换请求体的前后调用，以及请求体为空的调用
  */
 public interface RequestBodyAdvice {
 
 	/**
-	 * Invoked first to determine if this interceptor applies.
+	 * 确定该 Advice 是否支持
 	 * @param methodParameter the method parameter
 	 * @param targetType the target type, not necessarily the same as the method
 	 * parameter type, e.g. for {@code HttpEntity<String>}.
@@ -51,7 +41,7 @@ public interface RequestBodyAdvice {
 			Class<? extends HttpMessageConverter<?>> converterType);
 
 	/**
-	 * Invoked second before the request body is read and converted.
+	 * 在读取和转换请求体之前调用
 	 * @param inputMessage the request
 	 * @param parameter the target method parameter
 	 * @param targetType the target type, not necessarily the same as the method
@@ -63,7 +53,7 @@ public interface RequestBodyAdvice {
 			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException;
 
 	/**
-	 * Invoked third (and last) after the request body is converted to an Object.
+	 * 在请求体转换为对象后调用
 	 * @param body set to the converter Object before the first advice is called
 	 * @param inputMessage the request
 	 * @param parameter the target method parameter
@@ -76,7 +66,7 @@ public interface RequestBodyAdvice {
 			Type targetType, Class<? extends HttpMessageConverter<?>> converterType);
 
 	/**
-	 * Invoked second (and last) if the body is empty.
+	 * 请求体为空的时候调用
 	 * @param body usually set to {@code null} before the first advice is called
 	 * @param inputMessage the request
 	 * @param parameter the method parameter

@@ -178,6 +178,9 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	@Nullable
 	private ConversionService conversionService;
 
+	/**
+	 * 错误消息解析器
+	 */
 	@Nullable
 	private MessageCodesResolver messageCodesResolver;
 
@@ -944,10 +947,11 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	 * @see SmartValidator#validate(Object, Errors, Object...)
 	 */
 	public void validate(Object... validationHints) {
+		// 拿到具体的参数值
 		Object target = getTarget();
 		Assert.state(target != null, "No target to validate");
 		BindingResult bindingResult = getBindingResult();
-		// Call each validator with the same binding result
+		// 所有校验器都取校验
 		for (Validator validator : getValidators()) {
 			if (!ObjectUtils.isEmpty(validationHints) && validator instanceof SmartValidator) {
 				((SmartValidator) validator).validate(target, bindingResult, validationHints);

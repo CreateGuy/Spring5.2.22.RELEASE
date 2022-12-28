@@ -129,7 +129,7 @@ public class MediaType extends MimeType implements Serializable {
 	public static final String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
 
 	/**
-	 * Public constant media type for {@code application/octet-stream}.
+	 * 表明是一个字节流(未知的应用程序文件)，浏览器会去下载
 	 */
 	public static final MediaType APPLICATION_OCTET_STREAM;
 
@@ -516,15 +516,10 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Indicate whether this {@code MediaType} is compatible with the given media type.
-	 * <p>For instance, {@code text/*} is compatible with {@code text/plain},
-	 * {@code text/html}, and vice versa. In effect, this method is similar to
-	 * {@link #includes}, except that it <b>is</b> symmetric.
-	 * <p>Simply calls {@link MimeType#isCompatibleWith(MimeType)} but declared with a
-	 * {@code MediaType} parameter for binary backwards compatibility.
-	 * @param other the reference media type with which to compare
-	 * @return {@code true} if this media type is compatible with the given media type;
-	 * {@code false} otherwise
+	 * 判断此媒体类型是否与给定的媒体类型兼容
+	 * <li>例如，text/*与text/plain、text/html兼容，反之亦然。</li>
+	 * @param other
+	 * @return
 	 */
 	public boolean isCompatibleWith(@Nullable MediaType other) {
 		return super.isCompatibleWith(other);
@@ -545,11 +540,12 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Return a replica of this instance with its quality value removed.
+	 * 返回该实例的副本，删除其p值
 	 * @return the same instance if the media type doesn't contain a quality value,
 	 * or a new one otherwise
 	 */
 	public MediaType removeQualityValue() {
+		// 如果没有p值，返回原来的就行了
 		if (!getParameters().containsKey(PARAM_QUALITY_FACTOR)) {
 			return this;
 		}

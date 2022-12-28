@@ -33,8 +33,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.method.ControllerAdviceBean;
 
 /**
- * Invokes {@link RequestBodyAdvice} and {@link ResponseBodyAdvice} where each
- * instance may be (and is most likely) wrapped with
+ * 负责执行 {@link RequestBodyAdvice} 和 {@link ResponseBodyAdvice} 的
  * {@link org.springframework.web.method.ControllerAdviceBean ControllerAdviceBean}.
  *
  * @author Rossen Stoyanchev

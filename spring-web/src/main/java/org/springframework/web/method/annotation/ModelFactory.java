@@ -99,9 +99,7 @@ public final class ModelFactory {
 	 * <ol>
 	 * <li> 使用了 {@code @SessionAttributes} 注解的方法
 	 * <li> 使用了 {@code @ModelAttribute} 注解的方法
-	 * <li>Find {@code @ModelAttribute} method arguments also listed as
-	 * {@code @SessionAttributes} and ensure they're present in the model raising
-	 * an exception if necessary.
+	 * <li> 使用了 {@code @ModelAttribute} 注解的方法同时参数也在 {@code @SessionAttributes} 中
 	 * </ol>
 	 * @param request the current request
 	 * @param container a container with the model to be initialized
@@ -113,13 +111,15 @@ public final class ModelFactory {
 
 		// 读取会话中的保存的所有有关 @SessionAttributes 的属性
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
-		// 属性合并
+		// 1、属性合并
 		container.mergeAttributes(sessionAttributes);
-		// 执行标注了 @ModelAttribute 的方法
+		// 2、执行标注了 @ModelAttribute 的方法
 		invokeModelAttributeMethods(request, container);
 
+		// 3、遍历标注了 {@code @ModelAttribute} 的参数同时也标注了 {@code @SessionAttributes} 的参数
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
+				// 读取会话中的保存的特定的 @SessionAttributes 属性
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
 				if (value == null) {
 					throw new HttpSessionRequiredException("Expected session attribute '" + name + "'", name);
@@ -136,7 +136,7 @@ public final class ModelFactory {
 			throws Exception {
 
 		while (!this.modelMethods.isEmpty()) {
-			// 需要执行的Model方法
+			// 获得需要执行的Model方法
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
 			// 获得方法上的 @ModelAttribute 属性值
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
@@ -186,14 +186,18 @@ public final class ModelFactory {
 	}
 
 	/**
-	 * Find {@code @ModelAttribute} arguments also listed as {@code @SessionAttributes}.
+	 * 找到标注了 {@code @ModelAttribute} 的参数同时也标注了 {@code @SessionAttributes} 的参数
 	 */
 	private List<String> findSessionAttributeArguments(HandlerMethod handlerMethod) {
 		List<String> result = new ArrayList<>();
+		// 遍历方法的所有入参
 		for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
+			// 判断是否有指定注解
 			if (parameter.hasParameterAnnotation(ModelAttribute.class)) {
+				// 拿到参数的名称
 				String name = getNameForParameter(parameter);
 				Class<?> paramType = parameter.getParameterType();
+				// 判断属性是否在 需要设置到会话的属性集合中
 				if (this.sessionAttributesHandler.isHandlerSessionAttribute(name, paramType)) {
 					result.add(name);
 				}
@@ -203,20 +207,25 @@ public final class ModelFactory {
 	}
 
 	/**
-	 * Promote model attributes listed as {@code @SessionAttributes} to the session.
+	 * 将 model 中有关 {@code @SessionAttributes} 的属性保存在会话中
 	 * Add {@link BindingResult} attributes where necessary.
 	 * @param request the current request
 	 * @param container contains the model to update
 	 * @throws Exception if creating BindingResult attributes fails
 	 */
 	public void updateModel(NativeWebRequest request, ModelAndViewContainer container) throws Exception {
+		// 注意：是直接使用默认模型，而不是通过getModel()获得的
 		ModelMap defaultModel = container.getDefaultModel();
+		// 判断会话还没有结束
 		if (container.getSessionStatus().isComplete()){
+			// 清除会话中的保存的所有有关 SessionAttributes 的属性
 			this.sessionAttributesHandler.cleanupAttributes(request);
 		}
 		else {
+			// 将 model 中有关 @SessionAttributes 的属性保存在会话中
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
+		// 如果请求还没有完全处理完毕，更新 BindingResult
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {
 			updateBindingResult(request, defaultModel);
 		}
@@ -257,9 +266,7 @@ public final class ModelFactory {
 
 
 	/**
-	 * Derive the model attribute name for the given method parameter based on
-	 * a {@code @ModelAttribute} parameter annotation (if present) or falling
-	 * back on parameter type based conventions.
+	 * 拿到参数的名称
 	 * @param parameter a descriptor for the method parameter
 	 * @return the derived name
 	 * @see Conventions#getVariableNameForParameter(MethodParameter)
@@ -267,22 +274,23 @@ public final class ModelFactory {
 	public static String getNameForParameter(MethodParameter parameter) {
 		ModelAttribute ann = parameter.getParameterAnnotation(ModelAttribute.class);
 		String name = (ann != null ? ann.value() : null);
+		// 要么使用注解中的参数名称，要么用参数定义的名称
 		return (StringUtils.hasText(name) ? name : Conventions.getVariableNameForParameter(parameter));
 	}
 
 	/**
-	 * Derive the model attribute name for the given return value. Results will be
-	 * based on:
+	 * 为给定的返回值派生模型属性名，基于:
 	 * <ol>
-	 * <li>the method {@code ModelAttribute} annotation value
-	 * <li>the declared return type if it is more specific than {@code Object}
-	 * <li>the actual return value type
+	 * <li> {@code ModelAttribute}
+	 * <li> 声明的类型
+	 * <li> 实际的返回值类型
 	 * </ol>
 	 * @param returnValue the value returned from a method invocation
 	 * @param returnType a descriptor for the return type of the method
 	 * @return the derived name (never {@code null} or empty String)
 	 */
 	public static String getNameForReturnValue(@Nullable Object returnValue, MethodParameter returnType) {
+		// 1、使用 @ModelAttribute 中的参数名作为名称
 		ModelAttribute ann = returnType.getMethodAnnotation(ModelAttribute.class);
 		if (ann != null && StringUtils.hasText(ann.value())) {
 			return ann.value();
@@ -305,7 +313,7 @@ public final class ModelFactory {
 		private final InvocableHandlerMethod handlerMethod;
 
 		/**
-		 * 标注了 {@link ModelAttribute} 的方法中又标注了  {@link ModelAttribute}的入参
+		 * 方法中标注了 {@link ModelAttribute} 的入参
 		 */
 		private final Set<String> dependencies = new HashSet<>();
 

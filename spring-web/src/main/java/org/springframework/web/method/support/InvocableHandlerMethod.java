@@ -37,11 +37,19 @@ import org.springframework.web.method.HandlerMethod;
  */
 public class InvocableHandlerMethod extends HandlerMethod {
 
+	/**
+	 * 空参数数组，表示方法不需要入参
+	 */
 	private static final Object[] EMPTY_ARGS = new Object[0];
 
-
+	/**
+	 * 参数解析器
+	 */
 	private HandlerMethodArgumentResolverComposite resolvers = new HandlerMethodArgumentResolverComposite();
 
+	/**
+	 * 参数名发现器
+	 */
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 	/**
@@ -128,6 +136,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 通过参数解析器获得方法入参
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Arguments: " + Arrays.toString(args));
@@ -136,15 +145,19 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
-	 * Get the method argument values for the current request, checking the provided
-	 * argument values and falling back to the configured argument resolvers.
-	 * <p>The resulting array will be passed into {@link #doInvoke}.
-	 * @since 5.1.2
+	 * 通过参数解析器进行解析，返回给定方法的入参值
+	 * @param request
+	 * @param mavContainer
+	 * @param providedArgs
+	 * @return
+	 * @throws Exception
 	 */
 	protected Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 获得方法的入参
 		MethodParameter[] parameters = getMethodParameters();
+		// 无需入参，直接返回空参数数组
 		if (ObjectUtils.isEmpty(parameters)) {
 			return EMPTY_ARGS;
 		}
@@ -152,15 +165,19 @@ public class InvocableHandlerMethod extends HandlerMethod {
 		Object[] args = new Object[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
+			// 设置参数名发现器
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+			// 不懂，在RequestMappingHandlerMapping中没用
 			args[i] = findProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;
 			}
+			// 判断是否有参数解析器支持此参数
 			if (!this.resolvers.supportsParameter(parameter)) {
 				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
 			}
 			try {
+				// 解析参数
 				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
 			}
 			catch (Exception ex) {
@@ -178,13 +195,14 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
-	 * Invoke the handler method with the given argument values.
+	 * 使用给定的参数值调用处理程序方法
 	 */
 	@Nullable
 	protected Object doInvoke(Object... args) throws Exception {
-		// 使给定的方法可访问，必要时直接执行setAccessi
+		// 使给定的方法可访问，必要时直接执行setAccessible
 		ReflectionUtils.makeAccessible(getBridgedMethod());
 		try {
+			// 执行目标方法
 			return getBridgedMethod().invoke(getBean(), args);
 		}
 		catch (IllegalArgumentException ex) {

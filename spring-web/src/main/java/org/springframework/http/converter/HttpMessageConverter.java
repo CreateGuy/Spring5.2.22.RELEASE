@@ -35,7 +35,7 @@ import org.springframework.lang.Nullable;
 public interface HttpMessageConverter<T> {
 
 	/**
-	 * Indicates whether the given class can be read by this converter.
+	 * 判断此转换器能转换特定的类型以及是否支持此媒体类型(读取的过程)
 	 * @param clazz the class to test for readability
 	 * @param mediaType the media type to read (can be {@code null} if not specified);
 	 * typically the value of a {@code Content-Type} header.
@@ -44,7 +44,7 @@ public interface HttpMessageConverter<T> {
 	boolean canRead(Class<?> clazz, @Nullable MediaType mediaType);
 
 	/**
-	 * Indicates whether the given class can be written by this converter.
+	 * 判断此转换器能转换特定的类型以及是否支持此媒体类型(写入的过程)
 	 * @param clazz the class to test for writability
 	 * @param mediaType the media type to write (can be {@code null} if not specified);
 	 * typically the value of an {@code Accept} header.
@@ -53,13 +53,13 @@ public interface HttpMessageConverter<T> {
 	boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType);
 
 	/**
-	 * Return the list of {@link MediaType} objects supported by this converter.
+	 * 返回此转换器支持的 {@link MediaType}
 	 * @return the list of supported media types, potentially an immutable copy
 	 */
 	List<MediaType> getSupportedMediaTypes();
 
 	/**
-	 * Read an object of the given type from the given input message, and returns it.
+	 * 从给定的 HttpInputMessage 中读取给定类型的对象，并返回该对象。
 	 * @param clazz the type of object to return. This type must have previously been passed to the
 	 * {@link #canRead canRead} method of this interface, which must have returned {@code true}.
 	 * @param inputMessage the HTTP input message to read from
@@ -71,7 +71,7 @@ public interface HttpMessageConverter<T> {
 			throws IOException, HttpMessageNotReadableException;
 
 	/**
-	 * Write an given object to the given output message.
+	 * 将给定对象写入给定的 HttpOutputMessage 中
 	 * @param t the object to write to the output message. The type of this object must have previously been
 	 * passed to the {@link #canWrite canWrite} method of this interface, which must have returned {@code true}.
 	 * @param contentType the content type to use when writing. May be {@code null} to indicate that the
