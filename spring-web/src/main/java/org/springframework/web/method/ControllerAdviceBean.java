@@ -33,7 +33,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
- * 封装关于 @controllerAdvice 这种spring管理bean的信息，而不需要实例化它。
+ * 封装关于 {@link ControllerAdvice } 这种spring管理bean的信息，而不需要实例化它。
  *
  * <p>The {@link #findAnnotatedBeans(ApplicationContext)} method can be used to
  * discover such beans. However, a {@code ControllerAdviceBean} may be created
@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 public class ControllerAdviceBean implements Ordered {
 
 	/**
-	 * 标注了@controllerAdvice注解的bean的名称
+	 * 标注了{@link ControllerAdvice }注解的bean的名称
 	 */
 	private final Object beanOrName;
 

@@ -37,6 +37,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
@@ -58,15 +59,24 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 public final class ModelFactory {
 
+	/**
+	 * 符合条件的 {@link ModelAttribute} 方法
+	 */
 	private final List<ModelMethod> modelMethods = new ArrayList<>();
 
+	/**
+	 * 创建 {@link WebDataBinder} 实例的工厂
+	 */
 	private final WebDataBinderFactory dataBinderFactory;
 
+	/**
+	 * 将属性保存在会话中工具类
+	 */
 	private final SessionAttributesHandler sessionAttributesHandler;
 
 
 	/**
-	 * Create a new instance with the given {@code @ModelAttribute} methods.
+	 * 使用传入的 {@code @ModelAttribute} 方法创建实例
 	 * @param handlerMethods the {@code @ModelAttribute} methods to invoke
 	 * @param binderFactory for preparation of {@link BindingResult} attributes
 	 * @param attributeHandler for access to session attributes
@@ -85,10 +95,10 @@ public final class ModelFactory {
 
 
 	/**
-	 * Populate the model in the following order:
+	 * 按照下面的顺序填充模型
 	 * <ol>
-	 * <li>Retrieve "known" session attributes listed as {@code @SessionAttributes}.
-	 * <li>Invoke {@code @ModelAttribute} methods
+	 * <li> 使用了 {@code @SessionAttributes} 注解的方法
+	 * <li> 使用了 {@code @ModelAttribute} 注解的方法
 	 * <li>Find {@code @ModelAttribute} method arguments also listed as
 	 * {@code @SessionAttributes} and ensure they're present in the model raising
 	 * an exception if necessary.
@@ -101,8 +111,11 @@ public final class ModelFactory {
 	public void initModel(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)
 			throws Exception {
 
+		// 读取会话中的保存的所有有关 @SessionAttributes 的属性
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
+		// 属性合并
 		container.mergeAttributes(sessionAttributes);
+		// 执行标注了 @ModelAttribute 的方法
 		invokeModelAttributeMethods(request, container);
 
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
@@ -117,16 +130,18 @@ public final class ModelFactory {
 	}
 
 	/**
-	 * Invoke model attribute methods to populate the model.
-	 * Attributes are added only if not already present in the model.
+	 * 执行标注了 {@link ModelAttribute} 的方法
 	 */
 	private void invokeModelAttributeMethods(NativeWebRequest request, ModelAndViewContainer container)
 			throws Exception {
 
 		while (!this.modelMethods.isEmpty()) {
+			// 需要执行的Model方法
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
+			// 获得方法上的 @ModelAttribute 属性值
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
 			Assert.state(ann != null, "No ModelAttribute annotation");
+			// 一般情况下此时的Model都没有属性
 			if (container.containsAttribute(ann.name())) {
 				if (!ann.binding()) {
 					container.setBindingDisabled(ann.name());
@@ -134,12 +149,16 @@ public final class ModelFactory {
 				continue;
 			}
 
+			// 解析方法的参数，并执行目标方法
 			Object returnValue = modelMethod.invokeForRequest(request, container);
+			// 当返回值不是Void的情况
 			if (!modelMethod.isVoid()){
+				// 获得返回值的类型名称，比如说返回值是String类型，那么值就是string
 				String returnValueName = getNameForReturnValue(returnValue, modelMethod.getReturnType());
 				if (!ann.binding()) {
 					container.setBindingDisabled(returnValueName);
 				}
+				// 将返回值保存到模型中
 				if (!container.containsAttribute(returnValueName)) {
 					container.addAttribute(returnValueName, returnValue);
 				}
@@ -147,8 +166,15 @@ public final class ModelFactory {
 		}
 	}
 
+	/**
+	 * 返回下一个需要执行的Model方法
+	 * <p>以入参上有 @ModelAttribute 优先</p>
+	 * @param container
+	 * @return
+	 */
 	private ModelMethod getNextModelMethod(ModelAndViewContainer container) {
 		for (ModelMethod modelMethod : this.modelMethods) {
+			// 选择有依赖关系的方法优先
 			if (modelMethod.checkDependencies(container)) {
 				this.modelMethods.remove(modelMethod);
 				return modelMethod;
@@ -273,12 +299,19 @@ public final class ModelFactory {
 
 	private static class ModelMethod {
 
+		/**
+		 * HandlerMethod的扩展，负责如何绑定方法入参中的参数值
+		 */
 		private final InvocableHandlerMethod handlerMethod;
 
+		/**
+		 * 标注了 {@link ModelAttribute} 的方法中又标注了  {@link ModelAttribute}的入参
+		 */
 		private final Set<String> dependencies = new HashSet<>();
 
 		public ModelMethod(InvocableHandlerMethod handlerMethod) {
 			this.handlerMethod = handlerMethod;
+			// 将入参中有 @ModelAttribute 注解的保存起来
 			for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
 				if (parameter.hasParameterAnnotation(ModelAttribute.class)) {
 					this.dependencies.add(getNameForParameter(parameter));
@@ -290,6 +323,11 @@ public final class ModelFactory {
 			return this.handlerMethod;
 		}
 
+		/**
+		 * 选择有依赖关系的方法
+		 * @param mavContainer
+		 * @return
+		 */
 		public boolean checkDependencies(ModelAndViewContainer mavContainer) {
 			for (String name : this.dependencies) {
 				if (!mavContainer.containsAttribute(name)) {

@@ -27,7 +27,7 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
 /**
- * 特殊的 {@link Component @Component}，是配合下面三个注解使用的，实现切入的功能，切入的是Controller的情况
+ * 特殊的 {@link Component}，是配合下面三个注解使用的，实现切入的功能，切入的是Controller的情况
  * <ul>
  *     <li>
  *         {@link ExceptionHandler}：实现全局异常处理

@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation that indicates the session attributes that a specific handler uses.
+ * 将Model中的特定参数保存到会话中，以供后面的请求使用
  *
  * <p>This will typically list the names of model attributes which should be
  * transparently stored in the session or some conversational storage,
@@ -62,6 +62,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface SessionAttributes {
 
 	/**
+	 * 指定参数名
 	 * Alias for {@link #names}.
 	 */
 	@AliasFor("names")
@@ -80,10 +81,7 @@ public @interface SessionAttributes {
 	String[] names() default {};
 
 	/**
-	 * The types of session attributes in the model that should be stored in the
-	 * session or some conversational storage.
-	 * <p>All model attributes of these types will be stored in the session,
-	 * regardless of attribute name.
+	 * 指定应该保存在会话中的属性的类型
 	 */
 	Class<?>[] types() default {};
 

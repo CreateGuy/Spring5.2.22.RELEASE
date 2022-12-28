@@ -21,11 +21,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Create a {@link WebRequestDataBinder} instance and initialize it with a
- * {@link WebBindingInitializer}.
- *
- * @author Rossen Stoyanchev
- * @since 3.1
+ * 创建一个 {@link WebRequestDataBinder} 实例并用 {@link WebBindingInitializer}初始化它。
  */
 public class DefaultDataBinderFactory implements WebDataBinderFactory {
 

@@ -46,8 +46,14 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public abstract class AbstractBindingResult extends AbstractErrors implements BindingResult, Serializable {
 
+	/**
+	 * 要绑定的对象名称
+	 */
 	private final String objectName;
 
+	/**
+	 * 本质上是通过错误信息重新生成错误信息
+	 */
 	private MessageCodesResolver messageCodesResolver = new DefaultMessageCodesResolver();
 
 	private final List<ObjectError> errors = new ArrayList<>();
@@ -234,10 +240,7 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	}
 
 	/**
-	 * This default implementation determines the type based on the actual
-	 * field value, if any. Subclasses should override this to determine
-	 * the type from a descriptor, even for {@code null} values.
-	 * @see #getActualFieldValue
+	 * 确定属性的类型(Class)
 	 */
 	@Override
 	@Nullable

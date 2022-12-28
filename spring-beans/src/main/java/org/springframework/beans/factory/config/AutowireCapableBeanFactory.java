@@ -68,7 +68,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	int AUTOWIRE_NO = 0;
 
 	/**
-	 * 通过set方法，并且 set方法的名称需要和bnea的name一致
+	 * 通过set方法，并且 set方法的名称需要和bean的name一致
 	 */
 	int AUTOWIRE_BY_NAME = 1;
 

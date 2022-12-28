@@ -45,10 +45,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.util.NestedServletException;
 
 /**
- * Extends {@link InvocableHandlerMethod} with the ability to handle return
- * values through a registered {@link HandlerMethodReturnValueHandler} and
- * also supports setting the response status based on a method-level
- * {@code @ResponseStatus} annotation.
+ * 扩展了 {@link InvocableHandlerMethod}，使其能够通过注册的 {@link HandlerMethodReturnValueHandler} 处理返回值，还支持基于方法级别的 {@link ResponseStatus} 注解设置响应状态。
  *
  * <p>A {@code null} return value (including void) may be interpreted as the
  * end of request processing in combination with a {@code @ResponseStatus}

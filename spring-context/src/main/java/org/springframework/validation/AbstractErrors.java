@@ -39,6 +39,9 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public abstract class AbstractErrors implements Errors, Serializable {
 
+	/**
+	 * 嵌套路径
+	 */
 	private String nestedPath = "";
 
 	private final Deque<String> nestedPathStack = new ArrayDeque<>();
@@ -88,8 +91,7 @@ public abstract class AbstractErrors implements Errors, Serializable {
 	}
 
 	/**
-	 * Transform the given field into its full path,
-	 * regarding the nested path of this instance.
+	 * 将给定的字段转换为它的完整路径(关于此实例的嵌套路径)
 	 */
 	protected String fixedField(@Nullable String field) {
 		if (StringUtils.hasLength(field)) {
@@ -103,7 +105,7 @@ public abstract class AbstractErrors implements Errors, Serializable {
 	}
 
 	/**
-	 * Determine the canonical field name for the given field.
+	 * 规范给定的属性名称
 	 * <p>The default implementation simply returns the field name as-is.
 	 * @param field the original field name
 	 * @return the canonical field name

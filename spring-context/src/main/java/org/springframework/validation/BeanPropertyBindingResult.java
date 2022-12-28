@@ -24,10 +24,7 @@ import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.lang.Nullable;
 
 /**
- * Default implementation of the {@link Errors} and {@link BindingResult}
- * interfaces, for the registration and evaluation of binding errors on
- * JavaBean objects.
- *
+ * {@link Errors} 和 {@link BindingResult} 的默认实现，用于注册和计算Bean对象上的绑定错误
  * <p>Performs standard JavaBean property access, also supporting nested
  * properties. Normally, application code will work with the
  * {@code Errors} interface or the {@code BindingResult} interface.
@@ -43,9 +40,15 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class BeanPropertyBindingResult extends AbstractPropertyBindingResult implements Serializable {
 
+	/**
+	 * 要绑定的对象
+	 */
 	@Nullable
 	private final Object target;
 
+	/**
+	 * 是否允许设置嵌套属性，即对象中的对象的属性
+	 */
 	private final boolean autoGrowNestedPaths;
 
 	private final int autoGrowCollectionLimit;

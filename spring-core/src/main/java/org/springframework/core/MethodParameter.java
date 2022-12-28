@@ -675,7 +675,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return whether the parameter is declared with the given annotation type.
+	 * 确定参数是否又指定注解
 	 * @param annotationType the annotation type to look for
 	 * @see #getParameterAnnotation(Class)
 	 */

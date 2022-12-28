@@ -21,7 +21,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * A factory for creating a {@link WebDataBinder} instance for a named target object.
+ * 创建 {@link WebDataBinder} 实例的工厂
  *
  * @author Arjen Poutsma
  * @since 3.1

@@ -223,7 +223,7 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Return read-only "input" flash attributes from request before redirect.
+	 * 返回 InputFlashMap
 	 * @param request current request
 	 * @return a read-only Map, or {@code null} if not found
 	 * @see FlashMap

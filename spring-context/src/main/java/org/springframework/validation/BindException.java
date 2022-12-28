@@ -25,10 +25,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Thrown when binding errors are considered fatal. Implements the
- * {@link BindingResult} interface (and its super-interface {@link Errors})
- * to allow for the direct analysis of binding errors.
- *
+ * 当绑定错误被认为是致命错误时抛出
  * <p>As of Spring 2.0, this is a special-purpose class. Normally,
  * application code will work with the {@link BindingResult} interface,
  * or with a {@link DataBinder} that in turn exposes a BindingResult via

@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of the {@link MessageCodesResolver} interface.
+ * {@link MessageCodesResolver} 的默认实现
  *
  * <p>Will create two message codes for an object error, in the following order (when
  * using the {@link Format#PREFIX_ERROR_CODE prefixed}
@@ -93,7 +93,7 @@ import org.springframework.util.StringUtils;
 public class DefaultMessageCodesResolver implements MessageCodesResolver, Serializable {
 
 	/**
-	 * The separator that this implementation uses when resolving message codes.
+	 * 错误信息中间的分隔符
 	 */
 	public static final String CODE_SEPARATOR = ".";
 
@@ -139,18 +139,23 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
 	}
 
 	/**
-	 * Build the code list for the given code and field: an
-	 * object/field-specific code, a field-specific code, a plain error code.
-	 * <p>Arrays, Lists and Maps are resolved both for specific elements and
-	 * the whole collection.
-	 * <p>See the {@link DefaultMessageCodesResolver class level javadoc} for
-	 * details on the generated codes.
-	 * @return the list of codes
+	 * 通过错误Code和出错的对象以及错误的字段重新生成错误信息
+	 * 	 * <ul>
+	 * 	 *     <li>
+	 * 	 *         比如说入参是 "404", "user", "age", "int", 出参就是 404.user.age, 404.age, 404.int, 404
+	 * 	 *     </li>
+	 * 	 * </ul>
+	 * @param errorCode the error code used for rejecting the value
+	 * @param objectName the name of the object
+	 * @param field the field name
+	 * @param fieldType the field type (may be {@code null} if not determinable)
+	 * @return
 	 */
 	@Override
 	public String[] resolveMessageCodes(String errorCode, String objectName, String field, @Nullable Class<?> fieldType) {
 		Set<String> codeList = new LinkedHashSet<>();
 		List<String> fieldList = new ArrayList<>();
+		// 将有规则的字段名进行转换
 		buildFieldList(field, fieldList);
 		addCodes(codeList, errorCode, objectName, fieldList);
 		int dotIndex = field.lastIndexOf('.');
@@ -176,8 +181,7 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
 	}
 
 	/**
-	 * Add both keyed and non-keyed entries for the supplied {@code field}
-	 * to the supplied field list.
+	 * 将有规则的字段名进行转换
 	 */
 	protected void buildFieldList(String field, List<String> fieldList) {
 		fieldList.add(field);

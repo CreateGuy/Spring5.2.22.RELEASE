@@ -77,7 +77,7 @@ public class HandlerMethod {
 	private final BeanFactory beanFactory;
 
 	/**
-	 * 方法包含的对象的Class
+	 * 包含方法的对象的Class
 	 */
 	private final Class<?> beanType;
 
@@ -333,8 +333,7 @@ public class HandlerMethod {
 	}
 
 	/**
-	 * Return a single annotation on the underlying method traversing its super methods
-	 * if no annotation can be found on the given method itself.
+	 * 如果在给定方法本身上找不到指定注解，则返回遍历其超方法的底层方法上的注解
 	 * <p>Also supports <em>merged</em> composed annotations with attribute
 	 * overrides as of Spring Framework 4.2.2.
 	 * @param annotationType the type of annotation to introspect the method for

@@ -44,6 +44,9 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
+	/**
+	 * 创建 {@link WebDataBinder} 实例的工厂
+	 */
 	@Nullable
 	private WebDataBinderFactory dataBinderFactory;
 
@@ -103,7 +106,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
 
 	/**
-	 * Invoke the method after resolving its argument values in the context of the given request.
+	 * 解析方法的参数，并执行目标方法
 	 * <p>Argument values are commonly resolved through
 	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
 	 * The {@code providedArgs} parameter however may supply argument values to be used directly,

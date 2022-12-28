@@ -19,6 +19,7 @@ package org.springframework.validation;
 import org.springframework.lang.Nullable;
 
 /**
+ * 本质上是通过错误信息重新生成错误信息
  * Strategy interface for building message codes from validation error codes.
  * Used by DataBinder to build the codes list for ObjectErrors and FieldErrors.
  *
@@ -35,8 +36,7 @@ import org.springframework.lang.Nullable;
 public interface MessageCodesResolver {
 
 	/**
-	 * Build message codes for the given error code and object name.
-	 * Used for building the codes list of an ObjectError.
+	 * 通过错误Code和出错的对象重新生成错误信息
 	 * @param errorCode the error code used for rejecting the object
 	 * @param objectName the name of the object
 	 * @return the message codes to use
@@ -44,8 +44,7 @@ public interface MessageCodesResolver {
 	String[] resolveMessageCodes(String errorCode, String objectName);
 
 	/**
-	 * Build message codes for the given error code and field specification.
-	 * Used for building the codes list of an FieldError.
+	 * 通过错误Code和出错的对象以及错误的字段重新生成错误信息
 	 * @param errorCode the error code used for rejecting the value
 	 * @param objectName the name of the object
 	 * @param field the field name

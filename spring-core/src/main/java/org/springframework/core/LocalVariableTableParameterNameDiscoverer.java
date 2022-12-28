@@ -39,7 +39,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * 利用ASM字节码的局部变量表(LocalVariableTable)获得参数名称
+ * 利用ASM字节码对局部变量表(LocalVariableTable)获得参数名称
  *
  * <p>Uses ObjectWeb's ASM library for analyzing class files. Each discoverer instance
  * caches the ASM discovered information for each introspected Class, in a thread-safe

@@ -29,10 +29,15 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.bind.support.SimpleSessionStatus;
 
 /**
- * Records model and view related decisions made by
- * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers} and
- * {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers} during the course of invocation of
- * a controller method.
+ * 模型和视图的容器，由于下面两个进行操作
+ * <ul>
+ *     <li>
+ *         {@link HandlerMethodArgumentResolver}
+ *     </li>
+ *     <li>
+ *         {@link HandlerMethodReturnValueHandler}
+ *     </li>
+ * </ul>
  *
  * <p>The {@link #setRequestHandled} flag can be used to indicate the request
  * has been handled directly and view resolution is not required.
@@ -49,16 +54,25 @@ import org.springframework.web.bind.support.SimpleSessionStatus;
  */
 public class ModelAndViewContainer {
 
+	/**
+	 * 是否忽略默认模型而使用重定向模型
+	 */
 	private boolean ignoreDefaultModelOnRedirect = false;
 
 	@Nullable
 	private Object view;
 
+	/**
+	 * 针对非跳转模式的数据模型
+	 */
 	private final ModelMap defaultModel = new BindingAwareModelMap();
 
 	@Nullable
 	private ModelMap redirectModel;
 
+	/**
+	 * 是否使用了重定向的，比如说返回值是以 redirect: 开头
+	 */
 	private boolean redirectModelScenario = false;
 
 	@Nullable
@@ -132,12 +146,10 @@ public class ModelAndViewContainer {
 	}
 
 	/**
-	 * Return the model to use -- either the "default" or the "redirect" model.
-	 * The default model is used if {@code redirectModelScenario=false} or
-	 * there is no redirect model (i.e. RedirectAttributes was not declared as
-	 * a method argument) and {@code ignoreDefaultModelOnRedirect=false}.
+	 * 返回要使用的模型
 	 */
 	public ModelMap getModel() {
+		// 使用默认模型还是重定向模型
 		if (useDefaultModel()) {
 			return this.defaultModel;
 		}
@@ -150,7 +162,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
-	 * Whether to use the default model or the redirect model.
+	 * 使用默认模型还是重定向模型
 	 */
 	private boolean useDefaultModel() {
 		return (!this.redirectModelScenario || (this.redirectModel == null && !this.ignoreDefaultModelOnRedirect));
