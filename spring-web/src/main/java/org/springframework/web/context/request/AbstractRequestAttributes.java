@@ -58,7 +58,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	}
 
 	/**
-	 * Determine whether the original request is still active.
+	 * 确定原始请求是否仍处于活动状态
 	 * @see #requestCompleted()
 	 */
 	protected final boolean isRequestActive() {

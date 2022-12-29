@@ -1056,13 +1056,17 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
-				// 调用处理器
+				// 调用处理器，并获得 ModelAndView 对象
+				// 可能 ModelAndView 为空，比如说使用了@Response注解
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
+				// 判断异步任务是否已经启动
+				// 如果是返回值是异步任务，那么是在对于的返回值处理器就已经开始在异步线程中执行具体的代码了
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
 
+				// 如果视图名为空，通过视图名转换器设置视图名称
 				applyDefaultViewName(processedRequest, mv);
 				// 执行拦截器的 postHandle 方法
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
@@ -1071,10 +1075,10 @@ public class DispatcherServlet extends FrameworkServlet {
 				dispatchException = ex;
 			}
 			catch (Throwable err) {
-				// As of 4.3, we're processing Errors thrown from handler methods as well,
-				// making them available for @ExceptionHandler methods and other scenarios.
+				// 从4.3开始，也在处理从处理程序方法抛出的错误，使它们可用于ExceptionHandler方法和其他场景
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+			// 处理执行结果
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1101,10 +1105,12 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Do we need view name translation?
+	 * 是否需要进行视图名转换
 	 */
 	private void applyDefaultViewName(HttpServletRequest request, @Nullable ModelAndView mv) throws Exception {
+		// 视图不为空并且视图名没有的情况
 		if (mv != null && !mv.hasView()) {
+			// 通过视图名转换器获得默认视图名
 			String defaultViewName = getDefaultViewName(request);
 			if (defaultViewName != null) {
 				mv.setViewName(defaultViewName);
@@ -1113,8 +1119,13 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Handle the result of handler selection and handler invocation, which is
-	 * either a ModelAndView or an Exception to be resolved to a ModelAndView.
+	 * 处理 选择处理程序 和 处理程序执行的结果，该结果要么是ModelAndView，要么是要解析为ModelAndView的异常
+	 * @param request
+	 * @param response
+	 * @param mappedHandler 处理器执行链
+	 * @param mv
+	 * @param exception 处理 选择处理程序 和 处理程序执行的结果之间的异常
+	 * @throws Exception
 	 */
 	private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
 			@Nullable HandlerExecutionChain mappedHandler, @Nullable ModelAndView mv,
@@ -1122,13 +1133,17 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		boolean errorView = false;
 
+		// 派发过程中出现了异常
 		if (exception != null) {
+			// 不懂出现这种异常的情况
 			if (exception instanceof ModelAndViewDefiningException) {
 				logger.debug("ModelAndViewDefiningException encountered", exception);
 				mv = ((ModelAndViewDefiningException) exception).getModelAndView();
 			}
 			else {
+				// 拿到处理方法
 				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
+				// 处理异常
 				mv = processHandlerException(request, response, handler, exception);
 				errorView = (mv != null);
 			}
@@ -1300,7 +1315,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Determine an error ModelAndView via the registered HandlerExceptionResolvers.
+	 * 通过注册的异常处理器(HandlerExceptionResolvers)来处理派发过程中的异常和错误
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handler the executed handler, or {@code null} if none chosen at the time of the exception
@@ -1313,12 +1328,12 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected ModelAndView processHandlerException(HttpServletRequest request, HttpServletResponse response,
 			@Nullable Object handler, Exception ex) throws Exception {
 
-		// Success and error responses may use different content types
+		// 成功响应和错误响应可能使用不同的媒体类型
 		request.removeAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE);
 
-		// Check registered HandlerExceptionResolvers...
 		ModelAndView exMv = null;
 		if (this.handlerExceptionResolvers != null) {
+			// 遍历所有异常解析器，尝试解析
 			for (HandlerExceptionResolver resolver : this.handlerExceptionResolvers) {
 				exMv = resolver.resolveException(request, response, handler, ex);
 				if (exMv != null) {
@@ -1404,7 +1419,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Translate the supplied request into a default view name.
+	 * 通过视图名转换器获得默认视图名
 	 * @param request current HTTP servlet request
 	 * @return the view name (or {@code null} if no default found)
 	 * @throws Exception if view name translation failed

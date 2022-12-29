@@ -23,8 +23,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for handling exceptions in specific handler classes and/or
- * handler methods.
+ * 用于处理特定处理程序类和/或处理程序方法中的异常的注释，使用场景如下：
+ * <ol>
+ *     <li>
+ *         作用在Controller中的方法上：属于Controller的局部异常
+ *     </li>
+ *     <li>
+ *         {@link ControllerAdvice} + {@link ExceptionHandler}：全局异常
+ *     </li>
+ * </ol>
  *
  * <p>Handler methods which are annotated with this annotation are allowed to
  * have very flexible signatures. They may have parameters of the following
@@ -106,8 +113,7 @@ import java.lang.annotation.Target;
 public @interface ExceptionHandler {
 
 	/**
-	 * Exceptions handled by the annotated method. If empty, will default to any
-	 * exceptions listed in the method argument list.
+	 * 异常处理支持的类型，为空就是都支持
 	 */
 	Class<? extends Throwable>[] value() default {};
 

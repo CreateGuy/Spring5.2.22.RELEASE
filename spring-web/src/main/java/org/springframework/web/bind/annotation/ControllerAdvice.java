@@ -36,7 +36,10 @@ import org.springframework.stereotype.Component;
  *         {@link InitBinder}：实现参数处理和参数绑定
  *     </li>
  *     <li>
- *         {@link ModelAttribute}：全局参数绑定
+ *         {@link ModelAttribute}：实现全局参数绑定
+ *     </li>
+ *     <li>
+ * 			{@link RequestBodyAdvice} 或者 {@link ResponseBodyAdvice}：实现读取请求体和写入响应头的回调方法
  *     </li>
  * </ul>
  * <p>Classes annotated with {@code @ControllerAdvice} can be declared explicitly

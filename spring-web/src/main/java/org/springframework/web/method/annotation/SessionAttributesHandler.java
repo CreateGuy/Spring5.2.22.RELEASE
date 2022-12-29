@@ -91,7 +91,7 @@ public class SessionAttributesHandler {
 	}
 
 	/**
-	 * 判断属性是否在 需要设置到会话的属性集合中
+	 * 判断属性是否满足 {@code SessionAttribute}
 	 * @param attributeName
 	 * @param attributeType
 	 * @return

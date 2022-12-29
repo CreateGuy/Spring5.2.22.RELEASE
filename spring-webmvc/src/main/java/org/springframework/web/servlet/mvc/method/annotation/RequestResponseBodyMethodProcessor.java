@@ -196,6 +196,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest)
 			throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
 
+		// 我觉得是因为此处理器是处理@Response的，是直接返回数据的，不需要视图了，就可以标志为当前请求已经被完全处理完毕
 		mavContainer.setRequestHandled(true);
 		// 包装请求和响应
 		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);

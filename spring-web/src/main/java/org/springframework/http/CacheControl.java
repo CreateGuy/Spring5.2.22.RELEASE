@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * A builder for creating "Cache-Control" HTTP response headers.
+ * 用于创建 Cache-Control  HTTP响应头的构建器
  *
  * <p>Adding Cache-Control directives to HTTP responses can significantly improve the client
  * experience when interacting with a web application. This builder creates opinionated
@@ -51,13 +51,25 @@ import org.springframework.util.StringUtils;
  */
 public class CacheControl {
 
+	/**
+	 * 过期时间
+	 */
 	@Nullable
 	private Duration maxAge;
 
+	/**
+	 * 必须先与服务器确认返回的响应是否被更改，然后才能使用该响应来满足后续对同一个网址的请求
+	 */
 	private boolean noCache = false;
 
+	/**
+	 * 所有内容都不会被缓存到缓存或 Internet 临时文件中
+	 */
 	private boolean noStore = false;
 
+	/**
+	 * 如果缓存的内容失效，请求必须发送到服务器/代理以进行重新验证
+	 */
 	private boolean mustRevalidate = false;
 
 	private boolean noTransform = false;
@@ -66,6 +78,9 @@ public class CacheControl {
 
 	private boolean cachePrivate = false;
 
+	/**
+	 * 如果缓存的内容失效，请求必须发送到服务器/代理以进行重新验证
+	 */
 	private boolean proxyRevalidate = false;
 
 	@Nullable
@@ -97,7 +112,7 @@ public class CacheControl {
 	}
 
 	/**
-	 * Add a "max-age=" directive.
+	 * 添加 "max-age=" 指令
 	 * <p>This directive is well suited for publicly caching resources, knowing that
 	 * they won't change within the configured amount of time. Additional directives
 	 * can be also used, in case resources shouldn't be cached ({@link #cachePrivate()})
@@ -321,7 +336,7 @@ public class CacheControl {
 	}
 
 	/**
-	 * Return the "Cache-Control" header value, if any.
+	 * 返回 Cache-Control 的请求头值
 	 * @return the header value, or {@code null} if no directive was added
 	 */
 	@Nullable
@@ -331,7 +346,7 @@ public class CacheControl {
 	}
 
 	/**
-	 * Return the "Cache-Control" header value.
+	 * 返回 Cache-Control 的请求头值
 	 * @return the header value (potentially empty)
 	 */
 	private String toHeaderValue() {

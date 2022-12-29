@@ -53,6 +53,9 @@ public class BeanPropertyBindingResult extends AbstractPropertyBindingResult imp
 
 	private final int autoGrowCollectionLimit;
 
+	/**
+	 * bean对应的 BeanWrapper
+	 */
 	@Nullable
 	private transient BeanWrapper beanWrapper;
 

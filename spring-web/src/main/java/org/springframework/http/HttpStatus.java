@@ -19,7 +19,7 @@ package org.springframework.http;
 import org.springframework.lang.Nullable;
 
 /**
- * Enumeration of HTTP status codes.
+ * HTTP状态码的枚举
  *
  * <p>The HTTP status code series can be retrieved via {@link #series()}.
  *

@@ -22,16 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by objects that can resolve exceptions thrown during
- * handler mapping or execution, in the typical case to error views. Implementors are
- * typically registered as beans in the application context.
- *
- * <p>Error views are analogous to JSP error pages but can be used with any kind of
- * exception including any checked exception, with potentially fine-grained mappings for
- * specific handlers.
- *
- * @author Juergen Hoeller
- * @since 22.11.2003
+ * 异常处理器
  */
 public interface HandlerExceptionResolver {
 

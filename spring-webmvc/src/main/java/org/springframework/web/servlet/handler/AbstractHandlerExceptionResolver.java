@@ -53,15 +53,26 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
+	/**
+	 * 此异常解析器支持的处理器
+	 * <li>但没有看到有地方执行了set方法</li>
+	 */
 	@Nullable
 	private Set<?> mappedHandlers;
 
+	/**
+	 * 此异常解析器支持的处理器类型
+	 * <li>但没有看到有地方执行了set方法</li>
+	 */
 	@Nullable
 	private Class<?>[] mappedHandlerClasses;
 
 	@Nullable
 	private Log warnLogger;
 
+	/**
+	 * 是否防止响应被缓存
+	 */
 	private boolean preventResponseCaching = false;
 
 
@@ -137,7 +148,9 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	public ModelAndView resolveException(
 			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex) {
 
+		// 检查这个解析器是否适用于给定的处理程序
 		if (shouldApplyTo(request, handler)) {
+			// 防止响应被缓存
 			prepareResponse(ex, response);
 			ModelAndView result = doResolveException(request, response, handler, ex);
 			if (result != null) {
@@ -156,17 +169,10 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	}
 
 	/**
-	 * Check whether this resolver is supposed to apply to the given handler.
-	 * <p>The default implementation checks against the configured
-	 * {@linkplain #setMappedHandlers handlers} and
-	 * {@linkplain #setMappedHandlerClasses handler classes}, if any.
-	 * @param request current HTTP request
-	 * @param handler the executed handler, or {@code null} if none chosen
-	 * at the time of the exception (for example, if multipart resolution failed)
-	 * @return whether this resolved should proceed with resolving the exception
-	 * for the given request and handler
-	 * @see #setMappedHandlers
-	 * @see #setMappedHandlerClasses
+	 * 检查这个解析器是否适用于给定的处理程序
+	 * @param request
+	 * @param handler
+	 * @return
 	 */
 	protected boolean shouldApplyTo(HttpServletRequest request, @Nullable Object handler) {
 		if (handler != null) {
@@ -181,7 +187,7 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 				}
 			}
 		}
-		// Else only apply if there are no explicit handler mappings.
+		// 没有显式的设置此异常处理器应该处理的程序，那就认为可以
 		return (this.mappedHandlers == null && this.mappedHandlerClasses == null);
 	}
 
@@ -212,23 +218,19 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	}
 
 	/**
-	 * Prepare the response for the exceptional case.
-	 * <p>The default implementation prevents the response from being cached,
-	 * if the {@link #setPreventResponseCaching "preventResponseCaching"} property
-	 * has been set to "true".
-	 * @param ex the exception that got thrown during handler execution
-	 * @param response current HTTP response
-	 * @see #preventCaching
+	 * 是否防止响应被缓存
+	 * @param ex
+	 * @param response
 	 */
 	protected void prepareResponse(Exception ex, HttpServletResponse response) {
 		if (this.preventResponseCaching) {
+			// 防止响应被缓存
 			preventCaching(response);
 		}
 	}
 
 	/**
-	 * Prevents the response from being cached, through setting corresponding
-	 * HTTP {@code Cache-Control: no-store} header.
+	 * 通过设置相应的响应头 Cache-control: no-store，防止响应被缓存
 	 * @param response current HTTP response
 	 */
 	protected void preventCaching(HttpServletResponse response) {
@@ -237,17 +239,11 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 
 
 	/**
-	 * Actually resolve the given exception that got thrown during handler execution,
-	 * returning a {@link ModelAndView} that represents a specific error page if appropriate.
-	 * <p>May be overridden in subclasses, in order to apply specific exception checks.
-	 * Note that this template method will be invoked <i>after</i> checking whether this
-	 * resolved applies ("mappedHandlers" etc), so an implementation may simply proceed
-	 * with its actual exception handling.
+	 * 为了解决在处理程序执行期间抛出的异常，返回表示特定错误页面的 ModelAndView 对象
 	 * @param request current HTTP request
 	 * @param response current HTTP response
-	 * @param handler the executed handler, or {@code null} if none chosen at the time
-	 * of the exception (for example, if multipart resolution failed)
-	 * @param ex the exception that got thrown during handler execution
+	 * @param handler 处理程序
+	 * @param ex 在执行处理程序期间引发的异常
 	 * @return a corresponding {@code ModelAndView} to forward to,
 	 * or {@code null} for default processing in the resolution chain
 	 */

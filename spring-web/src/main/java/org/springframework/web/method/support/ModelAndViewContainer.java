@@ -75,6 +75,9 @@ public class ModelAndViewContainer {
 	 */
 	private boolean redirectModelScenario = false;
 
+	/**
+	 * HTTP状态码
+	 */
 	@Nullable
 	private HttpStatus status;
 

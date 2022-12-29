@@ -38,6 +38,9 @@ public class RedirectAttributesModelMap extends ModelMap implements RedirectAttr
 	@Nullable
 	private final DataBinder dataBinder;
 
+	/**
+	 * 专门用于在重定向的时候传递参数
+	 */
 	private final ModelMap flashAttributes = new ModelMap();
 
 

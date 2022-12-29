@@ -842,11 +842,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
+		// 是否需要让浏览器开始缓存
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
+			// 是否需要设置会话属性
 			if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
+				// 设置相关响应头
 				applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
 			}
 			else {
+				// 设置相关响应头
 				prepareResponse(response);
 			}
 		}
@@ -943,10 +947,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
-
+			// 获得 ModelAndView 对象
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
+			// 标志请求已经完成
 			webRequest.requestCompleted();
 		}
 	}
@@ -1087,24 +1092,38 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return new ServletRequestDataBinderFactory(binderMethods, getWebBindingInitializer());
 	}
 
+	/**
+	 * 获得 ModelAndView 对象
+	 * @param mavContainer
+	 * @param modelFactory
+	 * @param webRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@Nullable
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
-		//
+		// 将 model 中有关 {@code @SessionAttributes} 的属性保存在会话中
 		modelFactory.updateModel(webRequest, mavContainer);
+		// 比如说使用了@Response注解，那么就不需要视图了，这里就会直接返回
 		if (mavContainer.isRequestHandled()) {
 			return null;
 		}
+
+		// 创建 ModelAndView 以及配置视图名称
 		ModelMap model = mavContainer.getModel();
 		ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model, mavContainer.getStatus());
 		if (!mavContainer.isViewReference()) {
 			mav.setView((View) mavContainer.getView());
 		}
+
+		// 如果是使用重定向模型
 		if (model instanceof RedirectAttributes) {
 			Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			if (request != null) {
+				// 将FlashAttributes 保存在 FlashMap 中,后面处理重定向视图的时候，会读取FlashMap然后保存在会话中的
 				RequestContextUtils.getOutputFlashMap(request).putAll(flashAttributes);
 			}
 		}

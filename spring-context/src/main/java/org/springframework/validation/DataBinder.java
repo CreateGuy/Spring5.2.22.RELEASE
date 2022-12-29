@@ -335,8 +335,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Return the internal BindingResult held by this DataBinder,
-	 * as an AbstractPropertyBindingResult.
+	 * 返回由该 DataBinder 持有的内部 BindingResult
 	 */
 	protected AbstractPropertyBindingResult getInternalBindingResult() {
 		if (this.bindingResult == null) {
@@ -390,9 +389,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Return the BindingResult instance created by this DataBinder.
-	 * This allows for convenient access to the binding results after
-	 * a bind operation.
+	 * 返回由该 DataBinder 创建的 BindingResult 实例。这允许在绑定操作之后方便地访问绑定结果
 	 * @return the BindingResult instance, to be treated as BindingResult
 	 * or as Errors instance (Errors is a super-interface of BindingResult)
 	 * @see Errors

@@ -104,11 +104,14 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		return this.response;
 	}
 
-	/**
+	/***
 	 * 获得Session
+	 * @param allowCreate
+	 * @return 如果没有Session是否强制创建会话
 	 */
 	@Nullable
 	protected final HttpSession getSession(boolean allowCreate) {
+		// 确定原始请求是否仍处于活动状态
 		if (isRequestActive()) {
 			HttpSession session = this.request.getSession(allowCreate);
 			this.session = session;
@@ -117,7 +120,9 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 		else {
 			// Access through stored session reference, if any...
 			HttpSession session = this.session;
+			// 无法创建会话了
 			if (session == null) {
+				// 是直接抛出异常还是强制创建Session
 				if (allowCreate) {
 					throw new IllegalStateException(
 							"No session found and request already completed - cannot create new session!");
@@ -312,7 +317,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	@Override
 	protected void updateAccessedSessionAttributes() {
 		if (!this.sessionAttributesToUpdate.isEmpty()) {
-			// Update all affected session attributes.
+			// 更新所有受影响的会话属性
 			HttpSession session = getSession(false);
 			if (session != null) {
 				try {

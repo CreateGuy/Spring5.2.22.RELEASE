@@ -406,7 +406,7 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Replace all occurrences of a substring within a string with another string.
+	 * 用另一个字符串替换字符串中出现的所有子字符串
 	 * @param inString {@code String} to examine
 	 * @param oldPattern {@code String} to replace
 	 * @param newPattern {@code String} to insert
@@ -610,8 +610,8 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Strip the filename extension from the given Java resource path,
-	 * e.g. "mypath/myfile.txt" -> "mypath/myfile".
+	 * 从给定的字符串中删除文件名扩展名
+	 * <ol> e.g. "mypath/myfile.txt" -> "mypath/myfile".</ol>
 	 * @param path the file path
 	 * @return the path with stripped filename extension
 	 */

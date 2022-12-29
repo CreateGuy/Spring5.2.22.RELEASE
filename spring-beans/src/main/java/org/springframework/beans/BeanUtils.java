@@ -610,13 +610,9 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Check if the given type represents a "simple" value type: a primitive or
-	 * primitive wrapper, an enum, a String or other CharSequence, a Number, a
-	 * Date, a Temporal, a URI, a URL, a Locale, or a Class.
-	 * <p>{@code Void} and {@code void} are not considered simple value types.
-	 * @param type the type to check
-	 * @return whether the given type represents a "simple" value type
-	 * @see #isSimpleProperty(Class)
+	 * 判断类是否是简单类型
+	 * @param type
+	 * @return
 	 */
 	public static boolean isSimpleValueType(Class<?> type) {
 		return (Void.class != type && void.class != type &&

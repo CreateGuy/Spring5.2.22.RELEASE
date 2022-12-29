@@ -28,9 +28,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * A {@link HandlerExceptionResolver} that delegates to a list of other
- * {@link HandlerExceptionResolver HandlerExceptionResolvers}.
- *
+ * 包含了很多的 {@link HandlerExceptionResolver} 的实现类
  * @author Rossen Stoyanchev
  * @since 3.1
  */

@@ -227,17 +227,20 @@ public final class ModelFactory {
 		}
 		// 如果请求还没有完全处理完毕，更新 BindingResult
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {
+			// 添加 BindingResult 属性到Model中
 			updateBindingResult(request, defaultModel);
 		}
 	}
 
 	/**
-	 * Add {@link BindingResult} attributes to the model for attributes that require it.
+	 * 添加 {@code BindingResult} 属性到Model中
 	 */
 	private void updateBindingResult(NativeWebRequest request, ModelMap model) throws Exception {
 		List<String> keyNames = new ArrayList<>(model.keySet());
+		// 遍历所有Model中的属性
 		for (String name : keyNames) {
 			Object value = model.get(name);
+			// 是否是候选的 BindingResult 属性
 			if (value != null && isBindingCandidate(name, value)) {
 				String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + name;
 				if (!model.containsAttribute(bindingResultKey)) {
@@ -249,17 +252,19 @@ public final class ModelFactory {
 	}
 
 	/**
-	 * Whether the given attribute requires a {@link BindingResult} in the model.
+	 * 判断 {@link BindingResult} 属性是否应该填充在Model中
 	 */
 	private boolean isBindingCandidate(String attributeName, Object value) {
+		// 是否是有关 BindingResult 的属性
 		if (attributeName.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
 			return false;
 		}
-
+		// 判断属性是否满足 {@code SessionAttribute}
 		if (this.sessionAttributesHandler.isHandlerSessionAttribute(attributeName, value.getClass())) {
 			return true;
 		}
 
+		// 判断类型是否满足条件
 		return (!value.getClass().isArray() && !(value instanceof Collection) &&
 				!(value instanceof Map) && !BeanUtils.isSimpleValueType(value.getClass()));
 	}

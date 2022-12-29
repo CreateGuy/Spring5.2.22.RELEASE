@@ -136,7 +136,8 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * 判断当前请求对应的Controller返回值是否是异步任务(eg：WebAsyncTask)
+	 * 判断异步任务是否已经启动
+	 * <li>比如说返回值是 WebAsyncTask，那么对应的返回值处理器就已经开始处理</li>
 	 * @return
 	 */
 	public boolean isConcurrentHandlingStarted() {

@@ -50,11 +50,11 @@ public class ModelAndView {
 	@Nullable
 	private Object view;
 
-	/** Model Map. */
+	/** Model Map, 不是ModelAndViewContainer中的，但是也会全部保存过来 */
 	@Nullable
 	private ModelMap model;
 
-	/** Optional HTTP status for the response. */
+	/** 可选的HTTP响应状态码 */
 	@Nullable
 	private HttpStatus status;
 
