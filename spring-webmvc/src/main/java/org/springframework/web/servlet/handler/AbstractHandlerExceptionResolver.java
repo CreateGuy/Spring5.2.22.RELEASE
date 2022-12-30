@@ -152,13 +152,14 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 		if (shouldApplyTo(request, handler)) {
 			// 防止响应被缓存
 			prepareResponse(ex, response);
+			// 执行异常处理方法，并返回表示特定错误页面的 ModelAndView 对象
 			ModelAndView result = doResolveException(request, response, handler, ex);
 			if (result != null) {
 				// Print debug message when warn logger is not enabled.
 				if (logger.isDebugEnabled() && (this.warnLogger == null || !this.warnLogger.isWarnEnabled())) {
 					logger.debug(buildLogMessage(ex, request) + (result.isEmpty() ? "" : " to " + result));
 				}
-				// Explicitly configured warn logger in logException method.
+				// 记录错误日志
 				logException(ex, request);
 			}
 			return result;
@@ -192,14 +193,9 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	}
 
 	/**
-	 * Log the given exception at warn level, provided that warn logging has been
-	 * activated through the {@link #setWarnLogCategory "warnLogCategory"} property.
-	 * <p>Calls {@link #buildLogMessage} in order to determine the concrete message to log.
-	 * @param ex the exception that got thrown during handler execution
-	 * @param request current HTTP request (useful for obtaining metadata)
-	 * @see #setWarnLogCategory
-	 * @see #buildLogMessage
-	 * @see org.apache.commons.logging.Log#warn(Object, Throwable)
+	 * 记录错误日志
+	 * @param ex
+	 * @param request
 	 */
 	protected void logException(Exception ex, HttpServletRequest request) {
 		if (this.warnLogger != null && this.warnLogger.isWarnEnabled()) {

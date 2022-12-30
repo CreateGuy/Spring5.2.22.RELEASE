@@ -33,9 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
 /**
- * A {@link org.springframework.web.servlet.HandlerExceptionResolver
- * HandlerExceptionResolver} that uses the {@link ResponseStatus @ResponseStatus}
- * annotation to map exceptions to HTTP status codes.
+ * 处理有关 {@link ResponseStatus @ResponseStatus} 或者 ResponseStatusException 的相关异常的异常解析器
  *
  * <p>This exception resolver is enabled by default in the
  * {@link org.springframework.web.servlet.DispatcherServlet DispatcherServlet}
@@ -66,6 +64,25 @@ public class ResponseStatusExceptionResolver extends AbstractHandlerExceptionRes
 	}
 
 
+	/**
+	 * 只能处理下面两种情况的异常，并返回返回表示特定错误页面的 ModelAndView 对象
+	 * <ol>
+	 *     <li>
+	 *         异常是 ResponseStatusException 的实例
+	 *     </li>
+	 *     <li>
+	 *         异常上有 {@code @ResponseStatus} 注解
+	 *     </li>
+	 *     <li>
+	 *         上级异常有符合上面的情况
+	 *     </li>
+	 * </ol>
+	 * @param request current HTTP request
+	 * @param response current HTTP response
+	 * @param handler 处理程序
+	 * @param ex 在执行处理程序期间引发的异常
+	 * @return
+	 */
 	@Override
 	@Nullable
 	protected ModelAndView doResolveException(
@@ -73,14 +90,18 @@ public class ResponseStatusExceptionResolver extends AbstractHandlerExceptionRes
 
 		try {
 			if (ex instanceof ResponseStatusException) {
+				// 通过解析 ResponseStatusException 设置错误响应头，响应码，错误信息
 				return resolveResponseStatusException((ResponseStatusException) ex, request, response, handler);
 			}
 
+			// 查找异常上是否有 @ResponseStatus 注解
 			ResponseStatus status = AnnotatedElementUtils.findMergedAnnotation(ex.getClass(), ResponseStatus.class);
 			if (status != null) {
+				// 通过解析 @ResponseStatus 注解的值，设置响应码和错误信息
 				return resolveResponseStatus(status, request, response, handler, ex);
 			}
 
+			// 通过上一级异常，继续递归处理
 			if (ex.getCause() instanceof Exception) {
 				return doResolveException(request, response, handler, (Exception) ex.getCause());
 			}
@@ -94,56 +115,48 @@ public class ResponseStatusExceptionResolver extends AbstractHandlerExceptionRes
 	}
 
 	/**
-	 * Template method that handles the {@link ResponseStatus @ResponseStatus} annotation.
-	 * <p>The default implementation delegates to {@link #applyStatusAndReason}
-	 * with the status code and reason from the annotation.
-	 * @param responseStatus the {@code @ResponseStatus} annotation
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param handler the executed handler, or {@code null} if none chosen at the
-	 * time of the exception, e.g. if multipart resolution failed
-	 * @param ex the exception
-	 * @return an empty ModelAndView, i.e. exception resolved
+	 * 通过解析 {@code @ResponseStatus} 注解的值，设置响应码和错误信息
+	 * @param responseStatus
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @param ex
+	 * @return
+	 * @throws Exception
 	 */
 	protected ModelAndView resolveResponseStatus(ResponseStatus responseStatus, HttpServletRequest request,
 			HttpServletResponse response, @Nullable Object handler, Exception ex) throws Exception {
 
 		int statusCode = responseStatus.code().value();
 		String reason = responseStatus.reason();
+		// 将响应码和错误信息写入响应中
 		return applyStatusAndReason(statusCode, reason, response);
 	}
 
 	/**
-	 * Template method that handles an {@link ResponseStatusException}.
-	 * <p>The default implementation applies the headers from
-	 * {@link ResponseStatusException#getResponseHeaders()} and delegates to
-	 * {@link #applyStatusAndReason} with the status code and reason from the
-	 * exception.
-	 * @param ex the exception
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @param handler the executed handler, or {@code null} if none chosen at the
-	 * time of the exception, e.g. if multipart resolution failed
-	 * @return an empty ModelAndView, i.e. exception resolved
-	 * @since 5.0
+	 * 通过解析 ResponseStatusException 设置错误响应头，响应码，错误信息
+	 * @param ex
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @return
+	 * @throws Exception
 	 */
 	protected ModelAndView resolveResponseStatusException(ResponseStatusException ex,
 			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler) throws Exception {
 
+		// 添加与错误相关的响应头
 		ex.getResponseHeaders().forEach((name, values) ->
 				values.forEach(value -> response.addHeader(name, value)));
 
 		int statusCode = ex.getStatus().value();
 		String reason = ex.getReason();
+		// 将响应码和错误信息写入响应中
 		return applyStatusAndReason(statusCode, reason, response);
 	}
 
 	/**
-	 * Apply the resolved status code and reason to the response.
-	 * <p>The default implementation sends a response error using
-	 * {@link HttpServletResponse#sendError(int)} or
-	 * {@link HttpServletResponse#sendError(int, String)} if there is a reason
-	 * and then returns an empty ModelAndView.
+	 * 将响应码和错误信息写入响应中
 	 * @param statusCode the HTTP status code
 	 * @param reason the associated reason (may be {@code null} or empty)
 	 * @param response current HTTP response
@@ -152,13 +165,16 @@ public class ResponseStatusExceptionResolver extends AbstractHandlerExceptionRes
 	protected ModelAndView applyStatusAndReason(int statusCode, @Nullable String reason, HttpServletResponse response)
 			throws IOException {
 
+		// 没有错误原因
 		if (!StringUtils.hasLength(reason)) {
 			response.sendError(statusCode);
 		}
 		else {
+			// 进行国际化处理
 			String resolvedReason = (this.messageSource != null ?
 					this.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale()) :
 					reason);
+			// 写入响应码和错误原因
 			response.sendError(statusCode, resolvedReason);
 		}
 		return new ModelAndView();

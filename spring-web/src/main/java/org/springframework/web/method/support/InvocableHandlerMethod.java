@@ -148,7 +148,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 * 通过参数解析器进行解析，返回给定方法的入参值
 	 * @param request
 	 * @param mavContainer
-	 * @param providedArgs
+	 * @param providedArgs 额外参数，比如说抛出异常了，这里就会有异常和出现异常的处理器
 	 * @return
 	 * @throws Exception
 	 */
@@ -167,7 +167,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 			MethodParameter parameter = parameters[i];
 			// 设置参数名发现器
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
-			// 不懂，在RequestMappingHandlerMapping中没用
+			// 从额外参数中获得入参值
 			args[i] = findProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {
 				continue;

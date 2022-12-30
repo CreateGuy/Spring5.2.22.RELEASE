@@ -61,9 +61,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
- * An {@link AbstractHandlerMethodExceptionResolver} that resolves exceptions
- * through {@code @ExceptionHandler} methods.
- *
+ * 通过标注了 {@link org.springframework.web.bind.annotation.ExceptionHandler} 的方法来解决异常
  * <p>Support for custom argument and return value types can be added via
  * {@link #setCustomArgumentResolvers} and {@link #setCustomReturnValueHandlers}.
  * Or alternatively to re-configure all argument and return value types use
@@ -401,7 +399,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 
 		// 包装请求
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
-		// 创建下的 ModelAndViewContainer
+		// 创建新的 ModelAndViewContainer
 		ModelAndViewContainer mavContainer = new ModelAndViewContainer();
 
 		try {
@@ -410,11 +408,11 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			}
 			Throwable cause = exception.getCause();
 			if (cause != null) {
-				// Expose cause as provided argument as well
+				// 暴露上一级异常(可以作为入参), 执行异常处理方法
 				exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception, cause, handlerMethod);
 			}
 			else {
-				// Otherwise, just the given exception as-is
+				// 执行异常处理方法
 				exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception, handlerMethod);
 			}
 		}
@@ -424,14 +422,16 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			if (invocationEx != exception && invocationEx != exception.getCause() && logger.isWarnEnabled()) {
 				logger.warn("Failure in @ExceptionHandler " + exceptionHandlerMethod, invocationEx);
 			}
-			// Continue with default processing of the original exception...
+			// 返回空，让其他异常处理器执行
 			return null;
 		}
 
+		// 是否已经完全处理
 		if (mavContainer.isRequestHandled()) {
 			return new ModelAndView();
 		}
 		else {
+			// 创建并根据 ModelAndViewContainer 设置 ModelAndView 属性
 			ModelMap model = mavContainer.getModel();
 			HttpStatus status = mavContainer.getStatus();
 			ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model, status);
@@ -439,8 +439,10 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			if (!mavContainer.isViewReference()) {
 				mav.setView((View) mavContainer.getView());
 			}
+			// 如果是使用重定向模型
 			if (model instanceof RedirectAttributes) {
 				Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
+				// 将FlashAttributes 保存在 FlashMap 中,后面处理重定向视图的时候，会读取FlashMap然后保存在会话中的
 				RequestContextUtils.getOutputFlashMap(request).putAll(flashAttributes);
 			}
 			return mav;
@@ -451,10 +453,10 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	 * 找到异常处理的方法，按照下面的规则查询：
 	 * <ol>
 	 *     <li>
-	 *         局部：抛出异常的方法的外部类查询是否有 @ExceptionHandle 中查询
+	 *         局部：抛出异常的方法的外部类查询是否有 @ExceptionHandle 的方法
 	 *     </li>
 	 *     <li>
-	 *         全局：从容器中查询 @ControllerAdvice + @ExceptionHandle 的
+	 *         全局：从容器中查询 @ControllerAdvice + @ExceptionHandle 的方法
 	 *     </li>
 	 * </ol>
 	 * @param handlerMethod

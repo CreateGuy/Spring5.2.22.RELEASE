@@ -30,31 +30,28 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
 
 /**
- * {@link org.springframework.web.servlet.HandlerExceptionResolver} implementation
- * that allows for mapping exception class names to view names, either for a set of
- * given handlers or for all handlers in the DispatcherServlet.
- *
- * <p>Error views are analogous to error page JSPs, but can be used with any kind of
- * exception including any checked one, with fine-granular mappings for specific handlers.
- *
- * @author Juergen Hoeller
- * @author Arjen Poutsma
- * @author Rossen Stoyanchev
- * @since 22.11.2003
- * @see org.springframework.web.servlet.DispatcherServlet
+ * 有特定异常和对应错误视图名称的异常解析器
  */
 public class SimpleMappingExceptionResolver extends AbstractHandlerExceptionResolver {
 
 	/** The default name of the exception attribute: "exception". */
 	public static final String DEFAULT_EXCEPTION_ATTRIBUTE = "exception";
 
-
+	/**
+	 * 配置的异常和对应的错误视图名称的，网上是通过xml文件配置的
+	 */
 	@Nullable
 	private Properties exceptionMappings;
 
+	/**
+	 * 排除的异常(不被此异常解析器处理的异常)
+	 */
 	@Nullable
 	private Class<?>[] excludedExceptions;
 
+	/**
+	 * 默认错误视图名称
+	 */
 	@Nullable
 	private String defaultErrorView;
 
@@ -213,6 +210,7 @@ public class SimpleMappingExceptionResolver extends AbstractHandlerExceptionReso
 	@Nullable
 	protected String determineViewName(Exception ex, HttpServletRequest request) {
 		String viewName = null;
+		// 是否是此异常处理器不处理的异常
 		if (this.excludedExceptions != null) {
 			for (Class<?> excludedEx : this.excludedExceptions) {
 				if (excludedEx.equals(ex.getClass())) {
@@ -220,7 +218,7 @@ public class SimpleMappingExceptionResolver extends AbstractHandlerExceptionReso
 				}
 			}
 		}
-		// Check for specific exception mappings.
+		// 在给定的异常映射中查找匹配的视图名称
 		if (this.exceptionMappings != null) {
 			viewName = findMatchingViewName(this.exceptionMappings, ex);
 		}
@@ -235,7 +233,7 @@ public class SimpleMappingExceptionResolver extends AbstractHandlerExceptionReso
 	}
 
 	/**
-	 * Find a matching view name in the given exception mappings.
+	 * 在给定的异常映射中查找匹配的视图名称
 	 * @param exceptionMappings mappings between exception class names and error view names
 	 * @param ex the exception that got thrown during handler execution
 	 * @return the view name, or {@code null} if none found

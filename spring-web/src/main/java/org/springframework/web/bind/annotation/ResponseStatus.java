@@ -26,8 +26,7 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.http.HttpStatus;
 
 /**
- * Marks a method or exception class with the status {@link #code} and
- * {@link #reason} that should be returned.
+ * 当抛出异常的时候，用特地的响应码和错误信息
  *
  * <p>The status code is applied to the HTTP response when the handler
  * method is invoked and overrides status information set by other means,
@@ -60,6 +59,7 @@ import org.springframework.http.HttpStatus;
 public @interface ResponseStatus {
 
 	/**
+	 * 响应码
 	 * Alias for {@link #code}.
 	 */
 	@AliasFor("code")
@@ -77,7 +77,7 @@ public @interface ResponseStatus {
 	HttpStatus code() default HttpStatus.INTERNAL_SERVER_ERROR;
 
 	/**
-	 * The <em>reason</em> to be used for the response.
+	 * 错误原因
 	 * @see javax.servlet.http.HttpServletResponse#sendError(int, String)
 	 */
 	String reason() default "";

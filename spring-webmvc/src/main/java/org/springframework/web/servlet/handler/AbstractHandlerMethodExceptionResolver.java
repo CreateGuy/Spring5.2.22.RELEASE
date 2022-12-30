@@ -51,6 +51,14 @@ public abstract class AbstractHandlerMethodExceptionResolver extends AbstractHan
 		}
 	}
 
+	/**
+	 * 为了解决在处理程序执行期间抛出的异常，返回表示特定错误页面的 ModelAndView 对象
+	 * @param request current HTTP request
+	 * @param response current HTTP response
+	 * @param handler 处理程序
+	 * @param ex 在执行处理程序期间引发的异常
+	 * @return
+	 */
 	@Override
 	@Nullable
 	protected final ModelAndView doResolveException(

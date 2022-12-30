@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base class for exceptions associated with specific HTTP response status codes.
+ * 特定HTTP响应状态码与相关的异常的基类
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -36,8 +36,14 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class ResponseStatusException extends NestedRuntimeException {
 
+	/**
+	 * 响应码
+	 */
 	private final HttpStatus status;
 
+	/**
+	 * 错误原因
+	 */
 	@Nullable
 	private final String reason;
 
@@ -98,8 +104,7 @@ public class ResponseStatusException extends NestedRuntimeException {
 	}
 
 	/**
-	 * Return headers associated with the exception that should be added to the
-	 * error response, e.g. "Allow", "Accept", etc.
+	 * 返回应该添加到错误响应的异常相关的请求头，e.g. "Allow", "Accept", etc.
 	 * <p>The default implementation in this class returns empty headers.
 	 * @since 5.1.13
 	 */

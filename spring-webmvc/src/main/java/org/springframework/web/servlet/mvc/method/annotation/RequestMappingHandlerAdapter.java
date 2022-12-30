@@ -1104,7 +1104,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
-		// 将 model 中有关 {@code @SessionAttributes} 的属性保存在会话中
+		// 将 model 中有关 @SessionAttributes 的属性保存在会话中
 		modelFactory.updateModel(webRequest, mavContainer);
 		// 比如说使用了@Response注解，那么就不需要视图了，这里就会直接返回
 		if (mavContainer.isRequestHandled()) {
