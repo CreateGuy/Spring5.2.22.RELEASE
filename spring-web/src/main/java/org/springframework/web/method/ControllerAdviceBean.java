@@ -257,19 +257,17 @@ public class ControllerAdviceBean implements Ordered {
 
 
 	/**
-	 * Find beans annotated with {@link ControllerAdvice @ControllerAdvice} in the
-	 * given {@link ApplicationContext} and wrap them as {@code ControllerAdviceBean}
-	 * instances.
-	 * <p>As of Spring Framework 5.2, the {@code ControllerAdviceBean} instances
-	 * in the returned list are sorted using {@link OrderComparator#sort(List)}.
-	 * @see #getOrder()
-	 * @see OrderComparator
-	 * @see Ordered
+	 * 通过给定的 ApplicationContext，找到带有 {@code @ControllerAdvice} 注解的bean，并将它们包装为 ControllerAdviceBean 实例
+	 * @param context
+	 * @return
 	 */
 	public static List<ControllerAdviceBean> findAnnotatedBeans(ApplicationContext context) {
 		List<ControllerAdviceBean> adviceBeans = new ArrayList<>();
+		// 遍历所有给定类型的所有bean名称
 		for (String name : BeanFactoryUtils.beanNamesForTypeIncludingAncestors(context, Object.class)) {
+			// 确定不是代理bean
 			if (!ScopedProxyUtils.isScopedTarget(name)) {
+				// 拿到类上关于 @ControllerAdvice 的属性
 				ControllerAdvice controllerAdvice = context.findAnnotationOnBean(name, ControllerAdvice.class);
 				if (controllerAdvice != null) {
 					// Use the @ControllerAdvice annotation found by findAnnotationOnBean()

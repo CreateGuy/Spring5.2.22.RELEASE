@@ -196,7 +196,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	private static final boolean jsonbPresent;
 
 	/**
-	 * 确定媒体类型映射关系用
+	 * 初始化
 	 */
 	static {
 		ClassLoader classLoader = WebMvcConfigurationSupport.class.getClassLoader();
@@ -227,9 +227,15 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	@Nullable
 	private PathMatchConfigurer pathMatchConfigurer;
 
+	/**
+	 * 内容协商管理器
+	 */
 	@Nullable
 	private ContentNegotiationManager contentNegotiationManager;
 
+	/**
+	 * 自定义参数解析器
+	 */
 	@Nullable
 	private List<HandlerMethodArgumentResolver> argumentResolvers;
 
@@ -638,26 +644,40 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			@Qualifier("mvcConversionService") FormattingConversionService conversionService,
 			@Qualifier("mvcValidator") Validator validator) {
 
+		// 创建RequestMappingHandlerAdapter
 		RequestMappingHandlerAdapter adapter = createRequestMappingHandlerAdapter();
+		// 设置内容协商管理器
 		adapter.setContentNegotiationManager(contentNegotiationManager);
+		// 设置消息转换器
 		adapter.setMessageConverters(getMessageConverters());
+		// 设置WebDataBinder初始化器
 		adapter.setWebBindingInitializer(getConfigurableWebBindingInitializer(conversionService, validator));
+		// 设置自定义参数解析器
 		adapter.setCustomArgumentResolvers(getArgumentResolvers());
+		// 设置自定义返回值处理器
 		adapter.setCustomReturnValueHandlers(getReturnValueHandlers());
 
+		// 当 ObjectMapper 可以加载时候注册 Advice
 		if (jackson2Present) {
 			adapter.setRequestBodyAdvice(Collections.singletonList(new JsonViewRequestBodyAdvice()));
 			adapter.setResponseBodyAdvice(Collections.singletonList(new JsonViewResponseBodyAdvice()));
 		}
 
 		AsyncSupportConfigurer configurer = new AsyncSupportConfigurer();
+		// 配置 异步管理器配置类
 		configureAsyncSupport(configurer);
+
+		// 设置异步线的程线程池
 		if (configurer.getTaskExecutor() != null) {
 			adapter.setTaskExecutor(configurer.getTaskExecutor());
 		}
+
+		// 设置异步线程超时时间
 		if (configurer.getTimeout() != null) {
 			adapter.setAsyncRequestTimeout(configurer.getTimeout());
 		}
+
+		// 设置拦截器(回调方法)
 		adapter.setCallableInterceptors(configurer.getCallableInterceptors());
 		adapter.setDeferredResultInterceptors(configurer.getDeferredResultInterceptors());
 
@@ -665,9 +685,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Protected method for plugging in a custom subclass of
-	 * {@link RequestMappingHandlerAdapter}.
-	 * @since 4.3
+	 * 创建 {@link RequestMappingHandlerAdapter}.
 	 */
 	protected RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {
 		return new RequestMappingHandlerAdapter();
@@ -684,8 +702,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Return the {@link ConfigurableWebBindingInitializer} to use for
-	 * initializing all {@link WebDataBinder} instances.
+	 * 返回 {@link ConfigurableWebBindingInitializer}
 	 */
 	protected ConfigurableWebBindingInitializer getConfigurableWebBindingInitializer(
 			FormattingConversionService mvcConversionService, Validator mvcValidator) {
@@ -773,10 +790,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Provide access to the shared custom argument resolvers used by the
-	 * {@link RequestMappingHandlerAdapter} and the {@link ExceptionHandlerExceptionResolver}.
-	 * <p>This method cannot be overridden; use {@link #addArgumentResolvers} instead.
-	 * @since 4.3
+	 * 返回自定义参数解析器
 	 */
 	protected final List<HandlerMethodArgumentResolver> getArgumentResolvers() {
 		if (this.argumentResolvers == null) {
@@ -787,13 +801,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Add custom {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
-	 * to use in addition to the ones registered by default.
-	 * <p>Custom argument resolvers are invoked before built-in resolvers except for
-	 * those that rely on the presence of annotations (e.g. {@code @RequestParameter},
-	 * {@code @PathVariable}, etc). The latter can be customized by configuring the
-	 * {@link RequestMappingHandlerAdapter} directly.
-	 * @param argumentResolvers the list of custom converters (initially an empty list)
+	 * 注解自定义参数解析器({@code HandlerMethodArgumentResolvers})
 	 */
 	protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
 	}

@@ -38,6 +38,9 @@ import org.springframework.util.Assert;
  */
 public abstract class ScopedProxyUtils {
 
+	/**
+	 * 代理bean名称会以这个开头
+	 */
 	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
 
 	private static final int TARGET_NAME_PREFIX_LENGTH = TARGET_NAME_PREFIX.length();
@@ -117,9 +120,7 @@ public abstract class ScopedProxyUtils {
 	}
 
 	/**
-	 * Determine if the {@code beanName} is the name of a bean that references
-	 * the target bean within a scoped proxy.
-	 * @since 4.1.4
+	 * 确定bean名称是否是在作用域代理中引用目标bean的bean的名称
 	 */
 	public static boolean isScopedTarget(@Nullable String beanName) {
 		return (beanName != null && beanName.startsWith(TARGET_NAME_PREFIX));

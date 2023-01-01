@@ -30,16 +30,19 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
 
 /**
- * Helps with configuring options for asynchronous request processing.
- *
- * @author Rossen Stoyanchev
- * @since 3.2
+ * {@link org.springframework.web.context.request.async.WebAsyncManager} 的配置类
  */
 public class AsyncSupportConfigurer {
 
+	/**
+	 * 要使用的线程池
+	 */
 	@Nullable
 	private AsyncTaskExecutor taskExecutor;
 
+	/**
+	 * 异步线程超时时间
+	 */
 	@Nullable
 	private Long timeout;
 

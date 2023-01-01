@@ -298,8 +298,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException;
 
 	/**
-	 * Find an {@link Annotation} of {@code annotationType} on the specified bean,
-	 * traversing its interfaces and super classes if no annotation can be found on
+	 * 在指定bean上查找指定注解，如果找不到注释，则遍历它的接口和超类
 	 * the given class itself, as well as checking the bean's factory method (if any).
 	 * @param beanName the name of the bean to look for annotations on
 	 * @param annotationType the type of annotation to look for

@@ -116,7 +116,7 @@ public final class ModelFactory {
 		// 2、执行标注了 @ModelAttribute 的方法
 		invokeModelAttributeMethods(request, container);
 
-		// 3、遍历标注了 {@code @ModelAttribute} 的参数同时也标注了 {@code @SessionAttributes} 的参数
+		// 3、遍历标注了 @ModelAttribute 的参数同时也标注了 @SessionAttributes 的参数
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
 				// 读取会话中的保存的特定的 @SessionAttributes 属性

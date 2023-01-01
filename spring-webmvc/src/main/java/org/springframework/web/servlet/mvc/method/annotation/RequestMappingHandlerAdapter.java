@@ -129,14 +129,20 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 					AnnotatedElementUtils.hasAnnotation(method, ModelAttribute.class));
 
 
+	/**
+	 * 自定义参数解析器
+	 */
 	@Nullable
 	private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
+	/**
+	 * 最终要使用的参数解析器集合
+	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite argumentResolvers;
 
 	/**
-	 * 默认的参数解析器
+	 * 适用于标注了 @InitBinder 注解的的参数解析器
 	 */
 	@Nullable
 	private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
@@ -153,10 +159,16 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private List<ModelAndViewResolver> modelAndViewResolvers;
 
+	/**
+	 * 内容协商管理器
+	 */
 	private ContentNegotiationManager contentNegotiationManager = new ContentNegotiationManager();
 
 	private List<HttpMessageConverter<?>> messageConverters;
 
+	/**
+	 * @ControllerAdvice + RequestBodyAdvice的所有bean
+	 */
 	private final List<Object> requestResponseBodyAdvice = new ArrayList<>();
 
 	/**
@@ -177,8 +189,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private Long asyncRequestTimeout;
 
+	/**
+	 * 异步任务执行前后的回调接口，和下面的区别在于不同的异步任务是执行回调接口
+	 * <p>比如说返回值是 WebAsyncTask 那么就是执行此回调接口</p>
+	 */
 	private CallableProcessingInterceptor[] callableInterceptors = new CallableProcessingInterceptor[0];
 
+	/**
+	 * 异步任务执行前后的回调接口
+	 */
 	private DeferredResultProcessingInterceptor[] deferredResultInterceptors = new DeferredResultProcessingInterceptor[0];
 
 	private ReactiveAdapterRegistry reactiveAdapterRegistry = ReactiveAdapterRegistry.getSharedInstance();
@@ -602,17 +621,24 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	@Override
 	public void afterPropertiesSet() {
-		// Do this first, it may add ResponseBody advice beans
+		// 初始化 @ControllerAdvice
 		initControllerAdviceCache();
 
+		// 设置参数解析器
 		if (this.argumentResolvers == null) {
+			// 返回要使用的参数解析器列表
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
+			// 转换为一个混合的
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
+
+		// 设置适用于 @InitBinder 的参数解析器
 		if (this.initBinderArgumentResolvers == null) {
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultInitBinderArgumentResolvers();
 			this.initBinderArgumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
+
+		// 设置返回值处理器
 		if (this.returnValueHandlers == null) {
 			List<HandlerMethodReturnValueHandler> handlers = getDefaultReturnValueHandlers();
 			this.returnValueHandlers = new HandlerMethodReturnValueHandlerComposite().addHandlers(handlers);
@@ -624,28 +650,36 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			return;
 		}
 
+		// 找到所有标注了 @ControllerAdvice 注解的bean
 		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
 
 		List<Object> requestResponseBodyAdviceBeans = new ArrayList<>();
 
+		// 遍历所有遍历了 ControllerAdvice
 		for (ControllerAdviceBean adviceBean : adviceBeans) {
 			Class<?> beanType = adviceBean.getBeanType();
 			if (beanType == null) {
 				throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
 			}
+			// 类中有 @ModelAttribute 方法的情况，并注册到指定地方
 			Set<Method> attrMethods = MethodIntrospector.selectMethods(beanType, MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {
 				this.modelAttributeAdviceCache.put(adviceBean, attrMethods);
 			}
+
+			// 类中有 @InitBinder 方法的情况，并注册到指定地方
 			Set<Method> binderMethods = MethodIntrospector.selectMethods(beanType, INIT_BINDER_METHODS);
 			if (!binderMethods.isEmpty()) {
 				this.initBinderAdviceCache.put(adviceBean, binderMethods);
 			}
+
+			// 类实现了 RequestBodyAdvice 和 ResponseBodyAdvice 的情况，并注册到指定地方
 			if (RequestBodyAdvice.class.isAssignableFrom(beanType) || ResponseBodyAdvice.class.isAssignableFrom(beanType)) {
 				requestResponseBodyAdviceBeans.add(adviceBean);
 			}
 		}
 
+		// 注册到指定位置
 		if (!requestResponseBodyAdviceBeans.isEmpty()) {
 			this.requestResponseBodyAdvice.addAll(0, requestResponseBodyAdviceBeans);
 		}
@@ -675,13 +709,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * Return the list of argument resolvers to use including built-in resolvers
-	 * and custom resolvers provided via {@link #setCustomArgumentResolvers}.
+	 * 返回要使用的参数解析器列表，包括默认的和自定义的
+	 * @return
 	 */
 	private List<HandlerMethodArgumentResolver> getDefaultArgumentResolvers() {
 		List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>(30);
 
-		// Annotation-based argument resolution
+		// 注册基于注解的参数解析器
 		resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), false));
 		resolvers.add(new RequestParamMapMethodArgumentResolver());
 		resolvers.add(new PathVariableMethodArgumentResolver());
@@ -698,7 +732,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new SessionAttributeMethodArgumentResolver());
 		resolvers.add(new RequestAttributeMethodArgumentResolver());
 
-		// Type-based argument resolution
+		// 注册基于类型的参数解析器
 		resolvers.add(new ServletRequestMethodArgumentResolver());
 		resolvers.add(new ServletResponseMethodArgumentResolver());
 		resolvers.add(new HttpEntityMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));
@@ -709,7 +743,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new SessionStatusMethodArgumentResolver());
 		resolvers.add(new UriComponentsBuilderMethodArgumentResolver());
 
-		// Custom arguments
+		// 注册自定义的参数解析器
 		if (getCustomArgumentResolvers() != null) {
 			resolvers.addAll(getCustomArgumentResolvers());
 		}
@@ -722,8 +756,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * Return the list of argument resolvers to use for {@code @InitBinder}
-	 * methods including built-in and custom resolvers.
+	 * 返回适用 {@code @InitBinder} 参数解析器列表，包括默认和自定义解析器
 	 */
 	private List<HandlerMethodArgumentResolver> getDefaultInitBinderArgumentResolvers() {
 		List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>(20);
@@ -1004,7 +1037,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * 创建 InvocableHandlerMethod
+	 * 创建有关 @ModelAttribute 的 InvocableHandlerMethod
 	 * @param factory
 	 * @param bean
 	 * @param method
@@ -1012,7 +1045,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private InvocableHandlerMethod createModelAttributeMethod(WebDataBinderFactory factory, Object bean, Method method) {
 		InvocableHandlerMethod attrMethod = new InvocableHandlerMethod(bean, method);
-		// 设置参数名解析器
+		// 设置适用于标注了 @ModelAttribute 注解的的参数解析器
 		if (this.argumentResolvers != null) {
 			attrMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 		}
@@ -1061,14 +1094,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * 创建 {@link InvocableHandlerMethod}
+	 * 创建有关 @InitBinder 的 {@code InvocableHandlerMethod}
 	 * @param bean
 	 * @param method
 	 * @return
 	 */
 	private InvocableHandlerMethod createInitBinderMethod(Object bean, Method method) {
 		InvocableHandlerMethod binderMethod = new InvocableHandlerMethod(bean, method);
-		// 设置参数解析器
+		// 设置适用于标注了 @InitBinder 注解的的参数解析器
 		if (this.initBinderArgumentResolvers != null) {
 			binderMethod.setHandlerMethodArgumentResolvers(this.initBinderArgumentResolvers);
 		}

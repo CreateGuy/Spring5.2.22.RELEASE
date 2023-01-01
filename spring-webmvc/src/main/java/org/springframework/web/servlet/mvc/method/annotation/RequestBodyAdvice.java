@@ -25,7 +25,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.Nullable;
 
 /**
- * 负责在读取和转换请求体的前后调用，以及请求体为空的调用
+ * 负责在读取和转换请求体的前后回调方法，以及请求体为空之前的回调
  */
 public interface RequestBodyAdvice {
 

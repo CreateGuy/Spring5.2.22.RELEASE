@@ -94,10 +94,22 @@ public final class WebAsyncManager {
 	private volatile boolean errorHandlingInProgress;
 
 	/**
-	 *
+	 * 异步任务开始前后需要执行的回调方法，异步任务需要符合以下条件：
+	 * <ol>
+	 *     <li>支持 StreamingResponseBody 和 ResponseEntity<StreamingResponseBody> 类型的返回值，但是会被包装为 WebAsyncTask</li>
+	 *     <li>支持 Callable 类型的返回值，但是会被包装为 WebAsyncTask</li>
+	 *     <li>支持 WebAsyncTask 类型的返回值</li>
+	 * </ol>
 	 */
 	private final Map<Object, CallableProcessingInterceptor> callableInterceptors = new LinkedHashMap<>();
 
+	/**
+	 * 异步任务开始前后需要执行的回调方法，异步任务需要符合以下条件：
+	 * <ol>
+	 *     <li>支持DeferredResult ListenableFuture CompletionStage 类型作为返回值</li>
+	 *     <li>不懂</li>
+	 * </ol>
+	 */
 	private final Map<Object, DeferredResultProcessingInterceptor> deferredResultInterceptors = new LinkedHashMap<>();
 
 
