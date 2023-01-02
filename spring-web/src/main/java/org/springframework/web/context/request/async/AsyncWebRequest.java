@@ -22,7 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Extends {@link NativeWebRequest} with methods for asynchronous request processing.
+ * 包装 {@link NativeWebRequest} 的请求，有关于异步任务的相关参数
  *
  * @author Rossen Stoyanchev
  * @since 3.2
@@ -74,7 +74,7 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	void dispatch();
 
 	/**
-	 * Whether asynchronous processing has completed.
+	 * 异步处理是否已经完成
 	 */
 	boolean isAsyncComplete();
 

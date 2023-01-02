@@ -44,16 +44,31 @@ import org.springframework.web.context.request.ServletWebRequest;
  */
 public class StandardServletAsyncWebRequest extends ServletWebRequest implements AsyncWebRequest, AsyncListener {
 
+	/**
+	 * 超时时间
+	 */
 	private Long timeout;
 
 	private AsyncContext asyncContext;
 
+	/**
+	 * 异步任务是否已经执行完毕
+	 */
 	private AtomicBoolean asyncCompleted = new AtomicBoolean(false);
 
+	/**
+	 * 超时处理器
+	 */
 	private final List<Runnable> timeoutHandlers = new ArrayList<>();
 
+	/**
+	 * 异常处理器
+	 */
 	private final List<Consumer<Throwable>> exceptionHandlers = new ArrayList<>();
 
+	/**
+	 * 完成处理器
+	 */
 	private final List<Runnable> completionHandlers = new ArrayList<>();
 
 

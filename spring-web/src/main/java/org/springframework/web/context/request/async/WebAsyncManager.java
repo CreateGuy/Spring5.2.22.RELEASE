@@ -66,6 +66,9 @@ public final class WebAsyncManager {
 
 	private static final Log logger = LogFactory.getLog(WebAsyncManager.class);
 
+	/**
+	 * 全局的超时拦截器，WebAsyncTask可以设置局部的
+	 */
 	private static final CallableProcessingInterceptor timeoutCallableInterceptor =
 			new TimeoutCallableProcessingInterceptor();
 
@@ -74,19 +77,25 @@ public final class WebAsyncManager {
 
 	private static Boolean taskExecutorWarning = true;
 
-
+	/**
+	 * 包装 NativeWebRequest 的请求
+	 */
 	private AsyncWebRequest asyncWebRequest;
 
+	/**
+	 * 要使用的异步任务线程池
+	 */
 	private AsyncTaskExecutor taskExecutor = DEFAULT_TASK_EXECUTOR;
 
 	/**
-	 * 如果非默认值就代表，异步任务执行完毕设置为返回值，或者是出现了异常而设置的异常
+	 * 如果非默认值就代表异步任务执行完毕设置为返回值，或者是出现了异常而设置的异常
 	 */
 	private volatile Object concurrentResult = RESULT_NONE;
 
 	private volatile Object[] concurrentResultContext;
 
 	/*
+	 * 任务执行过程中，是否出现了错误，注意：如果超时了，被处理了，依旧不算出错了
 	 * Whether the concurrentResult is an error. If such errors remain unhandled, some
 	 * Servlet containers will call AsyncListener#onError at the end, after the ASYNC
 	 * and/or the ERROR dispatch (Boot's case), and we need to ignore those.
@@ -281,13 +290,10 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * Use the given {@link WebAsyncTask} to configure the task executor as well as
-	 * the timeout value of the {@code AsyncWebRequest} before delegating to
-	 * {@link #startCallableProcessing(Callable, Object...)}.
-	 * @param webAsyncTask a WebAsyncTask containing the target {@code Callable}
-	 * @param processingContext additional context to save that can be accessed
-	 * via {@link #getConcurrentResultContext()}
-	 * @throws Exception if concurrent processing failed to start
+	 * 开始处理 Callable 的异步任务
+	 * @param webAsyncTask
+	 * @param processingContext
+	 * @throws Exception
 	 */
 	public void startCallableProcessing(final WebAsyncTask<?> webAsyncTask, Object... processingContext)
 			throws Exception {
@@ -295,11 +301,13 @@ public final class WebAsyncManager {
 		Assert.notNull(webAsyncTask, "WebAsyncTask must not be null");
 		Assert.state(this.asyncWebRequest != null, "AsyncWebRequest must not be null");
 
+		// 设置超时时间
 		Long timeout = webAsyncTask.getTimeout();
 		if (timeout != null) {
 			this.asyncWebRequest.setTimeout(timeout);
 		}
 
+		// 设置异步任务线程池
 		AsyncTaskExecutor executor = webAsyncTask.getExecutor();
 		if (executor != null) {
 			this.taskExecutor = executor;
@@ -308,59 +316,81 @@ public final class WebAsyncManager {
 			logExecutorWarning();
 		}
 
+		// 设置执行异步任务前后的回调接口
 		List<CallableProcessingInterceptor> interceptors = new ArrayList<>();
+		// 将WebAsyncTask中的超时回调，错误回调，完成回调注册成为一个拦截器
 		interceptors.add(webAsyncTask.getInterceptor());
 		interceptors.addAll(this.callableInterceptors.values());
 		interceptors.add(timeoutCallableInterceptor);
 
+		// 返回具体的任务
 		final Callable<?> callable = webAsyncTask.getCallable();
+		// 包装为拦截器链
 		final CallableInterceptorChain interceptorChain = new CallableInterceptorChain(interceptors);
 
+		// 注册超时处理器
 		this.asyncWebRequest.addTimeoutHandler(() -> {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Async request timeout for " + formatRequestUri());
 			}
+			// 超时后触发，为了从拦截器中获得返回值
 			Object result = interceptorChain.triggerAfterTimeout(this.asyncWebRequest, callable);
+			// 是否成功处理了超时
 			if (result != CallableProcessingInterceptor.RESULT_NONE) {
+				// 设置并发结果和派发
 				setConcurrentResultAndDispatch(result);
 			}
 		});
 
+		// 注册错误处理器
 		this.asyncWebRequest.addErrorHandler(ex -> {
 			if (!this.errorHandlingInProgress) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Async request error for " + formatRequestUri() + ": " + ex);
 				}
+				// 抛出异常后触发，为了从拦截器中获得返回值
 				Object result = interceptorChain.triggerAfterError(this.asyncWebRequest, callable, ex);
 				result = (result != CallableProcessingInterceptor.RESULT_NONE ? result : ex);
+				// 设置并发结果和派发
 				setConcurrentResultAndDispatch(result);
 			}
 		});
 
+		// 注册任务完成处理器
 		this.asyncWebRequest.addCompletionHandler(() ->
+				//  任务完成后触发，执行完成任务回调
 				interceptorChain.triggerAfterCompletion(this.asyncWebRequest, callable));
 
+		// 在原始线程中，在执行 异步任务(Callable) 之前调用
 		interceptorChain.applyBeforeConcurrentHandling(this.asyncWebRequest, callable);
+		// 标记未开始异步任务处理
 		startAsyncProcessing(processingContext);
 		try {
 			Future<?> future = this.taskExecutor.submit(() -> {
 				Object result = null;
 				try {
+					// 在异步线程中，在执行 异步任务(Callable) 之前调用
 					interceptorChain.applyPreProcess(this.asyncWebRequest, callable);
+					// 执行任务
 					result = callable.call();
 				}
 				catch (Throwable ex) {
 					result = ex;
 				}
 				finally {
+					// 在异步线程中，在执行 异步任务(Callable) 之后调用
 					result = interceptorChain.applyPostProcess(this.asyncWebRequest, callable, result);
 				}
+				// 设置并发结果和派发
 				setConcurrentResultAndDispatch(result);
 			});
+			// 设置执行结果
 			interceptorChain.setTaskFuture(future);
 		}
+		// 当不能接受任务执行时抛出的异常
 		catch (RejectedExecutionException ex) {
 			Object result = interceptorChain.applyPostProcess(this.asyncWebRequest, callable, ex);
+			// 设置并发结果和派发
 			setConcurrentResultAndDispatch(result);
 			throw ex;
 		}
@@ -391,7 +421,12 @@ public final class WebAsyncManager {
 		return request != null ? request.getRequestURI() : "servlet container";
 	}
 
+	/**
+	 * 设置并发结果和派发
+	 * @param result
+	 */
 	private void setConcurrentResultAndDispatch(Object result) {
+		// 设置处理结果
 		synchronized (WebAsyncManager.this) {
 			if (this.concurrentResult != RESULT_NONE) {
 				return;
@@ -400,6 +435,7 @@ public final class WebAsyncManager {
 			this.errorHandlingInProgress = (result instanceof Throwable);
 		}
 
+		// 异步情况是否已经处理完成
 		if (this.asyncWebRequest.isAsyncComplete()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Async result set but request already complete: " + formatRequestUri());
@@ -487,6 +523,10 @@ public final class WebAsyncManager {
 		}
 	}
 
+	/**
+	 * 开始异步任务处理
+	 * @param processingContext
+	 */
 	private void startAsyncProcessing(Object[] processingContext) {
 		synchronized (WebAsyncManager.this) {
 			this.concurrentResult = RESULT_NONE;

@@ -46,25 +46,22 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface CallableProcessingInterceptor {
 
 	/**
-	 * Constant indicating that no result has been determined by this
-	 * interceptor, giving subsequent interceptors a chance.
-	 * @see #handleTimeout
-	 * @see #handleError
+	 * 常数，表示没有通过此拦截器获得正确的返回值，给后续拦截器一个机会。使用场景如下：
+	 * <ol>
+	 *     <li>异步任务(Callable)抛出错误(Throwable)</li>
+	 *     <li>异步任务(Callable)超时</li>
+	 * </ol>
 	 */
 	Object RESULT_NONE = new Object();
 
 	/**
-	 * Constant indicating that the response has been handled by this interceptor
-	 * without a result and that no further interceptors are to be invoked.
-	 * @see #handleTimeout
-	 * @see #handleError
+	 * 常量，指示此拦截器已处理响应但是没有结果，并且不再调用其他拦截器
 	 */
 	Object RESPONSE_HANDLED = new Object();
 
 
 	/**
-	 * Invoked <em>before</em> the start of concurrent handling in the original
-	 * thread in which the {@code Callable} is submitted for concurrent handling.
+	 * 在原始线程中，在执行 异步任务(Callable) 之前调用
 	 * <p>This is useful for capturing the state of the current thread just prior to
 	 * invoking the {@link Callable}. Once the state is captured, it can then be
 	 * transferred to the new {@link Thread} in
@@ -80,7 +77,7 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
-	 * 执行异步方法之前调用
+	 * 在异步线程中，在执行 异步任务(Callable) 之前调用
 	 * @param request
 	 * @param task
 	 * @param <T>
@@ -90,7 +87,7 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
-	 * 执行异步方法之后调用
+	 * 在异步线程中，在执行 异步任务(Callable) 之后调用
 	 * @param request
 	 * @param task
 	 * @param concurrentResult
@@ -102,6 +99,7 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
+	 * 异步任务(Callable) 任务超时时调用
 	 * Invoked from a container thread when the async request times out before
 	 * the {@code Callable} task completes. Implementations may return a value,
 	 * including an {@link Exception}, to use instead of the value the
@@ -119,6 +117,7 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
+	 * 异步任务(Callable) 抛出了错误时调用
 	 * Invoked from a container thread when an error occurred while processing
 	 * the async request before the {@code Callable} task completes.
 	 * Implementations may return a value, including an {@link Exception}, to
@@ -138,6 +137,7 @@ public interface CallableProcessingInterceptor {
 	}
 
 	/**
+	 * 异步任务(Callable) 任务完成时调用
 	 * Invoked from a container thread when async processing completes for any
 	 * reason including timeout or network error.
 	 * <p>The default implementation is empty.

@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Holder for a {@link Callable}, a timeout value, and a task executor.
+ * 异步任务：包装了{@link Callable}, 超时时间, 线程池。。。
  *
  * @author Rossen Stoyanchev
  * @author Juergen Hoeller
@@ -35,20 +35,44 @@ import org.springframework.web.context.request.NativeWebRequest;
  */
 public class WebAsyncTask<V> implements BeanFactoryAware {
 
+	/**
+	 * 具体的任务
+	 */
 	private final Callable<V> callable;
 
+	/**
+	 * 此异步任务中的 Callable 的超时时间，以毫秒为单位
+	 */
 	private Long timeout;
 
+	/**
+	 * 此异步任务要使用的线程池
+	 */
 	private AsyncTaskExecutor executor;
 
+	/**
+	 * 此异步任务要使用的线程池名称
+	 */
 	private String executorName;
 
+	/**
+	 * bean工厂，一般情况下是 {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 */
 	private BeanFactory beanFactory;
 
+	/**
+	 * 超时回调
+	 */
 	private Callable<V> timeoutCallback;
 
+	/**
+	 * 异常回调
+	 */
 	private Callable<V> errorCallback;
 
+	/**
+	 * 完成回调
+	 */
 	private Runnable completionCallback;
 
 
@@ -124,8 +148,7 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 	}
 
 	/**
-	 * Return the AsyncTaskExecutor to use for concurrent handling,
-	 * or {@code null} if none specified.
+	 * 返回线程池, 要么使用设置的线程池，要么从容器中获得指定的线程池
 	 */
 	@Nullable
 	public AsyncTaskExecutor getExecutor() {
@@ -177,6 +200,10 @@ public class WebAsyncTask<V> implements BeanFactoryAware {
 		this.completionCallback = callback;
 	}
 
+	/**
+	 * 将超时回调，错误回调，完成回调注册成为一个拦截器，并返回
+	 * @return
+	 */
 	CallableProcessingInterceptor getInterceptor() {
 		return new CallableProcessingInterceptor() {
 			@Override

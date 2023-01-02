@@ -31,8 +31,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface HandlerMethodReturnValueHandler {
 
 	/**
-	 * Whether the given {@linkplain MethodParameter method return type} is
-	 * supported by this handler.
+	 * 此返回值处理器是否支持此参数类型
 	 * @param returnType the method return type to check
 	 * @return {@code true} if this handler supports the supplied return type;
 	 * {@code false} otherwise
@@ -40,8 +39,7 @@ public interface HandlerMethodReturnValueHandler {
 	boolean supportsReturnType(MethodParameter returnType);
 
 	/**
-	 * Handle the given return value by adding attributes to the model and
-	 * setting a view or setting the
+	 * 处理返回值
 	 * {@link ModelAndViewContainer#setRequestHandled} flag to {@code true}
 	 * to indicate the response has been handled directly.
 	 * @param returnValue the value returned from the handler method
