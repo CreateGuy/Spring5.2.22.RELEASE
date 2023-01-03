@@ -72,7 +72,7 @@ public interface View {
 
 
 	/**
-	 * Return the content type of the view, if predetermined.
+	 * 返回视图支持的媒体类型
 	 * <p>Can be used to check the view's content type upfront,
 	 * i.e. before an actual rendering attempt.
 	 * @return the content type String (optionally including a character set),

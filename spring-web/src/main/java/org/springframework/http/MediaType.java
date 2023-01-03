@@ -568,7 +568,7 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Parse the given String into a single {@code MediaType}.
+	 * 将给定的字符串转为 {@code MediaType}.
 	 * @param mediaType the string to parse
 	 * @return the media type
 	 * @throws InvalidMediaTypeException if the media type value cannot be parsed

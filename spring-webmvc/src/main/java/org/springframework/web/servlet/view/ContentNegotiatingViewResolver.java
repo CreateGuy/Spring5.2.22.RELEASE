@@ -52,16 +52,12 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
 /**
- * Implementation of {@link ViewResolver} that resolves a view based on the request file name
- * or {@code Accept} header.
- *
- * <p>The {@code ContentNegotiatingViewResolver} does not resolve views itself, but delegates to
- * other {@link ViewResolver ViewResolvers}. By default, these other view resolvers are picked up automatically
- * from the application context, though they can also be set explicitly by using the
- * {@link #setViewResolvers viewResolvers} property. <strong>Note</strong> that in order for this
- * view resolver to work properly, the {@link #setOrder order} property needs to be set to a higher
- * precedence than the others (the default is {@link Ordered#HIGHEST_PRECEDENCE}).
- *
+ * ViewResolver的一个实现，它基于视图名或 Accept 请求头
+ * <ul>
+ *     <li>本身不解析视图，而是委托给其他视图解析器</li>
+ *     <li>默认情况下，这些其他视图解析器是自动从容器中获取的，不过也可以通过使用viewResolvers属性显式地设置它们</li>
+ *     <li>注意，为了使这个视图解析器正常工作，order属性需要设置为比其他属性更高的优先级(默认为Ordered。最高优先级)。</li>
+ * </ul>
  * <p>This view resolver uses the requested {@linkplain MediaType media type} to select a suitable
  * {@link View} for a request. The requested media type is determined through the configured
  * {@link ContentNegotiationManager}. Once the requested media type has been determined, this resolver
@@ -89,13 +85,25 @@ import org.springframework.web.servlet.ViewResolver;
 public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 		implements ViewResolver, Ordered, InitializingBean {
 
+	/**
+	 * 内容协商管理器
+	 */
 	@Nullable
 	private ContentNegotiationManager contentNegotiationManager;
 
+	/**
+	 * 创建 {@link org.springframework.web.accept.ContentNegotiationStrategy} 实例的 FactoryBean
+	 */
 	private final ContentNegotiationManagerFactoryBean cnmFactoryBean = new ContentNegotiationManagerFactoryBean();
 
+	/**
+	 * 如果找不到合适的视图，是否应返回 4e6 Not Acceptable 状态码
+	 */
 	private boolean useNotAcceptableStatusCode = false;
 
+	/**
+	 * 默认视图
+	 */
 	@Nullable
 	private List<View> defaultViews;
 
@@ -182,8 +190,10 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 
 	@Override
 	protected void initServletContext(ServletContext servletContext) {
+		// 获得容器中的视图解析器
 		Collection<ViewResolver> matchingBeans =
 				BeanFactoryUtils.beansOfTypeIncludingAncestors(obtainApplicationContext(), ViewResolver.class).values();
+		// 初始化视图解析器
 		if (this.viewResolvers == null) {
 			this.viewResolvers = new ArrayList<>(matchingBeans.size());
 			for (ViewResolver viewResolver : matchingBeans) {
@@ -223,9 +233,12 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 	public View resolveViewName(String viewName, Locale locale) throws Exception {
 		RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
 		Assert.state(attrs instanceof ServletRequestAttributes, "No current ServletRequestAttributes");
+		// 返回客户端和服务端都支持的媒体类型
 		List<MediaType> requestedMediaTypes = getMediaTypes(((ServletRequestAttributes) attrs).getRequest());
 		if (requestedMediaTypes != null) {
+			// 获得候选视图
 			List<View> candidateViews = getCandidateViews(viewName, locale, requestedMediaTypes);
+			// 获得最佳的视图
 			View bestView = getBestView(candidateViews, requestedMediaTypes, attrs);
 			if (bestView != null) {
 				return bestView;
@@ -235,6 +248,7 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 		String mediaTypeInfo = logger.isDebugEnabled() && requestedMediaTypes != null ?
 				" given " + requestedMediaTypes.toString() : "";
 
+		// 没有找到合适的视图，是否选择 406
 		if (this.useNotAcceptableStatusCode) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using 406 NOT_ACCEPTABLE" + mediaTypeInfo);
@@ -248,7 +262,7 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * Determines the list of {@link MediaType} for the given {@link HttpServletRequest}.
+	 * 返回客户端和服务端都支持的媒体类型 {@code MediaType}
 	 * @param request the current servlet request
 	 * @return the list of media types requested, if any
 	 */
@@ -257,9 +271,12 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 		Assert.state(this.contentNegotiationManager != null, "No ContentNegotiationManager set");
 		try {
 			ServletWebRequest webRequest = new ServletWebRequest(request);
+			// 客户端可以接受的媒体类型列表
 			List<MediaType> acceptableMediaTypes = this.contentNegotiationManager.resolveMediaTypes(webRequest);
+			// 服务端可以生成的媒体类型列表
 			List<MediaType> producibleMediaTypes = getProducibleMediaTypes(request);
 			Set<MediaType> compatibleMediaTypes = new LinkedHashSet<>();
+			// 确定两边都可以接受的类型(包括通配符的情况)
 			for (MediaType acceptable : acceptableMediaTypes) {
 				for (MediaType producible : producibleMediaTypes) {
 					if (acceptable.isCompatibleWith(producible)) {
@@ -279,6 +296,11 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 		}
 	}
 
+	/**
+	 * 服务器可以生成的媒体类型
+	 * @param request
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private List<MediaType> getProducibleMediaTypes(HttpServletRequest request) {
 		Set<MediaType> mediaTypes = (Set<MediaType>)
@@ -292,14 +314,25 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * Return the more specific of the acceptable and the producible media types
-	 * with the q-value of the former.
+	 *  返回更具体的可接受和可生产的媒体类型*，并带有前者的q值
 	 */
 	private MediaType getMostSpecificMediaType(MediaType acceptType, MediaType produceType) {
 		produceType = produceType.copyQualityValue(acceptType);
 		return (MediaType.SPECIFICITY_COMPARATOR.compare(acceptType, produceType) < 0 ? acceptType : produceType);
 	}
 
+	/**
+	 * 获得候选视图，规则如下:
+	 * <ol>
+	 *     <li>以视图名进行解析</li>
+	 *     <li>以视图名 + 媒体类型对应的扩展名 进行解析</li>
+	 * </ol>
+	 * @param viewName
+	 * @param locale
+	 * @param requestedMediaTypes 两边都可以接受的媒体类型
+	 * @return
+	 * @throws Exception
+	 */
 	private List<View> getCandidateViews(String viewName, Locale locale, List<MediaType> requestedMediaTypes)
 			throws Exception {
 
@@ -307,14 +340,19 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 		if (this.viewResolvers != null) {
 			Assert.state(this.contentNegotiationManager != null, "No ContentNegotiationManager set");
 			for (ViewResolver viewResolver : this.viewResolvers) {
+				// 以视图名进行解析
 				View view = viewResolver.resolveViewName(viewName, locale);
 				if (view != null) {
 					candidateViews.add(view);
 				}
+
+				// 以视图名 + 媒体类型对应的扩展名 进行解析
 				for (MediaType requestedMediaType : requestedMediaTypes) {
+					// 将给定的媒体类型解析为文件扩展名列表
 					List<String> extensions = this.contentNegotiationManager.resolveFileExtensions(requestedMediaType);
 					for (String extension : extensions) {
 						String viewNameWithExtension = viewName + '.' + extension;
+						// 将视图名加上媒体类型对应的扩展名，再次进行解析
 						view = viewResolver.resolveViewName(viewNameWithExtension, locale);
 						if (view != null) {
 							candidateViews.add(view);
@@ -323,14 +361,28 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 				}
 			}
 		}
+
+		// 是否添加默认的视图
 		if (!CollectionUtils.isEmpty(this.defaultViews)) {
 			candidateViews.addAll(this.defaultViews);
 		}
 		return candidateViews;
 	}
 
+	/**
+	 * 获得最佳的视图，规则如下：
+	 * <ol>
+	 *     <li>有重定向视图</li>
+	 *     <li>有客户端接收的媒体类型和视图的媒体类型兼容的</li>
+	 * </ol>
+	 * @param candidateViews 候选视图
+	 * @param requestedMediaTypes 请求方能够接收的媒体类型
+	 * @param attrs
+	 * @return
+	 */
 	@Nullable
 	private View getBestView(List<View> candidateViews, List<MediaType> requestedMediaTypes, RequestAttributes attrs) {
+		// 如果有重定向视图，直接作为最佳视图
 		for (View candidateView : candidateViews) {
 			if (candidateView instanceof SmartView) {
 				SmartView smartView = (SmartView) candidateView;
@@ -339,10 +391,13 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 				}
 			}
 		}
+
 		for (MediaType mediaType : requestedMediaTypes) {
 			for (View candidateView : candidateViews) {
 				if (StringUtils.hasText(candidateView.getContentType())) {
+					// 将给定的媒体类型字符串转为媒体类型
 					MediaType candidateContentType = MediaType.parseMediaType(candidateView.getContentType());
+					// 客户端接收的媒体类型和视图的媒体类型是否能兼容
 					if (mediaType.isCompatibleWith(candidateContentType)) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("Selected '" + mediaType + "' given " + requestedMediaTypes);
@@ -357,6 +412,9 @@ public class ContentNegotiatingViewResolver extends WebApplicationObjectSupport
 	}
 
 
+	/**
+	 * 406视图
+	 */
 	private static final View NOT_ACCEPTABLE_VIEW = new View() {
 
 		@Override

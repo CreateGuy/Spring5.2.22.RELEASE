@@ -1149,8 +1149,9 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Did the handler return a view to render?
+		// 该 ModelAndView 对象是否为空(即它是否不持有任何视图，也不包含模型)
 		if (mv != null && !mv.wasCleared()) {
+			// 根据给定的 ModelAndView 渲染视图
 			render(mv, request, response);
 			if (errorView) {
 				WebUtils.clearErrorRequestAttributes(request);
@@ -1367,8 +1368,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Render the given ModelAndView.
-	 * <p>This is the last stage in handling a request. It may involve resolving the view by name.
+	 * 根据给定的 ModelAndView 渲染视图
+	 * <p>这是处理请求的最后一个阶段。它可能涉及通过名称解析器解析视图
 	 * @param mv the ModelAndView to render
 	 * @param request current HTTP servlet request
 	 * @param response current HTTP servlet response
@@ -1376,15 +1377,16 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @throws Exception if there's a problem rendering the view
 	 */
 	protected void render(ModelAndView mv, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// Determine locale for request and apply it to the response.
+		// 获得最后使用的 Locale，并写入响应中
 		Locale locale =
 				(this.localeResolver != null ? this.localeResolver.resolveLocale(request) : request.getLocale());
 		response.setLocale(locale);
 
 		View view;
 		String viewName = mv.getViewName();
+		// 渲染视图，要么有视图名要么有视图，然后就抛出异常
 		if (viewName != null) {
-			// We need to resolve the view name.
+			// 解析视图名，获得视图
 			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);
 			if (view == null) {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() +

@@ -29,22 +29,19 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 
 /**
- * {@link LocaleResolver} implementation that simply uses the primary locale
- * specified in the "accept-language" header of the HTTP request (that is,
- * the locale sent by the client browser, normally that of the client's OS).
- *
- * <p>Note: Does not support {@code setLocale}, since the accept header
- * can only be changed through changing the client's locale settings.
- *
- * @author Juergen Hoeller
- * @author Rossen Stoyanchev
- * @since 27.02.2003
+ * {@link LocaleResolver} 的实现，它只使用请求头的 accept-language 指定的主要语言环境(即客户端浏览器发送的语言环境，通常是客户端操作系统的语言环境)
  * @see javax.servlet.http.HttpServletRequest#getLocale()
  */
 public class AcceptHeaderLocaleResolver implements LocaleResolver {
 
+	/**
+	 * 已配置的支持区域设置的列表
+	 */
 	private final List<Locale> supportedLocales = new ArrayList<>(4);
 
+	/**
+	 * 默认环境
+	 */
 	@Nullable
 	private Locale defaultLocale;
 
@@ -96,14 +93,17 @@ public class AcceptHeaderLocaleResolver implements LocaleResolver {
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
 		Locale defaultLocale = getDefaultLocale();
+		// 如果默认环境不为空，同时请求头的 Accept-Language 为空的时候，使用默认环境
 		if (defaultLocale != null && request.getHeader("Accept-Language") == null) {
 			return defaultLocale;
 		}
 		Locale requestLocale = request.getLocale();
 		List<Locale> supportedLocales = getSupportedLocales();
+		// 已配置的支持区域设置的列表为空，直接使用请求中的
 		if (supportedLocales.isEmpty() || supportedLocales.contains(requestLocale)) {
 			return requestLocale;
 		}
+		// 尽量找到两边都支持的 Locale，不然就只能够匹配语言的 Locale，而不匹配地区
 		Locale supportedLocale = findSupportedLocale(request, supportedLocales);
 		if (supportedLocale != null) {
 			return supportedLocale;
@@ -111,20 +111,27 @@ public class AcceptHeaderLocaleResolver implements LocaleResolver {
 		return (defaultLocale != null ? defaultLocale : requestLocale);
 	}
 
+	/**
+	 * 尽量找到两边都支持的 Locale，不然就只能够匹配语言的 Locale，而不匹配地区
+	 * @param request
+	 * @param supportedLocales
+	 * @return
+	 */
 	@Nullable
 	private Locale findSupportedLocale(HttpServletRequest request, List<Locale> supportedLocales) {
 		Enumeration<Locale> requestLocales = request.getLocales();
+		// 候选Locale
 		Locale languageMatch = null;
 		while (requestLocales.hasMoreElements()) {
 			Locale locale = requestLocales.nextElement();
 			if (supportedLocales.contains(locale)) {
 				if (languageMatch == null || languageMatch.getLanguage().equals(locale.getLanguage())) {
-					// Full match: language + country, possibly narrowed from earlier language-only match
+					// 完全匹配: language + country
 					return locale;
 				}
 			}
 			else if (languageMatch == null) {
-				// Let's try to find a language-only match as a fallback
+				// 只匹配语言作为候选
 				for (Locale candidate : supportedLocales) {
 					if (!StringUtils.hasLength(candidate.getCountry()) &&
 							candidate.getLanguage().equals(locale.getLanguage())) {

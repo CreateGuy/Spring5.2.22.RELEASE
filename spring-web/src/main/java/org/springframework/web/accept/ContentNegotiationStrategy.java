@@ -37,7 +37,7 @@ public interface ContentNegotiationStrategy {
 
 
 	/**
-	 * 解析可以返回的媒体类型列表
+	 * 解析客户端可以接受的的媒体类型列表
 	 * @param webRequest
 	 * @return
 	 * @throws HttpMediaTypeNotAcceptableException

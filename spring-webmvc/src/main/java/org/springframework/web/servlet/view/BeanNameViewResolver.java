@@ -27,9 +27,8 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
 /**
- * A simple implementation of {@link org.springframework.web.servlet.ViewResolver}
- * that interprets a view name as a bean name in the current application context,
- * i.e. typically in the XML file of the executing {@code DispatcherServlet}.
+ * 一个简单的 {@link org.springframework.web.servlet.ViewResolver} 的实现
+ * 它将视图名解析为当前容器中的bean。通常在执行DispatcherServlet的XML文件中。
  *
  * <p>This resolver can be handy for small applications, keeping all definitions
  * ranging from controllers to views in the same place. For larger applications,
@@ -77,9 +76,10 @@ public class BeanNameViewResolver extends WebApplicationObjectSupport implements
 	public View resolveViewName(String viewName, Locale locale) throws BeansException {
 		ApplicationContext context = obtainApplicationContext();
 		if (!context.containsBean(viewName)) {
-			// Allow for ViewResolver chaining...
+			// 返回空，让后面的视图解析器去尝试
 			return null;
 		}
+		// 判断指定bean是否实现了 View 接口
 		if (!context.isTypeMatch(viewName, View.class)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found bean named '" + viewName + "' but it does not implement View");
@@ -88,6 +88,7 @@ public class BeanNameViewResolver extends WebApplicationObjectSupport implements
 			// let's accept this as a non-match and allow for chaining as well...
 			return null;
 		}
+		// 返回指定bean
 		return context.getBean(viewName, View.class);
 	}
 

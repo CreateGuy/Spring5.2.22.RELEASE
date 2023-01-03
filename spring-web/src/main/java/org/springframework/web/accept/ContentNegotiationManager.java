@@ -126,7 +126,7 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 	}
 
 	/**
-	 * 解析可以返回的媒体类型列表
+	 * 解析客户端可以接受的的媒体类型列表
 	 * @param request
 	 * @return
 	 * @throws HttpMediaTypeNotAcceptableException
@@ -143,6 +143,11 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 		return MEDIA_TYPE_ALL_LIST;
 	}
 
+	/**
+	 * 将给定的媒体类型解析为文件扩展名列表
+	 * @param mediaType the media type to resolve
+	 * @return
+	 */
 	@Override
 	public List<String> resolveFileExtensions(MediaType mediaType) {
 		return doResolveExtensions(resolver -> resolver.resolveFileExtensions(mediaType));
