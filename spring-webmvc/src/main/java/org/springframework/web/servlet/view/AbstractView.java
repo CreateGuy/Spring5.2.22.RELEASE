@@ -70,18 +70,33 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	private static final int OUTPUT_BYTE_ARRAY_INITIAL_SIZE = 4096;
 
 
+	/**
+	 * 当前视图的媒体类型
+	 */
 	@Nullable
 	private String contentType = DEFAULT_CONTENT_TYPE;
 
+	/**
+	 * 是否暴露 RequestContext
+	 */
 	@Nullable
 	private String requestContextAttribute;
 
 	private final Map<String, Object> staticAttributes = new LinkedHashMap<>();
 
+	/**
+	 * 是否允许暴露 PathVariables 参数
+	 */
 	private boolean exposePathVariables = true;
 
+	/**
+	 * 是否使 ApplicationContext 中的所有Spring bean可访问
+	 */
 	private boolean exposeContextBeansAsAttributes = false;
 
+	/**
+	 * 在 ApplicationContext 中可以暴露的bean名称
+	 */
 	@Nullable
 	private Set<String> exposedContextBeanNames;
 
@@ -311,27 +326,37 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 					(this.staticAttributes.isEmpty() ? "" : ", static attributes " + this.staticAttributes));
 		}
 
+		// 合并各种地方的属性
 		Map<String, Object> mergedModel = createMergedOutputModel(model, request, response);
+		// 为渲染而做准备
 		prepareResponse(request, response);
+		//
 		renderMergedOutputModel(mergedModel, getRequestToExpose(request), response);
 	}
 
 	/**
-	 * Creates a combined output Map (never {@code null}) that includes dynamic values and static attributes.
-	 * Dynamic values take precedence over static attributes.
+	 * 合并各种地方的属性，如下：
+	 * <ol>
+	 *     <li>model</li>
+	 *     <li>staticAttributes</li>
+	 *     <li>pathVariables</li>
+	 *     <li>RequestContext</li>
+	 * </ol>
 	 */
 	protected Map<String, Object> createMergedOutputModel(@Nullable Map<String, ?> model,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		// 是否暴露 PathVariables 值
 		@SuppressWarnings("unchecked")
 		Map<String, Object> pathVars = (this.exposePathVariables ?
 				(Map<String, Object>) request.getAttribute(View.PATH_VARIABLES) : null);
 
-		// Consolidate static and dynamic model attributes.
+		// 计算静态、模型、路径变量的总和
 		int size = this.staticAttributes.size();
 		size += (model != null ? model.size() : 0);
 		size += (pathVars != null ? pathVars.size() : 0);
 
+		// 进行静态、模型、路径变量的合并
 		Map<String, Object> mergedModel = new LinkedHashMap<>(size);
 		mergedModel.putAll(this.staticAttributes);
 		if (pathVars != null) {
@@ -341,7 +366,7 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 			mergedModel.putAll(model);
 		}
 
-		// Expose RequestContext?
+		// 是否暴露 RequestContext
 		if (this.requestContextAttribute != null) {
 			mergedModel.put(this.requestContextAttribute, createRequestContext(request, response, mergedModel));
 		}
@@ -350,7 +375,7 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	}
 
 	/**
-	 * Create a RequestContext to expose under the specified attribute name.
+	 * 在指定的属性名下创建一个RequestContext来公开
 	 * <p>The default implementation creates a standard RequestContext instance for the
 	 * given request and model. Can be overridden in subclasses for custom instances.
 	 * @param request current HTTP request
@@ -367,21 +392,23 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	}
 
 	/**
-	 * Prepare the given response for rendering.
+	 * 为渲染而做准备
 	 * <p>The default implementation applies a workaround for an IE bug
 	 * when sending download content via HTTPS.
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 */
 	protected void prepareResponse(HttpServletRequest request, HttpServletResponse response) {
+		// 返回的视图是否生成下载内容
 		if (generatesDownloadContent()) {
+			// 猜测是客户端不缓存，然后每次都请求
 			response.setHeader("Pragma", "private");
 			response.setHeader("Cache-Control", "private, must-revalidate");
 		}
 	}
 
 	/**
-	 * Return whether this view generates download content
+	 * 返回的视图是否生成下载内容
 	 * (typically binary content like PDF or Excel files).
 	 * <p>The default implementation returns {@code false}. Subclasses are
 	 * encouraged to return {@code true} here if they know that they are
@@ -395,16 +422,12 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 	}
 
 	/**
-	 * Get the request handle to expose to {@link #renderMergedOutputModel}, i.e. to the view.
-	 * <p>The default implementation wraps the original request for exposure of Spring beans
-	 * as request attributes (if demanded).
-	 * @param originalRequest the original servlet request as provided by the engine
-	 * @return the wrapped request, or the original request if no wrapping is necessary
-	 * @see #setExposeContextBeansAsAttributes
-	 * @see #setExposedContextBeanNames
-	 * @see org.springframework.web.context.support.ContextExposingHttpServletRequest
+	 * 要么返回原请求，要么返回包装后可以暴露容器中bean的请求
+	 * @param originalRequest
+	 * @return
 	 */
 	protected HttpServletRequest getRequestToExpose(HttpServletRequest originalRequest) {
+		// 要么可以暴露容器中的所有bean，要么可以暴露指定bean名称
 		if (this.exposeContextBeansAsAttributes || this.exposedContextBeanNames != null) {
 			WebApplicationContext wac = getWebApplicationContext();
 			Assert.state(wac != null, "No WebApplicationContext");
@@ -430,9 +453,7 @@ public abstract class AbstractView extends WebApplicationObjectSupport implement
 
 
 	/**
-	 * Expose the model objects in the given map as request attributes.
-	 * Names will be taken from the model Map.
-	 * This method is suitable for all resources reachable by {@link javax.servlet.RequestDispatcher}.
+	 * 将传入的属性暴露在请求域中
 	 * @param model a Map of model objects to expose
 	 * @param request current HTTP request
 	 */

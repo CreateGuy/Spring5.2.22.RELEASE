@@ -27,20 +27,22 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * HttpServletRequest decorator that makes all Spring beans in a
- * given WebApplicationContext accessible as request attributes,
- * through lazy checking once an attribute gets accessed.
- *
- * @author Juergen Hoeller
- * @since 2.5
+ * HttpServletRequest包装，
+ * 它通过使用 WebApplicationContext 让所有Spring bean作为请求属性可访问
  */
 public class ContextExposingHttpServletRequest extends HttpServletRequestWrapper {
 
 	private final WebApplicationContext webApplicationContext;
 
+	/**
+	 * 可以暴露bean的名称
+	 */
 	@Nullable
 	private final Set<String> exposedContextBeanNames;
 
+	/**
+	 * 显式属性
+	 */
 	@Nullable
 	private Set<String> explicitAttributes;
 
@@ -80,21 +82,37 @@ public class ContextExposingHttpServletRequest extends HttpServletRequestWrapper
 	}
 
 
+	/**
+	 * 获得指定属性
+	 * @param name
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public Object getAttribute(String name) {
+		// 1、要么没有显式属性，要么显式属性中没有包含指定的内容
+		// 2、如果设置了可以暴露bean的名称的话，必须要求在这个里面
+		// 3、要求容器中有这个bean
+		// 满足以三个条件才会从容器中获得bean，反正就从请求域中获取
 		if ((this.explicitAttributes == null || !this.explicitAttributes.contains(name)) &&
 				(this.exposedContextBeanNames == null || this.exposedContextBeanNames.contains(name)) &&
 				this.webApplicationContext.containsBean(name)) {
 			return this.webApplicationContext.getBean(name);
 		}
 		else {
+			// 从请求域中获取参数
 			return super.getAttribute(name);
 		}
 	}
 
+	/**
+	 * 设置指定属性
+	 * @param name
+	 * @param value
+	 */
 	@Override
 	public void setAttribute(String name, Object value) {
+		// 设置到请求域中
 		super.setAttribute(name, value);
 		if (this.explicitAttributes == null) {
 			this.explicitAttributes = new HashSet<>(8);

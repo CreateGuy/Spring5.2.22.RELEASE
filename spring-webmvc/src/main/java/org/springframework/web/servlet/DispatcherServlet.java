@@ -316,7 +316,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	private boolean throwExceptionIfNoHandlerFound = false;
 
 	/**
-	 * 执行完请求后是否清除 Request Attribute 中所有属性
+	 * 执行完包含请求后是否清除请求域中的参数，然后还原
 	 * */
 	private boolean cleanupAfterInclude = true;
 
@@ -954,6 +954,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			doDispatch(request, response);
 		}
 		finally {
+			// 当没有启动异步线程的时候
 			if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
 				// 在 include()的情况下还原请求域参数
 				if (attributesSnapshot != null) {
@@ -1082,21 +1083,23 @@ public class DispatcherServlet extends FrameworkServlet {
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
+			// 此时只能是 dispatchException 方法抛出的异常，然后执行拦截器的 afterCompletion 方法
 			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
 		}
 		catch (Throwable err) {
+			// 此时只能是 dispatchException 方法抛出的异常，然后执行拦截器的 afterCompletion 方法
 			triggerAfterCompletion(processedRequest, response, mappedHandler,
 					new NestedServletException("Handler processing failed", err));
 		}
 		finally {
+			// 当异步线程已经启动的时候，执行特定拦截器(AsyncHandlerInterceptor)的 afterConcurrentHandlingStarted 方法
 			if (asyncManager.isConcurrentHandlingStarted()) {
-				// Instead of postHandle and afterCompletion
 				if (mappedHandler != null) {
 					mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
 				}
 			}
 			else {
-				// Clean up any resources used by a multipart request.
+				// 清理由 Multipart 请求使用的任何资源
 				if (multipartRequestParsed) {
 					cleanupMultipart(processedRequest);
 				}
@@ -1153,6 +1156,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		if (mv != null && !mv.wasCleared()) {
 			// 根据给定的 ModelAndView 渲染视图
 			render(mv, request, response);
+			// 如果有错误视图，清空请求域中相关的错误属性
 			if (errorView) {
 				WebUtils.clearErrorRequestAttributes(request);
 			}
@@ -1163,13 +1167,14 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// 如果异步任务已经启动了
 		if (WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
 			// Concurrent handling started during a forward
 			return;
 		}
 
+		// 执行拦截器的 afterCompletion 方法
 		if (mappedHandler != null) {
-			// Exception (if any) is already handled..
 			mappedHandler.triggerAfterCompletion(request, response, null);
 		}
 	}
@@ -1244,7 +1249,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Clean up any resources used by the given multipart request (if any).
+	 * 清理由 Multipart 请求使用的任何资源(不懂)
 	 * @param request current HTTP request
 	 * @see MultipartResolver#cleanupMultipart
 	 */
@@ -1410,6 +1415,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (mv.getStatus() != null) {
 				response.setStatus(mv.getStatus().value());
 			}
+			// 视图渲染
 			view.render(mv.getModelInternal(), request, response);
 		}
 		catch (Exception ex) {
@@ -1470,7 +1476,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * 在include()之后恢复请求域的参数
+	 * 在include()之后恢复源请求的请求域参数
 	 * @param request current HTTP request
 	 * @param attributesSnapshot include()之前的请求域参数
 	 */
@@ -1486,7 +1492,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Add attributes that may have been removed
+		// 添加可能已删除的属性
 		attrsToCheck.addAll((Set<String>) attributesSnapshot.keySet());
 
 		// 还原include()之前的请求域参数

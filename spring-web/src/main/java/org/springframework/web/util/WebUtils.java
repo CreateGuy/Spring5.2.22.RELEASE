@@ -535,8 +535,7 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Clear the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
-	 * attributes under the keys defined in the Servlet 2.3 specification:
+	 * 清空请求域中相关的错误属性 {@link javax.servlet.http.HttpServletRequest}
 	 * {@code javax.servlet.error.status_code},
 	 * {@code javax.servlet.error.exception_type},
 	 * {@code javax.servlet.error.message},

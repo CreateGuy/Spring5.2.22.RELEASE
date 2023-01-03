@@ -36,18 +36,18 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class RequestHandledEvent extends ApplicationEvent {
 
-	/** Session id that applied to the request, if any. */
+	/** 应用于请求的会话id(如果有的话) */
 	@Nullable
 	private String sessionId;
 
-	/** Usually the UserPrincipal. */
+	/** 当前登录用户的 UserPrincipal */
 	@Nullable
 	private String userName;
 
-	/** Request processing time. */
+	/** 请求处理时间 */
 	private final long processingTimeMillis;
 
-	/** Cause of failure, if any. */
+	/** 失败原因，如果有的话 */
 	@Nullable
 	private Throwable failureCause;
 

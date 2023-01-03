@@ -64,7 +64,7 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 	private static final CacheFilter DEFAULT_CACHE_FILTER = (view, viewName, locale) -> true;
 
 
-	/** The maximum number of entries in the cache. */
+	/** 缓存中的最大条目数 */
 	private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
 
 	/** Whether we should refrain from resolving views again if unresolved once. */
@@ -73,7 +73,7 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 	/** Filter function that determines if view should be cached. */
 	private CacheFilter cacheFilter = DEFAULT_CACHE_FILTER;
 
-	/** Fast access cache for Views, returning already cached instances without a global lock. */
+	/** 快速访问视图缓存，返回已经缓存的实例，不带全局锁。. */
 	private final Map<Object, View> viewAccessCache = new ConcurrentHashMap<>(DEFAULT_CACHE_LIMIT);
 
 	/** Map from view key to View instance, synchronized for View creation. */
@@ -174,6 +174,7 @@ public abstract class AbstractCachingViewResolver extends WebApplicationObjectSu
 			return createView(viewName, locale);
 		}
 		else {
+			// 获得缓存key
 			Object cacheKey = getCacheKey(viewName, locale);
 			View view = this.viewAccessCache.get(cacheKey);
 			if (view == null) {

@@ -65,8 +65,14 @@ import org.springframework.web.util.WebUtils;
  */
 public class InternalResourceView extends AbstractUrlBasedView {
 
+	/**
+	 * 一直使用包含
+	 */
 	private boolean alwaysInclude = false;
 
+	/**
+	 * 是否防止循环派发
+	 */
 	private boolean preventDispatchLoop = false;
 
 
@@ -138,23 +144,24 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	protected void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// Expose the model object as request attributes.
+		// 将属性暴露在请求域中
 		exposeModelAsRequestAttributes(model, request);
 
 		// Expose helpers as request attributes, if any.
+		// 没有什么有用的实现
 		exposeHelpers(request);
 
-		// Determine the path for the request dispatcher.
+		// 确定请求分派器的路径
 		String dispatcherPath = prepareForRendering(request, response);
 
-		// Obtain a RequestDispatcher for the target resource (typically a JSP).
+		// 获取目标资源(的RequestDispatcher)
 		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
 		if (rd == null) {
 			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
 					"]: Check that the corresponding file exists within your web application archive!");
 		}
 
-		// If already included or response already committed, perform include, else forward.
+		// 如果是包含或者说请求已经提交，那么就使用包含，否则使用转发
 		if (useInclude(request, response)) {
 			response.setContentType(getContentType());
 			if (logger.isDebugEnabled()) {
@@ -164,7 +171,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 		}
 
 		else {
-			// Note: The forwarded resource is supposed to determine the content type itself.
+			// 注意:转发的资源应该决定内容类型本身
 			if (logger.isDebugEnabled()) {
 				logger.debug("Forwarding to [" + getUrl() + "]");
 			}
@@ -187,8 +194,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	}
 
 	/**
-	 * Prepare for rendering, and determine the request dispatcher path
-	 * to forward to (or to include).
+	 * 准备渲染，并确定要转发(或包含)的路径
 	 * <p>This implementation simply returns the configured URL.
 	 * Subclasses can override this to determine a resource to render,
 	 * typically interpreting the URL in a different manner.
@@ -204,8 +210,10 @@ public class InternalResourceView extends AbstractUrlBasedView {
 		String path = getUrl();
 		Assert.state(path != null, "'url' not set");
 
+		// 是否防止循环派发
 		if (this.preventDispatchLoop) {
 			String uri = request.getRequestURI();
+			// 用要派发的路径和当前请求的路径相比较
 			if (path.startsWith("/") ? uri.equals(path) : uri.equals(StringUtils.applyRelativePath(uri, path))) {
 				throw new ServletException("Circular view path [" + path + "]: would dispatch back " +
 						"to the current handler URL [" + uri + "] again. Check your ViewResolver setup! " +
@@ -230,18 +238,12 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	}
 
 	/**
-	 * Determine whether to use RequestDispatcher's {@code include} or
-	 * {@code forward} method.
-	 * <p>Performs a check whether an include URI attribute is found in the request,
-	 * indicating an include request, and whether the response has already been committed.
-	 * In both cases, an include will be performed, as a forward is not possible anymore.
-	 * @param request current HTTP request
-	 * @param response current HTTP response
-	 * @return {@code true} for include, {@code false} for forward
-	 * @see javax.servlet.RequestDispatcher#forward
-	 * @see javax.servlet.RequestDispatcher#include
-	 * @see javax.servlet.ServletResponse#isCommitted
-	 * @see org.springframework.web.util.WebUtils#isIncludeRequest
+	 * 是否使用包含(Include)，根据以下情况：
+	 * <ol>
+	 *     <li>一直使用包含</li>
+	 *     <li>本次请求本来就是包含</li>
+	 *     <li>检查响应是否已经提交给客户端</li>
+	 * </ol>
 	 */
 	protected boolean useInclude(HttpServletRequest request, HttpServletResponse response) {
 		return (this.alwaysInclude || WebUtils.isIncludeRequest(request) || response.isCommitted());

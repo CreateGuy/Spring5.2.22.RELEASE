@@ -30,6 +30,9 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractUrlBasedView extends AbstractView implements InitializingBean {
 
+	/**
+	 * 派发的路径
+	 */
 	@Nullable
 	private String url;
 

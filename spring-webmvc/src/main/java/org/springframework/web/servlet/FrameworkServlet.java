@@ -198,7 +198,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/** Should we publish the context as a ServletContext attribute?. */
 	private boolean publishContext = true;
 
-	/** Should we publish a ServletRequestHandledEvent at the end of each request?. */
+	/** 是否在每次请求的完后发布一个 {@link ServletRequestHandledEvent} */
 	private boolean publishEvents = true;
 
 	/** 将LocaleContext 和 RequestAttributes公开为子线程可使用 */
@@ -1022,12 +1022,15 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		finally {
-			// 清空LocaleContext和RequestContext
+			// 重置LocaleContext和RequestContext
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
+			// 标记为请求已完成
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
 			}
+			// 打印结果
 			logResult(request, response, failureCause, asyncManager);
+			// 推送指定 ServletRequestHandledEvent 事件
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}
@@ -1089,7 +1092,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
-	 * 清空LocaleContext和RequestContext
+	 * 重置LocaleContext和RequestContext
 	 * @param request
 	 * @param prevLocaleContext
 	 * @param previousAttributes
@@ -1101,6 +1104,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		RequestContextHolder.setRequestAttributes(previousAttributes, this.threadContextInheritable);
 	}
 
+	/**
+	 * 打印结果
+	 * @param request
+	 * @param response
+	 * @param failureCause
+	 * @param asyncManager
+	 */
 	private void logResult(HttpServletRequest request, HttpServletResponse response,
 			@Nullable Throwable failureCause, WebAsyncManager asyncManager) {
 
@@ -1156,6 +1166,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
+	/**
+	 * 推送指定 {@code ServletRequestHandledEvent} 事件
+	 * @param request
+	 * @param response
+	 * @param startTime
+	 * @param failureCause
+	 */
 	private void publishRequestHandledEvent(HttpServletRequest request, HttpServletResponse response,
 			long startTime, @Nullable Throwable failureCause) {
 

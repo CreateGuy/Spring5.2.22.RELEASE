@@ -30,19 +30,19 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class ServletRequestHandledEvent extends RequestHandledEvent {
 
-	/** URL that triggered the request. */
+	/** 请求Url*/
 	private final String requestUrl;
 
-	/** IP address that the request came from. */
+	/** 请求的远程地址. */
 	private final String clientAddress;
 
-	/** Usually GET or POST. */
+	/** 请求方式：通常是 GET or POST. */
 	private final String method;
 
-	/** Name of the servlet that handled the request. */
+	/** 处理请求的servlet的名称：通常是dispatchServlet */
 	private final String servletName;
 
-	/** HTTP status code of the response. */
+	/** 响应的HTTP状态码 */
 	private final int statusCode;
 
 
