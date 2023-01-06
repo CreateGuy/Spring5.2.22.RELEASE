@@ -32,7 +32,7 @@ public interface HandlerMethodReturnValueHandler {
 
 	/**
 	 * 此返回值处理器是否支持此参数类型
-	 * @param returnType the method return type to check
+	 * @param returnType 返回值的类型
 	 * @return {@code true} if this handler supports the supplied return type;
 	 * {@code false} otherwise
 	 */

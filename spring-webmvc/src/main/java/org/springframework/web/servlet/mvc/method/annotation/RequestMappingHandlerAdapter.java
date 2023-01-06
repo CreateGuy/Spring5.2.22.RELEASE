@@ -98,19 +98,9 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
- * Extension of {@link AbstractHandlerMethodAdapter} that supports
- * {@link RequestMapping @RequestMapping} annotated {@link HandlerMethod HandlerMethods}.
- *
- * <p>Support for custom argument and return value types can be added via
- * {@link #setCustomArgumentResolvers} and {@link #setCustomReturnValueHandlers},
- * or alternatively, to re-configure all argument and return value types,
- * use {@link #setArgumentResolvers} and {@link #setReturnValueHandlers}.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.1
- * @see HandlerMethodArgumentResolver
- * @see HandlerMethodReturnValueHandler
+ * 扩展至 {@link AbstractHandlerMethodAdapter}，支持标注了
+ * {@link RequestMapping} 注解的 {@link HandlerMethod HandlerMethods}
+ * <li>与 {@link RequestMappingHandlerMapping} 配合使用</li>
  */
 public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
@@ -147,15 +137,21 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
 
+	/**
+	 * 自定义返回值处理器
+	 */
 	@Nullable
 	private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
 
 	/**
-	 * 返回值处理器
+	 * 最终要使用返回值处理器
 	 */
 	@Nullable
 	private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
+	/**
+	 * 特定返回值的解析器
+	 */
 	@Nullable
 	private List<ModelAndViewResolver> modelAndViewResolvers;
 
@@ -164,6 +160,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private ContentNegotiationManager contentNegotiationManager = new ContentNegotiationManager();
 
+	/**
+	 * 用于从HTTP请求和响应转换到HTTP请求和响应的
+	 */
 	private List<HttpMessageConverter<?>> messageConverters;
 
 	/**
@@ -200,6 +199,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private DeferredResultProcessingInterceptor[] deferredResultInterceptors = new DeferredResultProcessingInterceptor[0];
 
+	/**
+	 * 有关 Reactive 的
+	 */
 	private ReactiveAdapterRegistry reactiveAdapterRegistry = ReactiveAdapterRegistry.getSharedInstance();
 
 	/**
@@ -215,6 +217,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private boolean ignoreDefaultModelOnRedirect = false;
 
+	/**
+	 * 浏览器缓存的过期时间
+	 */
 	private int cacheSecondsForSessionAttributeHandlers = 0;
 
 	/**
@@ -222,6 +227,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private boolean synchronizeOnSession = false;
 
+	/**
+	 * 用于读取和保存会话属性的
+	 */
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
 
 	/**
@@ -229,6 +237,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 */
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
+	/**
+	 * 一般情况下都是 {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 */
 	@Nullable
 	private ConfigurableBeanFactory beanFactory;
 
@@ -788,8 +799,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	/**
-	 * Return the list of return value handlers to use including built-in and
-	 * custom handlers provided via {@link #setReturnValueHandlers}.
+	 * 返回默认的返回值处理器，包含默认的和自定义的
 	 */
 	private List<HandlerMethodReturnValueHandler> getDefaultReturnValueHandlers() {
 		List<HandlerMethodReturnValueHandler> handlers = new ArrayList<>(20);
@@ -808,7 +818,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		handlers.add(new DeferredResultMethodReturnValueHandler());
 		handlers.add(new AsyncTaskMethodReturnValueHandler(this.beanFactory));
 
-		// Annotation-based return value types
+		// 基于注解的返回值处理器
 		handlers.add(new ModelAttributeMethodProcessor(false));
 		handlers.add(new RequestResponseBodyMethodProcessor(getMessageConverters(),
 				this.contentNegotiationManager, this.requestResponseBodyAdvice));
@@ -817,7 +827,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		handlers.add(new ViewNameMethodReturnValueHandler());
 		handlers.add(new MapMethodProcessor());
 
-		// Custom return value types
+		// 自定义的返回值处理器
 		if (getCustomReturnValueHandlers() != null) {
 			handlers.addAll(getCustomReturnValueHandlers());
 		}
@@ -915,7 +925,6 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	/**
 	 * 执行处理程序，并返回 {@link ModelAndView}
-	 * if view resolution is required.
 	 * @since 4.2
 	 * @see #createInvocableHandlerMethod(HandlerMethod)
 	 */

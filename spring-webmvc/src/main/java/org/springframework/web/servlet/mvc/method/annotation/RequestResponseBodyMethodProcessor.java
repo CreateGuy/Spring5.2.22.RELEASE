@@ -117,7 +117,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 	}
 
 	/**
-	 * 此返回值处理器只支持带有 {@code ResponseBody} 注解的入参
+	 * 此返回值处理器只支持带有 {@code ResponseBody} 注解的返回值
 	 * @param returnType
 	 * @return
 	 */

@@ -40,6 +40,9 @@ import org.springframework.web.servlet.LocaleContextResolver;
  */
 public abstract class AbstractLocaleContextResolver extends AbstractLocaleResolver implements LocaleContextResolver {
 
+	/**
+	 * 默认时区
+	 */
 	@Nullable
 	private TimeZone defaultTimeZone;
 

@@ -24,32 +24,20 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
- * {@link org.springframework.web.servlet.ThemeResolver} implementation that
- * uses a theme attribute in the user's session in case of a custom setting,
- * with a fallback to the default theme. This is most appropriate if the
- * application needs user sessions anyway.
- *
- * <p>Custom controllers can override the user's theme by calling
- * {@code setThemeName}, e.g. responding to a theme change request.
- *
- * @author Jean-Pierre Pawlak
- * @author Juergen Hoeller
- * @since 17.06.2003
- * @see #setThemeName
+ * 基于 Session 的主题解析器
  */
 public class SessionThemeResolver extends AbstractThemeResolver {
 
 	/**
-	 * Name of the session attribute that holds the theme name.
-	 * Only used internally by this implementation.
-	 * Use {@code RequestContext(Utils).getTheme()}
-	 * to retrieve the current theme in controllers or views.
-	 * @see org.springframework.web.servlet.support.RequestContext#getTheme
-	 * @see org.springframework.web.servlet.support.RequestContextUtils#getTheme
+	 * 保存在会话中的主题的属性名
 	 */
 	public static final String THEME_SESSION_ATTRIBUTE_NAME = SessionThemeResolver.class.getName() + ".THEME";
 
-
+	/**
+	 * 使用特定的主题还是默认主题
+	 * @param request the request to be used for resolution
+	 * @return
+	 */
 	@Override
 	public String resolveThemeName(HttpServletRequest request) {
 		String themeName = (String) WebUtils.getSessionAttribute(request, THEME_SESSION_ATTRIBUTE_NAME);
@@ -57,6 +45,12 @@ public class SessionThemeResolver extends AbstractThemeResolver {
 		return (themeName != null ? themeName : getDefaultThemeName());
 	}
 
+	/**
+	 * 将主题保存到会话中，或者说删除主题
+	 * @param request the request to be used for theme name modification
+	 * @param response the response to be used for theme name modification
+	 * @param themeName the new theme name ({@code null} or empty to reset it)
+	 */
 	@Override
 	public void setThemeName(
 			HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable String themeName) {

@@ -217,7 +217,7 @@ public class CookieGenerator {
 	}
 
 	/**
-	 * 从响应中删除此生成器设置的的cookie。将生成一个空值和最大年龄d的cookie。
+	 * 从响应中删除此生成器设置的的cookie。将生成一个空值和最大年龄的cookie。
 	 * <p>Delegates to {@link #createCookie} for cookie creation.
 	 * @param response the HTTP response to remove the cookie from
 	 * @see #setCookieName

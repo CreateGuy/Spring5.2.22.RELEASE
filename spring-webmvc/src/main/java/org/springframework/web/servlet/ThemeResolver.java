@@ -50,15 +50,14 @@ import org.springframework.lang.Nullable;
 public interface ThemeResolver {
 
 	/**
-	 * Resolve the current theme name via the given request.
-	 * Should return a default theme as fallback in any case.
+	 * 解析请求获得主题返回值
 	 * @param request the request to be used for resolution
 	 * @return the current theme name
 	 */
 	String resolveThemeName(HttpServletRequest request);
 
 	/**
-	 * Set the current theme name to the given one.
+	 * 设置主题
 	 * @param request the request to be used for theme name modification
 	 * @param response the response to be used for theme name modification
 	 * @param themeName the new theme name ({@code null} or empty to reset it)

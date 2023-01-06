@@ -31,9 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.ModelAndViewResolver;
 
 /**
- * This return value handler is intended to be ordered after all others as it
- * attempts to handle _any_ return value type (i.e. returns {@code true} for
- * all return types).
+ * 这个返回值处理器被安排在所有其他返回值类型之后，因为它会处理任何返回值类型
  *
  * <p>The return value is handled either with a {@link ModelAndViewResolver}
  * or otherwise by regarding it as a model attribute if it is a non-simple

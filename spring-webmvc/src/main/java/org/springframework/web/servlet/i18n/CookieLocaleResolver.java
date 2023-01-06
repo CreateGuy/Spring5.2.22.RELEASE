@@ -55,7 +55,7 @@ import org.springframework.web.util.WebUtils;
 public class CookieLocaleResolver extends CookieGenerator implements LocaleContextResolver {
 
 	/**
-	 * 请求域中存储Local的键
+	 * 请求域中存储Locale的键
 	 */
 	public static final String LOCALE_REQUEST_ATTRIBUTE_NAME = CookieLocaleResolver.class.getName() + ".LOCALE";
 
@@ -73,12 +73,12 @@ public class CookieLocaleResolver extends CookieGenerator implements LocaleConte
 	private boolean languageTagCompliant = true;
 
 	/**
-	 * 是否在解析Local失败后忽略异常
+	 * 是否在解析Locale失败后忽略异常
 	 */
 	private boolean rejectInvalidCookies = true;
 
 	/**
-	 * 默认的语言环境
+	 * 默认的语言环境(语言+地区)
 	 */
 	@Nullable
 	private Locale defaultLocale;
@@ -286,7 +286,7 @@ public class CookieLocaleResolver extends CookieGenerator implements LocaleConte
 	}
 
 	/**
-	 * 将传入的Local设置到Cookie中
+	 * 将传入的LocaleContext设置到Cookie中
 	 * @param request the request to be used for locale modification
 	 * @param response the response to be used for locale modification
 	 * @param localeContext the new locale context, or {@code null} to clear the locale

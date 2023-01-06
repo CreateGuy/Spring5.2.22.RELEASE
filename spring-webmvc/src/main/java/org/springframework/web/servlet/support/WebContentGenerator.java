@@ -470,7 +470,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	@SuppressWarnings("deprecation")
 	protected final void applyCacheSeconds(HttpServletResponse response, int cacheSeconds) {
 		if (this.useExpiresHeader || !this.useCacheControlHeader) {
-			// 已弃用HTTpe缓存操作，与之前的Spring版本一样
+			// 已弃用HTTP缓存操作，与之前的Spring版本一样
 			if (cacheSeconds > 0) {
 				cacheForSeconds(response, cacheSeconds);
 			}

@@ -612,7 +612,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return whether the method/constructor is annotated with the given type.
+	 * 返回方法/构造函数是否带有给定类型的注解
 	 * @param annotationType the annotation type to look for
 	 * @since 4.3
 	 * @see #getMethodAnnotation(Class)

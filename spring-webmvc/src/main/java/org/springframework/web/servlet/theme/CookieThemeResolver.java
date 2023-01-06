@@ -28,17 +28,7 @@ import org.springframework.web.util.CookieGenerator;
 import org.springframework.web.util.WebUtils;
 
 /**
- * {@link ThemeResolver} implementation that uses a cookie sent back to the user
- * in case of a custom setting, with a fallback to the default theme.
- * This is particularly useful for stateless applications without user sessions.
- *
- * <p>Custom controllers can thus override the user's theme by calling
- * {@code setThemeName}, e.g. responding to a certain theme change request.
- *
- * @author Jean-Pierre Pawlak
- * @author Juergen Hoeller
- * @since 17.06.2003
- * @see #setThemeName
+ * 基于 Cookie 的主题解析器
  */
 public class CookieThemeResolver extends CookieGenerator implements ThemeResolver {
 
@@ -48,10 +38,7 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 	public static final String ORIGINAL_DEFAULT_THEME_NAME = "theme";
 
 	/**
-	 * Name of the request attribute that holds the theme name. Only used
-	 * for overriding a cookie value if the theme has been changed in the
-	 * course of the current request! Use RequestContext.getTheme() to
-	 * retrieve the current theme in controllers or views.
+	 * 主题名称在请求域中的名称
 	 * @see org.springframework.web.servlet.support.RequestContext#getTheme
 	 */
 	public static final String THEME_REQUEST_ATTRIBUTE_NAME = CookieThemeResolver.class.getName() + ".THEME";
@@ -87,13 +74,13 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 
 	@Override
 	public String resolveThemeName(HttpServletRequest request) {
-		// Check request for preparsed or preset theme.
+		// 先检查请求域中的主题
 		String themeName = (String) request.getAttribute(THEME_REQUEST_ATTRIBUTE_NAME);
 		if (themeName != null) {
 			return themeName;
 		}
 
-		// Retrieve cookie value from request.
+		// 后检查Cookie中的主题
 		String cookieName = getCookieName();
 		if (cookieName != null) {
 			Cookie cookie = WebUtils.getCookie(request, cookieName);
@@ -105,7 +92,7 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 			}
 		}
 
-		// Fall back to default theme.
+		// 请求域和Cookie中都没有，使用默认主题
 		if (themeName == null) {
 			themeName = getDefaultThemeName();
 		}
@@ -113,6 +100,12 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 		return themeName;
 	}
 
+	/**
+	 * 设置主题
+	 * @param request the request to be used for theme name modification
+	 * @param response the response to be used for theme name modification
+	 * @param themeName the new theme name ({@code null} or empty to reset it)
+	 */
 	@Override
 	public void setThemeName(
 			HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable String themeName) {
@@ -120,12 +113,12 @@ public class CookieThemeResolver extends CookieGenerator implements ThemeResolve
 		Assert.notNull(response, "HttpServletResponse is required for CookieThemeResolver");
 
 		if (StringUtils.hasText(themeName)) {
-			// Set request attribute and add cookie.
+			// 将主题设置到请求域中并添加到cookie中
 			request.setAttribute(THEME_REQUEST_ATTRIBUTE_NAME, themeName);
 			addCookie(response, themeName);
 		}
 		else {
-			// Set request attribute to fallback theme and remove cookie.
+			// 将主题设置到请求域中并删除cookie中的属性
 			request.setAttribute(THEME_REQUEST_ATTRIBUTE_NAME, getDefaultThemeName());
 			removeCookie(response);
 		}
