@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartResolver;
 
 /**
- * Annotation that can be used to associate the part of a "multipart/form-data" request
+ * 将请求体中的 multipart/form-data 数据转为JavaBean的注解
  * with a method argument.
  *
  * <p>Supported method argument types include {@link MultipartFile} in conjunction with

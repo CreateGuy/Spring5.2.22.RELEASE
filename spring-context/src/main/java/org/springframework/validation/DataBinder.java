@@ -130,7 +130,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	private final Object target;
 
 	/**
-	 * 返回绑定对象的名称
+	 * 返回绑定参数的名称
 	 */
 	private final String objectName;
 
@@ -285,8 +285,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Create the {@link AbstractPropertyBindingResult} instance using standard
-	 * JavaBean property access.
+	 * 创建 {@link AbstractPropertyBindingResult} 实例
 	 * @since 4.2.1
 	 */
 	protected AbstractPropertyBindingResult createBeanPropertyBindingResult() {
@@ -752,6 +751,17 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 		return getTypeConverter().convertIfNecessary(value, requiredType, methodParam);
 	}
 
+	/**
+	 * 将参数值转为目标类型
+	 * @param value the value to convert
+	 * @param requiredType 目标类型
+	 * (or {@code null} if not known, for example in case of a collection element)
+	 * @param field the reflective field that is the target of the conversion
+	 * (for analysis of generic types; may be {@code null})
+	 * @param <T>
+	 * @return
+	 * @throws TypeMismatchException
+	 */
 	@Override
 	@Nullable
 	public <T> T convertIfNecessary(@Nullable Object value, @Nullable Class<T> requiredType, @Nullable Field field)
@@ -936,9 +946,8 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Invoke the specified Validators, if any, with the given validation hints.
-	 * <p>Note: Validation hints may get ignored by the actual target Validator.
-	 * @param validationHints one or more hint objects to be passed to a {@link SmartValidator}
+	 * 进行参数校验
+	 * @param validationHints 一般都是 Validated 中的 value 的值
 	 * @since 3.1
 	 * @see #setValidator(Validator)
 	 * @see SmartValidator#validate(Object, Errors, Object...)

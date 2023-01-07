@@ -26,8 +26,7 @@ import java.util.Map;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation which indicates that a method parameter should be bound to a web
- * request parameter.
+ * 指示方法参数的取值是从queryString中的
  *
  * <p>Supported for annotated handler methods in Spring MVC and Spring WebFlux
  * as follows:
@@ -64,6 +63,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface RequestParam {
 
 	/**
+	 * 参数名称
 	 * Alias for {@link #name}.
 	 */
 	@AliasFor("name")
@@ -77,19 +77,12 @@ public @interface RequestParam {
 	String name() default "";
 
 	/**
-	 * Whether the parameter is required.
-	 * <p>Defaults to {@code true}, leading to an exception being thrown
-	 * if the parameter is missing in the request. Switch this to
-	 * {@code false} if you prefer a {@code null} value if the parameter is
-	 * not present in the request.
-	 * <p>Alternatively, provide a {@link #defaultValue}, which implicitly
-	 * sets this flag to {@code false}.
+	 * 是否必填
 	 */
 	boolean required() default true;
 
 	/**
-	 * The default value to use as a fallback when the request parameter is
-	 * not provided or has an empty value.
+	 * 当请求参数未提供或为空值时使用的默认值。
 	 * <p>Supplying a default value implicitly sets {@link #required} to
 	 * {@code false}.
 	 */

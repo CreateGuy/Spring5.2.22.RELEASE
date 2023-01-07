@@ -42,7 +42,7 @@ import org.springframework.web.util.WebUtils;
 public final class MultipartResolutionDelegate {
 
 	/**
-	 * Indicates an unresolvable value.
+	 * 无效值
 	 */
 	public static final Object UNRESOLVABLE = new Object();
 
@@ -69,6 +69,11 @@ public final class MultipartResolutionDelegate {
 				isMultipartContent(request));
 	}
 
+	/**
+	 * 客户端是否要求服务端以 multipart 进行解析
+	 * @param request
+	 * @return
+	 */
 	private static boolean isMultipartContent(HttpServletRequest request) {
 		String contentType = request.getContentType();
 		return (contentType != null && contentType.toLowerCase().startsWith("multipart/"));
@@ -82,7 +87,11 @@ public final class MultipartResolutionDelegate {
 		return new StandardMultipartHttpServletRequest(request);
 	}
 
-
+	/**
+	 * 是否是 Multipart 参数
+	 * @param parameter
+	 * @return
+	 */
 	public static boolean isMultipartArgument(MethodParameter parameter) {
 		Class<?> paramType = parameter.getNestedParameterType();
 		return (MultipartFile.class == paramType ||
@@ -90,26 +99,38 @@ public final class MultipartResolutionDelegate {
 				(Part.class == paramType || isPartCollection(parameter) || isPartArray(parameter)));
 	}
 
+	/**
+	 * 如果是 {@code Multipart} 参数，那么就进行解析
+	 * @param name
+	 * @param parameter
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@Nullable
 	public static Object resolveMultipartArgument(String name, MethodParameter parameter, HttpServletRequest request)
 			throws Exception {
 
 		MultipartHttpServletRequest multipartRequest =
 				WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);
+		// 客户端是否要求服务端以 multipart 进行解析
 		boolean isMultipart = (multipartRequest != null || isMultipartContent(request));
 
+		// 参数是否是 multipart 类型
 		if (MultipartFile.class == parameter.getNestedParameterType()) {
 			if (multipartRequest == null && isMultipart) {
 				multipartRequest = new StandardMultipartHttpServletRequest(request);
 			}
 			return (multipartRequest != null ? multipartRequest.getFile(name) : null);
 		}
+		// 如果参数是集合那么泛型是否是 MultipartFile 类型
 		else if (isMultipartFileCollection(parameter)) {
 			if (multipartRequest == null && isMultipart) {
 				multipartRequest = new StandardMultipartHttpServletRequest(request);
 			}
 			return (multipartRequest != null ? multipartRequest.getFiles(name) : null);
 		}
+		// 判断参数是数组那么判断组件类型是否是 MultipartFile 类型
 		else if (isMultipartFileArray(parameter)) {
 			if (multipartRequest == null && isMultipart) {
 				multipartRequest = new StandardMultipartHttpServletRequest(request);
@@ -122,12 +143,15 @@ public final class MultipartResolutionDelegate {
 				return null;
 			}
 		}
+		// 判断参数是否是 Part 类型
 		else if (Part.class == parameter.getNestedParameterType()) {
 			return (isMultipart ? request.getPart(name): null);
 		}
+		// 判断参数是集合那么泛型是否是 Part 类型
 		else if (isPartCollection(parameter)) {
 			return (isMultipart ? resolvePartList(request, name) : null);
 		}
+		// 判断参数是数组那么判断组件类型是否是 Part 类型
 		else if (isPartArray(parameter)) {
 			return (isMultipart ? resolvePartList(request, name).toArray(new Part[0]) : null);
 		}
@@ -136,22 +160,47 @@ public final class MultipartResolutionDelegate {
 		}
 	}
 
+	/**
+	 * 判断参数是集合那么泛型是否是 {@code MultipartFile}
+	 * @param methodParam
+	 * @return
+	 */
 	private static boolean isMultipartFileCollection(MethodParameter methodParam) {
 		return (MultipartFile.class == getCollectionParameterType(methodParam));
 	}
 
+	/**
+	 * 判断参数是数组那么判断组件类型是否是 {@code MultipartFile}
+	 * @param methodParam
+	 * @return
+	 */
 	private static boolean isMultipartFileArray(MethodParameter methodParam) {
 		return (MultipartFile.class == methodParam.getNestedParameterType().getComponentType());
 	}
 
+	/**
+	 * 判断参数是集合那么泛型是否是 {@code Part}
+	 * @param methodParam
+	 * @return
+	 */
 	private static boolean isPartCollection(MethodParameter methodParam) {
 		return (Part.class == getCollectionParameterType(methodParam));
 	}
 
+	/**
+	 * 判断参数是数组那么判断组件类型是否是 {@code Part}
+	 * @param methodParam
+	 * @return
+	 */
 	private static boolean isPartArray(MethodParameter methodParam) {
 		return (Part.class == methodParam.getNestedParameterType().getComponentType());
 	}
 
+	/**
+	 * 返回集合的类型(泛型)
+	 * @param methodParam
+	 * @return
+	 */
 	@Nullable
 	private static Class<?> getCollectionParameterType(MethodParameter methodParam) {
 		Class<?> paramType = methodParam.getNestedParameterType();

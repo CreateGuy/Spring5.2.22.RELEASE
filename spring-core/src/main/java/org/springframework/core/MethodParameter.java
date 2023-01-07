@@ -352,8 +352,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return a variant of this {@code MethodParameter} which points to the
-	 * same parameter but one nesting level deeper.
+	 * 返回此MethodParameter的一个变体，它指向相同的参数，但更深一层嵌套
 	 * @since 4.3
 	 */
 	public MethodParameter nested() {
@@ -538,7 +537,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the nested type of the method/constructor parameter.
+	 * 返回方法/构造函数参数的嵌套类型
 	 * @return the parameter type (never {@code null})
 	 * @since 3.1
 	 * @see #getNestingLevel()
@@ -670,7 +669,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * 确定参数是否又指定注解
+	 * 确定参数是否有指定注解
 	 * @param annotationType the annotation type to look for
 	 * @see #getParameterAnnotation(Class)
 	 */
@@ -689,7 +688,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the name of the method/constructor parameter.
+	 * 返回方法/构造函数参数的名称
 	 * @return the parameter name (may be {@code null} if no
 	 * parameter name metadata is contained in the class file or no
 	 * {@link #initParameterNameDiscovery ParameterNameDiscoverer}

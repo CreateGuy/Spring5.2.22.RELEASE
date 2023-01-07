@@ -20,15 +20,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Context object for evaluating an expression within a bean definition.
- *
- * @author Juergen Hoeller
- * @since 3.0
+ * 上下文对象，用于计算容器或者作用范围类是否有某些参数
  */
 public class BeanExpressionContext {
 
+	/**
+	 * 一般情况都是 {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+	 */
 	private final ConfigurableBeanFactory beanFactory;
 
+	/**
+	 * 作用域范围，比如说 {@link RequestScope}， {@link SessionScope}
+	 */
 	@Nullable
 	private final Scope scope;
 
