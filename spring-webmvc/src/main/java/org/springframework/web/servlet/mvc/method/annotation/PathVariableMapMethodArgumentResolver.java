@@ -33,7 +33,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * Resolves {@link Map} method arguments annotated with an @{@link PathVariable}
+ * 解析 {@link Map} +  @{@link PathVariable} 的参数解析器
  * where the annotation does not specify a path variable name. The created
  * {@link Map} contains all URI template name/value pairs.
  *
@@ -47,11 +47,12 @@ public class PathVariableMapMethodArgumentResolver implements HandlerMethodArgum
 	public boolean supportsParameter(MethodParameter parameter) {
 		PathVariable ann = parameter.getParameterAnnotation(PathVariable.class);
 		return (ann != null && Map.class.isAssignableFrom(parameter.getParameterType()) &&
+				// 不能设置参数名称，不然会被 PathVariableMethodArgumentResolver 支持
 				!StringUtils.hasText(ann.value()));
 	}
 
 	/**
-	 * Return a Map with all URI template variables or an empty map.
+	 * 直接拿到所有的路径变量然后返回
 	 */
 	@Override
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,

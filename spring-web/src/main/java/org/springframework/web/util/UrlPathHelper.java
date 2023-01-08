@@ -585,6 +585,7 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 解码路径变量
 	 * Decode the given URI path variables via {@link #decodeRequestString} unless
 	 * {@link #setUrlDecode} is set to {@code true} in which case it is assumed
 	 * the URL path from which the variables were extracted is already decoded

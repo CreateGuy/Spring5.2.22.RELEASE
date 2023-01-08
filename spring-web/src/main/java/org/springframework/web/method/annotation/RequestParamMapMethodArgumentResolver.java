@@ -39,8 +39,7 @@ import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.multipart.support.MultipartResolutionDelegate;
 
 /**
- * Resolves {@link Map} method arguments annotated with an @{@link RequestParam}
- * where the annotation does not specify a request parameter name.
+ * 处理 @{@link RequestParam} + {@link Map} 的参数的参数解析器
  *
  * <p>The created {@link Map} contains all request parameter name/value pairs,
  * or all multipart files for a given parameter name if specifically declared
@@ -60,6 +59,11 @@ import org.springframework.web.multipart.support.MultipartResolutionDelegate;
  */
 public class RequestParamMapMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+	/**
+	 * 此参数解析器只支持 @{@code RequestParam} + {@code Map}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		RequestParam requestParam = parameter.getParameterAnnotation(RequestParam.class);
@@ -71,10 +75,12 @@ public class RequestParamMapMethodArgumentResolver implements HandlerMethodArgum
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 参数泛型
 		ResolvableType resolvableType = ResolvableType.forMethodParameter(parameter);
 
+		// MultiValueMap的情况
 		if (MultiValueMap.class.isAssignableFrom(parameter.getParameterType())) {
-			// MultiValueMap
+			// 拿到value的类型
 			Class<?> valueType = resolvableType.as(MultiValueMap.class).getGeneric(1).resolve();
 			if (valueType == MultipartFile.class) {
 				MultipartRequest multipartRequest = MultipartResolutionDelegate.resolveMultipartRequest(webRequest);
@@ -93,6 +99,7 @@ public class RequestParamMapMethodArgumentResolver implements HandlerMethodArgum
 				return new LinkedMultiValueMap<>(0);
 			}
 			else {
+				// 其他情况都当value是 LinkedMultiValueMap 来处理
 				Map<String, String[]> parameterMap = webRequest.getParameterMap();
 				MultiValueMap<String, String> result = new LinkedMultiValueMap<>(parameterMap.size());
 				parameterMap.forEach((key, values) -> {
@@ -103,9 +110,9 @@ public class RequestParamMapMethodArgumentResolver implements HandlerMethodArgum
 				return result;
 			}
 		}
-
+		// 常规的Map
 		else {
-			// Regular Map
+			// 拿到value的类型
 			Class<?> valueType = resolvableType.asMap().getGeneric(1).resolve();
 			if (valueType == MultipartFile.class) {
 				MultipartRequest multipartRequest = MultipartResolutionDelegate.resolveMultipartRequest(webRequest);

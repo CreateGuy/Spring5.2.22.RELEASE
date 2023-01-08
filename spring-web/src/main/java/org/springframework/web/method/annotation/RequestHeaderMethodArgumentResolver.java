@@ -57,12 +57,22 @@ public class RequestHeaderMethodArgumentResolver extends AbstractNamedValueMetho
 	}
 
 
+	/**
+	 * 此参数解析器只支持标注了 {@link RequestHeader} 注解的参数
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return (parameter.hasParameterAnnotation(RequestHeader.class) &&
 				!Map.class.isAssignableFrom(parameter.nestedIfOptional().getNestedParameterType()));
 	}
 
+	/**
+	 * 创建 {@code RequestHeader} 的 {@code NamedValueInfo}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		RequestHeader ann = parameter.getParameterAnnotation(RequestHeader.class);
@@ -87,7 +97,9 @@ public class RequestHeaderMethodArgumentResolver extends AbstractNamedValueMetho
 		throw new MissingRequestHeaderException(name, parameter);
 	}
 
-
+	/**
+	 * {@link RequestHeader} 对应的 NamedValueInfo
+	 */
 	private static final class RequestHeaderNamedValueInfo extends NamedValueInfo {
 
 		private RequestHeaderNamedValueInfo(RequestHeader annotation) {

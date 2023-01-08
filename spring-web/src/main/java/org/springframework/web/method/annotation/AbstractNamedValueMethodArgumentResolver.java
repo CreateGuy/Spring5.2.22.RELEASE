@@ -174,10 +174,9 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	}
 
 	/**
-	 * Create the {@link NamedValueInfo} object for the given method parameter. Implementations typically
-	 * retrieve the method annotation by means of {@link MethodParameter#getParameterAnnotation(Class)}.
-	 * @param parameter the method parameter
-	 * @return the named value information
+	 * 创建对应注解的 {@link NamedValueInfo}
+	 * @param parameter
+	 * @return
 	 */
 	protected abstract NamedValueInfo createNamedValueInfo(MethodParameter parameter);
 
@@ -233,8 +232,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 			throws Exception;
 
 	/**
-	 * Invoked when a named value is required, but {@link #resolveName(String, MethodParameter, NativeWebRequest)}
-	 * returned {@code null} and there is no default value. Subclasses typically throw an exception in this case.
+	 * 当无法解析到参数的时候调用
 	 * @param name the name for the value
 	 * @param parameter the method parameter
 	 * @param request the current request
@@ -247,10 +245,10 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 	}
 
 	/**
-	 * Invoked when a named value is required, but {@link #resolveName(String, MethodParameter, NativeWebRequest)}
-	 * returned {@code null} and there is no default value. Subclasses typically throw an exception in this case.
-	 * @param name the name for the value
-	 * @param parameter the method parameter
+	 * 没有找到参数值的回调
+	 * @param name
+	 * @param parameter
+	 * @throws ServletException
 	 */
 	protected void handleMissingValue(String name, MethodParameter parameter) throws ServletException {
 		throw new ServletRequestBindingException("Missing argument '" + name +

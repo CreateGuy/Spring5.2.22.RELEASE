@@ -42,7 +42,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Resolves method arguments annotated with an @{@link PathVariable}.
+ * 解析标注了 @{@link PathVariable} 注解的参数值的参数解析器
  *
  * <p>An @{@link PathVariable} is a named value that gets resolved from a URI template variable.
  * It is always required and does not have a default value to fall back on. See the base class
@@ -70,9 +70,11 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
+		// 只支持带有 PathVariable 注解的参数
 		if (!parameter.hasParameterAnnotation(PathVariable.class)) {
 			return false;
 		}
+		// 如果是参数类型是Map就必须要求制定路径值放在哪个key上了
 		if (Map.class.isAssignableFrom(parameter.nestedIfOptional().getNestedParameterType())) {
 			PathVariable pathVariable = parameter.getParameterAnnotation(PathVariable.class);
 			return (pathVariable != null && StringUtils.hasText(pathVariable.value()));
@@ -91,21 +93,37 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
+		// 路径变量在 RequestMappingHandlerMapping 就已经暴露在请求域中了
 		Map<String, String> uriTemplateVars = (Map<String, String>) request.getAttribute(
 				HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
 		return (uriTemplateVars != null ? uriTemplateVars.get(name) : null);
 	}
 
+	/**
+	 * 无法解析到参数值的时候抛出异常
+	 * @param name the name for the value
+	 * @param parameter the method parameter
+	 * @throws ServletRequestBindingException
+	 */
 	@Override
 	protected void handleMissingValue(String name, MethodParameter parameter) throws ServletRequestBindingException {
 		throw new MissingPathVariableException(name, parameter);
 	}
 
+	/**
+	 * 处理解析后的参数值
+	 * @param arg the resolved argument value
+	 * @param name the argument name
+	 * @param parameter the argument parameter type
+	 * @param mavContainer the {@link ModelAndViewContainer} (may be {@code null})
+	 * @param request
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void handleResolvedValue(@Nullable Object arg, String name, MethodParameter parameter,
 			@Nullable ModelAndViewContainer mavContainer, NativeWebRequest request) {
 
+		// 将要使用的 PathVariables 参数值暴露到请求域中
 		String key = View.PATH_VARIABLES;
 		int scope = RequestAttributes.SCOPE_REQUEST;
 		Map<String, Object> pathVars = (Map<String, Object>) request.getAttribute(key, scope);
@@ -143,7 +161,9 @@ public class PathVariableMethodArgumentResolver extends AbstractNamedValueMethod
 		}
 	}
 
-
+	/**
+	 * 表示 {@link PathVariable} 的NamedValueInfo
+	 */
 	private static class PathVariableNamedValueInfo extends NamedValueInfo {
 
 		public PathVariableNamedValueInfo(PathVariable annotation) {
