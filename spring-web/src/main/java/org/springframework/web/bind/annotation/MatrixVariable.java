@@ -25,22 +25,8 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation which indicates that a method parameter should be bound to a
- * name-value pair within a path segment. Supported for {@link RequestMapping}
- * annotated handler methods.
- *
- * <p>If the method parameter type is {@link java.util.Map} and a matrix variable
- * name is specified, then the matrix variable value is converted to a
- * {@link java.util.Map} assuming an appropriate conversion strategy is available.
- *
- * <p>If the method parameter is {@link java.util.Map Map&lt;String, String&gt;} or
- * {@link org.springframework.util.MultiValueMap MultiValueMap&lt;String, String&gt;}
- * and a variable name is not specified, then the map is populated with all
- * matrix variable names and values.
- *
- * @author Rossen Stoyanchev
- * @author Sam Brannen
- * @since 3.2
+ * 专门解析矩阵值的
+ * <ul><li>/request;username=admin;password=123456;age=20</li></ul>
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
@@ -62,9 +48,7 @@ public @interface MatrixVariable {
 	String name() default "";
 
 	/**
-	 * The name of the URI path variable where the matrix variable is located,
-	 * if necessary for disambiguation (e.g. a matrix variable with the same
-	 * name present in more than one path segment).
+	 * 当多级目录的时候，指定具体位置
 	 */
 	String pathVar() default ValueConstants.DEFAULT_NONE;
 
@@ -79,9 +63,7 @@ public @interface MatrixVariable {
 	boolean required() default true;
 
 	/**
-	 * The default value to use as a fallback.
-	 * <p>Supplying a default value implicitly sets {@link #required} to
-	 * {@code false}.
+	 * 如果设置为必穿，但是没有找到值，就是默认值
 	 */
 	String defaultValue() default ValueConstants.DEFAULT_NONE;
 

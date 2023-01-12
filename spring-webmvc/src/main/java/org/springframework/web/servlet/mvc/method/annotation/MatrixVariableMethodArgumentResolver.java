@@ -36,16 +36,12 @@ import org.springframework.web.method.annotation.AbstractNamedValueMethodArgumen
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
- * Resolves arguments annotated with {@link MatrixVariable @MatrixVariable}.
- *
- * <p>If the method parameter is of type {@link Map} it will by resolved by
- * {@link MatrixVariableMapMethodArgumentResolver} instead unless the annotation
- * specifies a name in which case it is considered to be a single attribute of
- * type map (vs multiple attributes collected in a map).
- *
- * @author Rossen Stoyanchev
- * @author Sam Brannen
- * @since 3.2
+ * 解析使用了 @{@link MatrixVariable @MatrixVariable} 的参数
+ * <ul>
+ *     <li>是解析矩阵值，eg：/request;username=admin;password=123456;age=20</li>
+ *     <li>如果方法参数是Map类型，它将被 {@link MatrixVariableMapMethodArgumentResolver}解析</li>
+ *     <li>除非注解指定了一个名称，在这种情况下，它被认为是解析出来的参数将会被放到Map类型的单个属性中</li>
+ * </ul>
  */
 public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
@@ -53,12 +49,17 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 		super(null);
 	}
 
-
+	/**
+	 * 此参数解析器只能解析 {@code MatrixVariable} 或者是解析为Map中的单个参数
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		if (!parameter.hasParameterAnnotation(MatrixVariable.class)) {
 			return false;
 		}
+		// 如果是Map看泛型对应是否有指定@MatrixVariable
 		if (Map.class.isAssignableFrom(parameter.nestedIfOptional().getNestedParameterType())) {
 			MatrixVariable matrixVariable = parameter.getParameterAnnotation(MatrixVariable.class);
 			return (matrixVariable != null && StringUtils.hasText(matrixVariable.name()));
@@ -66,6 +67,11 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 		return true;
 	}
 
+	/**
+	 * 创建对应的 {@code NamedValueInfo}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		MatrixVariable ann = parameter.getParameterAnnotation(MatrixVariable.class);
@@ -77,6 +83,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) throws Exception {
+		// 拿到通过 RequestMappingHandlerMapping 设置过的矩阵变量值
 		Map<String, MultiValueMap<String, String>> pathParameters = (Map<String, MultiValueMap<String, String>>)
 				request.getAttribute(HandlerMapping.MATRIX_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
 		if (CollectionUtils.isEmpty(pathParameters)) {
@@ -88,6 +95,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 		String pathVar = ann.pathVar();
 		List<String> paramValues = null;
 
+		// 如果指定的参数的位置的话，从指定位置读取值，比如说user.id
 		if (!pathVar.equals(ValueConstants.DEFAULT_NONE)) {
 			if (pathParameters.containsKey(pathVar)) {
 				paramValues = pathParameters.get(pathVar).get(name);
@@ -98,6 +106,7 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 			paramValues = new ArrayList<>();
 			for (MultiValueMap<String, String> params : pathParameters.values()) {
 				if (params.containsKey(name)) {
+					// 如果出现了重复的参数名
 					if (found) {
 						String paramType = parameter.getNestedParameterType().getName();
 						throw new ServletRequestBindingException(
@@ -121,12 +130,20 @@ public class MatrixVariableMethodArgumentResolver extends AbstractNamedValueMeth
 		}
 	}
 
+	/**
+	 * 未找到具体参数值，就直接抛出异常
+	 * @param name
+	 * @param parameter
+	 * @throws ServletRequestBindingException
+	 */
 	@Override
 	protected void handleMissingValue(String name, MethodParameter parameter) throws ServletRequestBindingException {
 		throw new MissingMatrixVariableException(name, parameter);
 	}
 
-
+	/**
+	 * 此参数解析器对应的 {@link NamedValueInfo}
+	 */
 	private static final class MatrixVariableNamedValueInfo extends NamedValueInfo {
 
 		private MatrixVariableNamedValueInfo(MatrixVariable annotation) {

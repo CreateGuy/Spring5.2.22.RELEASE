@@ -144,12 +144,13 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 		// 将请求路径暴露到请求域中
 		request.setAttribute(BEST_MATCHING_PATTERN_ATTRIBUTE, bestPattern);
 
+		// 解码矩阵变量，然后暴露在请求域中
 		if (isMatrixVariableContentAvailable()) {
 			Map<String, MultiValueMap<String, String>> matrixVars = extractMatrixVariables(request, uriVariables);
 			request.setAttribute(HandlerMapping.MATRIX_VARIABLES_ATTRIBUTE, matrixVars);
 		}
 
-		// 解码路径变量，然后暴露在请求域中
+		// 解码Rest变量，然后暴露在请求域中
 		Map<String, String> decodedUriVariables = getUrlPathHelper().decodePathVariables(request, uriVariables);
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, decodedUriVariables);
 
@@ -164,6 +165,12 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 		return !getUrlPathHelper().shouldRemoveSemicolonContent();
 	}
 
+	/**
+	 * 暴露矩阵变量值
+	 * @param request
+	 * @param uriVariables
+	 * @return
+	 */
 	private Map<String, MultiValueMap<String, String>> extractMatrixVariables(
 			HttpServletRequest request, Map<String, String> uriVariables) {
 
