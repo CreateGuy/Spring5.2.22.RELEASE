@@ -163,18 +163,19 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 					bindRequestParameters(binder, webRequest);
 				}
 				validateIfApplicable(binder, parameter);
+				// 绑定过程中如果出现了异常并且不允许致命异常，那么抛出异常
 				if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
 					throw new BindException(binder.getBindingResult());
 				}
 			}
-			// Value type adaptation, also covering java.util.Optional
+			// 当参数值和指定参数类型不匹配的时候，进行转换
 			if (!parameter.getParameterType().isInstance(attribute)) {
 				attribute = binder.convertIfNecessary(binder.getTarget(), parameter.getParameterType(), parameter);
 			}
 			bindingResult = binder.getBindingResult();
 		}
 
-		// Add resolved attribute and BindingResult at the end of the model
+		// 在模型的最后面添加有关绑定的相关参数
 		Map<String, Object> bindingResultModel = bindingResult.getModel();
 		mavContainer.removeAttributes(bindingResultModel);
 		mavContainer.addAllAttributes(bindingResultModel);
@@ -432,7 +433,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	}
 
 	/**
-	 * Whether to raise a fatal bind exception on validation errors.
+	 * 是否允许致命异常
 	 * <p>The default implementation delegates to {@link #isBindExceptionRequired(MethodParameter)}.
 	 * @param binder the data binder used to perform data binding
 	 * @param parameter the method parameter declaration
@@ -444,7 +445,8 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	}
 
 	/**
-	 * Whether to raise a fatal bind exception on validation errors.
+	 * 当指定指定参数的后面是一个 {@code Errors} 时，返回true
+	 * <p>比如说倒数第二个参数抛出了异常，那么倒数第一个是异常类型，那么就可以丢给处理程序处理</p>
 	 * @param parameter the method parameter declaration
 	 * @return {@code true} if the next method parameter is not of type {@link Errors}
 	 * @since 5.0

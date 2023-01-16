@@ -260,14 +260,8 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	//---------------------------------------------------------------------
 
 	/**
-	 * Return a model Map for the obtained state, exposing an Errors
-	 * instance as '{@link #MODEL_KEY_PREFIX MODEL_KEY_PREFIX} + objectName'
-	 * and the object itself.
-	 * <p>Note that the Map is constructed every time you're calling this method.
-	 * Adding things to the map and then re-calling this method will not work.
-	 * <p>The attributes in the model Map returned by this method are usually
-	 * included in the ModelAndView for a form view that uses Spring's bind tag,
-	 * which needs access to the Errors instance.
+	 * 将此BinderResult对应的参数和自身包装为一个Map，然后返回
+	 * <p>此方法返回的Map中的属性通常包含在Spring的ModelAndView中的Model中</p>
 	 * @see #getObjectName
 	 * @see #MODEL_KEY_PREFIX
 	 */
