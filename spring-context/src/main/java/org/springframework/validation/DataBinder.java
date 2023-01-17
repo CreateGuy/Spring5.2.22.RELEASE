@@ -951,6 +951,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 		BindingResult bindingResult = getBindingResult();
 		// 所有校验器都去校验
 		for (Validator validator : getValidators()) {
+			// Spring用的都是hibernate的，没看
 			if (!ObjectUtils.isEmpty(validationHints) && validator instanceof SmartValidator) {
 				((SmartValidator) validator).validate(target, bindingResult, validationHints);
 			}

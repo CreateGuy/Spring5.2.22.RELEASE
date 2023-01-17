@@ -345,8 +345,7 @@ public abstract class CollectionUtils {
 	}
 
 	/**
-	 * Retrieve the last element of the given Set, using {@link SortedSet#last()}
-	 * or otherwise iterating over all elements (assuming a linked set).
+	 * 返回最后一个元素
 	 * @param set the Set to check (may be {@code null} or empty)
 	 * @return the last element, or {@code null} if none
 	 * @since 5.0.3

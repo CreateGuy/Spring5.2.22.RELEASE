@@ -29,7 +29,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolves {@link Errors} method arguments.
+ * 解析方法入参为 {@link Errors} 类型的参数解析器
  *
  * <p>An {@code Errors} method argument is expected to appear immediately after
  * the model attribute in the method signature. It is resolved by expecting the
@@ -42,6 +42,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 public class ErrorsMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+	/**
+	 * 此参数解析器只支持 {@code Errors}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> paramType = parameter.getParameterType();
@@ -58,11 +63,15 @@ public class ErrorsMethodArgumentResolver implements HandlerMethodArgumentResolv
 				"Errors/BindingResult argument only supported on regular handler methods");
 
 		ModelMap model = mavContainer.getModel();
+		// 返回model最后一个属性
 		String lastKey = CollectionUtils.lastElement(model.keySet());
+		// 如果是有关 BindingResult 的属性
 		if (lastKey != null && lastKey.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
+			// 直接返回，BindingResult 也是一个 Errors
 			return model.get(lastKey);
 		}
 
+		// Errors/BindingResult 应该在 @RequestBody 和 @RequestPart等等之后
 		throw new IllegalStateException(
 				"An Errors/BindingResult argument is expected to be declared immediately after " +
 				"the model attribute, the @RequestBody or the @RequestPart arguments " +
