@@ -1196,20 +1196,21 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * 检查是否是文件请求，如果是就将文件数据解析成 MultipartFile 并封装在 request 中
+	 * 检查是否是多部分请求，如果是就将文件数据解析成 MultipartFile 并封装在 request 中
 	 * <p>If no multipart resolver is set, simply use the existing request.
 	 * @param request current HTTP request
 	 * @return the processed request (multipart wrapper if necessary)
 	 * @see MultipartResolver#resolveMultipart
 	 */
 	protected HttpServletRequest checkMultipart(HttpServletRequest request) throws MultipartException {
-		// 检查是否是文件请求
+		// 检查是否是多部分请求
 		if (this.multipartResolver != null && this.multipartResolver.isMultipart(request)) {
 			if (WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class) != null) {
 				if (request.getDispatcherType().equals(DispatcherType.REQUEST)) {
 					logger.trace("Request already resolved to MultipartHttpServletRequest, e.g. by MultipartFilter");
 				}
 			}
+			// 检查是否在派发过程中出现了多部分异常
 			else if (hasMultipartException(request)) {
 				logger.debug("Multipart resolution previously failed for current request - " +
 						"skipping re-resolution for undisturbed error rendering");
@@ -1235,10 +1236,12 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Check "javax.servlet.error.exception" attribute for a multipart exception.
+	 * 检查是否在派发过程中出现了多部分异常
 	 */
 	private boolean hasMultipartException(HttpServletRequest request) {
+		// 检查后发现这请求域参数通常在派发过程中异常处理代码中设置过
 		Throwable error = (Throwable) request.getAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE);
+		// 溯源找异常的类型
 		while (error != null) {
 			if (error instanceof MultipartException) {
 				return true;
@@ -1347,12 +1350,13 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 			}
 		}
+		// 当能够从异常解析器中获得模型和视图的时候
 		if (exMv != null) {
 			if (exMv.isEmpty()) {
 				request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 				return null;
 			}
-			// We might still need view name translation for a plain error model...
+			// 如果是普通的错误类型，通过视图名解析器获得视图名
 			if (!exMv.hasView()) {
 				String defaultViewName = getDefaultViewName(request);
 				if (defaultViewName != null) {
@@ -1365,6 +1369,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			else if (logger.isDebugEnabled()) {
 				logger.debug("Using resolved error view: " + exMv);
 			}
+			// 往请求域中暴露在派发过程中出现的异常
 			WebUtils.exposeErrorRequestAttributes(request, ex, getServletName());
 			return exMv;
 		}

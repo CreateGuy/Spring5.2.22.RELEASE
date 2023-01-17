@@ -88,7 +88,7 @@ public final class MultipartResolutionDelegate {
 	}
 
 	/**
-	 * 是否是 Multipart 参数
+	 * 是否是有关 Multipart 参数
 	 * @param parameter
 	 * @return
 	 */
@@ -111,6 +111,7 @@ public final class MultipartResolutionDelegate {
 	public static Object resolveMultipartArgument(String name, MethodParameter parameter, HttpServletRequest request)
 			throws Exception {
 
+		// 拿到底层的MultipartHttpServletRequest请求，如果有
 		MultipartHttpServletRequest multipartRequest =
 				WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);
 		// 客户端是否要求服务端以 multipart 进行解析

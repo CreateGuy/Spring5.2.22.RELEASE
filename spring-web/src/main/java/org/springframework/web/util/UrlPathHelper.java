@@ -34,7 +34,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * URL路径匹配的帮助类。在f@code RequestDispatcher include中提供对uRL路径的支持，并支持一致的URL解码。
+ * URL路径匹配的帮助类。在@{@code RequestDispatcher include中提供对uRL路径的支持，并支持一致的URL解码。
  *
  * <p>Used by {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}
  * and {@link org.springframework.web.servlet.support.RequestContext} for path matching
@@ -64,6 +64,9 @@ public class UrlPathHelper {
 
 	private boolean alwaysUseFullPath = false;
 
+	/**
+	 * 是否解码
+	 */
 	private boolean urlDecode = true;
 
 	private boolean removeSemicolonContent = true;
@@ -494,6 +497,7 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 解码传入的字符串
 	 * Decode the given source string with a URLDecoder. The encoding will be taken
 	 * from the request, falling back to the default "ISO-8859-1".
 	 * <p>The default implementation uses {@code URLDecoder.decode(input, enc)}.

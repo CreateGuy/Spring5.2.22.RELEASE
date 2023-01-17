@@ -63,6 +63,7 @@ import org.springframework.util.ReflectionUtils;
 public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements BeanWrapper {
 
 	/**
+	 * 对内省机制中获得的数据的缓存
 	 * Cached introspections results for this object, to prevent encountering
 	 * the cost of JavaBeans introspection every time.
 	 */

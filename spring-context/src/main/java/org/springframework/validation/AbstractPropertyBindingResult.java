@@ -180,8 +180,8 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 
 
 	/**
-	 * Provide the PropertyAccessor to work with, according to the
-	 * concrete strategy of access.
+	 * 根据具体的访问策略，提供使用的PropertyAccessor
+	 * <p>SpringBoot中一般都是对应 {@link org.springframework.beans.BeanWrapperImpl}</p>
 	 * <p>Note that a PropertyAccessor used by a BindingResult should
 	 * always have its "extractOldValueForEditor" flag set to "true"
 	 * by default, since this is typically possible without side effects

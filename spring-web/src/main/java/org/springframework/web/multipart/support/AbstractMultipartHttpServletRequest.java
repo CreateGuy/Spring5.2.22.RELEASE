@@ -44,6 +44,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public abstract class AbstractMultipartHttpServletRequest extends HttpServletRequestWrapper
 		implements MultipartHttpServletRequest {
 
+	/**
+	 * 多部分请求中的文件参数，是文件名作为键
+	 */
 	@Nullable
 	private MultiValueMap<String, MultipartFile> multipartFiles;
 
@@ -123,8 +126,7 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 
 
 	/**
-	 * Set a Map with parameter names as keys and list of MultipartFile objects as values.
-	 * To be invoked by subclasses on initialization.
+	 * 保存多部分请求中的文件参数
 	 */
 	protected final void setMultipartFiles(MultiValueMap<String, MultipartFile> multipartFiles) {
 		this.multipartFiles =

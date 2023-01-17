@@ -745,7 +745,7 @@ public abstract class StringUtils {
 	}
 
 	/**
-	 * Decode the given encoded URI component value. Based on the following rules:
+	 * 解码传入的字符串。根据以下规则:
 	 * <ul>
 	 * <li>Alphanumeric characters {@code "a"} through {@code "z"}, {@code "A"} through {@code "Z"},
 	 * and {@code "0"} through {@code "9"} stay the same.</li>

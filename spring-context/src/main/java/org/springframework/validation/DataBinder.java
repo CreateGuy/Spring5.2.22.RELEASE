@@ -124,7 +124,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	protected static final Log logger = LogFactory.getLog(DataBinder.class);
 
 	/**
-	 * 要绑定属性的对象
+	 * 要绑定属性的值
 	 */
 	@Nullable
 	private final Object target;

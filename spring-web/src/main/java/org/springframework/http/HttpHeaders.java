@@ -176,7 +176,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	public static final String CONTENT_ENCODING = "Content-Encoding";
 
 	/**
-	 * 表示客户端应该如果处理响应内容
+	 * 表示应该如何处理响应内容
 	 * <ol>
 	 *     <li>
 	 *         response.setHeader("Content-disposition", "attachment;filename=" +filename)：以附件的情况进行下载

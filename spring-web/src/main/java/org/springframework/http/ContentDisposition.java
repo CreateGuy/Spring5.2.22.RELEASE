@@ -48,15 +48,27 @@ public final class ContentDisposition {
 			"Invalid header field parameter format (as defined in RFC 5987)";
 
 
+	/**
+	 * 参数类型，比如说form-data
+	 */
 	@Nullable
 	private final String type;
 
+	/**
+	 * 参数名称
+	 */
 	@Nullable
 	private final String name;
 
+	/**
+	 * 如果是文件类型，那就是文件名称
+	 */
 	@Nullable
 	private final String filename;
 
+	/**
+	 * 编码规则
+	 */
 	@Nullable
 	private final Charset charset;
 
@@ -271,7 +283,8 @@ public final class ContentDisposition {
 	}
 
 	/**
-	 * Parse a {@literal Content-Disposition} header value as defined in RFC 2183.
+	 * 解析RFC 2183中定义的Content-Disposition头值
+	 * <p>像form-data; name="username" -> 自然能解析出类型，参数名称</p>
 	 * @param contentDisposition the {@literal Content-Disposition} header value
 	 * @return the parsed content disposition
 	 * @see #toString()

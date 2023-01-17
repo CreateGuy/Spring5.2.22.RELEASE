@@ -166,7 +166,7 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 	}
 
 	/**
-	 * 通过传入的参数名从 queryString 中解析值
+	 * 通过传入的参数名从 queryString 中解析值，或者解析 Multipart 类型的值
 	 * @param name the name of the value being resolved
 	 * @param parameter the method parameter to resolve to an argument value
 	 * (pre-nested in case of a {@link java.util.Optional} declaration)
@@ -190,13 +190,16 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 
 		Object arg = null;
 		MultipartRequest multipartRequest = request.getNativeRequest(MultipartRequest.class);
-		// 如果有multipartRequest，我也不懂哪里包装的
+		// 如果有multipartRequest，是MultipartResolver中封装的
 		if (multipartRequest != null) {
+			// 文件的参数名称不可以一样，但是文件名可以重复
 			List<MultipartFile> files = multipartRequest.getFiles(name);
 			if (!files.isEmpty()) {
 				arg = (files.size() == 1 ? files.get(0) : files);
 			}
 		}
+
+		// 还拿得不到参数，直接从queryString中获取
 		if (arg == null) {
 			// 拿到Url后面指定参数的的值(queryString)
 			String[] paramValues = request.getParameterValues(name);

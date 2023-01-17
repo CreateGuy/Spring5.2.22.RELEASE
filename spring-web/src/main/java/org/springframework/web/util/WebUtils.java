@@ -491,6 +491,7 @@ public abstract class WebUtils {
 	}
 
 	/**
+	 * 往请求域中暴露传入的异常
 	 * Expose the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
 	 * attributes under the keys defined in the Servlet 2.3 specification, for error pages that
 	 * are rendered directly rather than through the Servlet container's error page resolution:
@@ -553,8 +554,8 @@ public abstract class WebUtils {
 	}
 
 	/**
-	 * Retrieve the first cookie with the given name. Note that multiple
-	 * cookies can have the same name but different paths or domains.
+	 * 返回第一个具有给定名称的cookie。
+	 * <p>注意：多个cookie可以具有相同的名称，但路径或域不同。</p>
 	 * @param request current servlet request
 	 * @param name cookie name
 	 * @return the first cookie with the given name, or {@code null} if none is found

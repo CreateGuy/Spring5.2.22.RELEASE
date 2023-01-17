@@ -71,8 +71,7 @@ public @interface RequestPart {
 	String value() default "";
 
 	/**
-	 * The name of the part in the {@code "multipart/form-data"} request to bind to.
-	 * @since 4.2
+	 * 是ContentType是"multipart/form-data"时候，要绑定的参数名称
 	 */
 	@AliasFor("value")
 	String name() default "";

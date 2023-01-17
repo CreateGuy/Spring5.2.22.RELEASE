@@ -53,11 +53,21 @@ public abstract class AbstractCookieValueMethodArgumentResolver extends Abstract
 	}
 
 
+	/**
+	 * 此参数解析器只支持@{@code CookieValue}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.hasParameterAnnotation(CookieValue.class);
 	}
 
+	/**
+	 * 创建对应的 {@code NamedValueInfo}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	protected NamedValueInfo createNamedValueInfo(MethodParameter parameter) {
 		CookieValue annotation = parameter.getParameterAnnotation(CookieValue.class);

@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 
 /**
+ * 用于解析多部分普通参数和文件参数解析器
  * Standard implementation of the {@link MultipartResolver} interface,
  * based on the Servlet 3.0 {@link javax.servlet.http.Part} API.
  * To be added as "multipartResolver" bean to a Spring DispatcherServlet context,
@@ -60,6 +61,9 @@ import org.springframework.web.multipart.MultipartResolver;
  */
 public class StandardServletMultipartResolver implements MultipartResolver {
 
+	/**
+	 * 是否在包装请求的时候，就去解析多部分请求
+	 */
 	private boolean resolveLazily = false;
 
 
@@ -76,7 +80,11 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 		this.resolveLazily = resolveLazily;
 	}
 
-
+	/**
+	 * 认为带有 ContentType 中携带了multipart/ 就表示是多部分请求
+	 * @param request the servlet request to be evaluated
+	 * @return
+	 */
 	@Override
 	public boolean isMultipart(HttpServletRequest request) {
 		return StringUtils.startsWithIgnoreCase(request.getContentType(), "multipart/");

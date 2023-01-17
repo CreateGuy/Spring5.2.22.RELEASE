@@ -58,11 +58,14 @@ public class ServletCookieValueMethodArgumentResolver extends AbstractCookieValu
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		Assert.state(servletRequest != null, "No HttpServletRequest");
 
+		// 从请求上获取指定Cookie
 		Cookie cookieValue = WebUtils.getCookie(servletRequest, cookieName);
+		// 由于此类的supports方法只检测了 @CookieValue，所有就有可能不是 Cookie 类型
 		if (Cookie.class.isAssignableFrom(parameter.getNestedParameterType())) {
 			return cookieValue;
 		}
 		else if (cookieValue != null) {
+			// 解码传入的Cookie值
 			return this.urlPathHelper.decodeRequestString(servletRequest, cookieValue.getValue());
 		}
 		else {

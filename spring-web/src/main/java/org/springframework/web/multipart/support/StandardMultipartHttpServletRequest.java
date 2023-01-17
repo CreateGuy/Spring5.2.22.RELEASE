@@ -85,21 +85,30 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 
 		super(request);
 		if (!lazyParsing) {
+			// 解析多部分请求
 			parseRequest(request);
 		}
 	}
 
-
+	/**
+	 * 解析多部分请求
+	 * @param request
+	 */
 	private void parseRequest(HttpServletRequest request) {
 		try {
 			Collection<Part> parts = request.getParts();
+			// 请求中的普通参数
 			this.multipartParameterNames = new LinkedHashSet<>(parts.size());
+			// 请求中的文件参数
 			MultiValueMap<String, MultipartFile> files = new LinkedMultiValueMap<>(parts.size());
 			for (Part part : parts) {
 				String headerValue = part.getHeader(HttpHeaders.CONTENT_DISPOSITION);
+				// 按照某种规范解析多部分参数值
 				ContentDisposition disposition = ContentDisposition.parse(headerValue);
 				String filename = disposition.getFilename();
+				// 如果是文件参数
 				if (filename != null) {
+					// 可能是文件名称不符合某种规范，重新设置名称
 					if (filename.startsWith("=?") && filename.endsWith("?=")) {
 						filename = MimeDelegate.decode(filename);
 					}
@@ -109,6 +118,7 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 					this.multipartParameterNames.add(part.getName());
 				}
 			}
+			// 保存多部分请求中的文件参数
 			setMultipartFiles(files);
 		}
 		catch (Throwable ex) {
@@ -202,13 +212,19 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 
 
 	/**
-	 * Spring MultipartFile adapter, wrapping a Servlet 3.0 Part object.
+	 * * Spring MultipartFile适配器，包装Servlet 3.0 Part对象
 	 */
 	@SuppressWarnings("serial")
 	private static class StandardMultipartFile implements MultipartFile, Serializable {
 
+		/**
+		 * 表示在multipart/form-data POST请求中接收到的多部分参数中的文件参数
+		 */
 		private final Part part;
 
+		/**
+		 * 文件名称
+		 */
 		private final String filename;
 
 		public StandardMultipartFile(Part part, String filename) {

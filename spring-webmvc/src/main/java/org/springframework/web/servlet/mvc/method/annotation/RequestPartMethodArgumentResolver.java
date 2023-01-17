@@ -42,11 +42,11 @@ import org.springframework.web.multipart.support.MultipartResolutionDelegate;
 import org.springframework.web.multipart.support.RequestPartServletServerHttpRequest;
 
 /**
- * Resolves the following method arguments:
+ * 此参数解析器解析以下的情况
  * <ul>
- * <li>Annotated with @{@link RequestPart}
- * <li>Of type {@link MultipartFile} in conjunction with Spring's {@link MultipartResolver} abstraction
- * <li>Of type {@code javax.servlet.http.Part} in conjunction with Servlet 3.0 multipart requests
+ * <li>@{@link RequestPart}
+ * <li>{@link MultipartFile}
+ * <li>{@code javax.servlet.http.Part}
  * </ul>
  *
  * <p>When a parameter is annotated with {@code @RequestPart}, the content of the part is
@@ -124,6 +124,7 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 		parameter = parameter.nestedIfOptional();
 		Object arg = null;
 
+		// 从请求上解析出 Multipart 参数
 		Object mpArg = MultipartResolutionDelegate.resolveMultipartArgument(name, parameter, servletRequest);
 		if (mpArg != MultipartResolutionDelegate.UNRESOLVABLE) {
 			arg = mpArg;
@@ -131,15 +132,19 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 		else {
 			try {
 				HttpInputMessage inputMessage = new RequestPartServletServerHttpRequest(servletRequest, name);
+				// 调用HttpMessageConverter转换请求体为指定参数类型
 				arg = readWithMessageConverters(inputMessage, parameter, parameter.getNestedGenericParameterType());
 				if (binderFactory != null) {
 					WebDataBinder binder = binderFactory.createBinder(request, arg, name);
 					if (arg != null) {
+						// 参数校验
 						validateIfApplicable(binder, parameter);
+						// 是否允许非致命错误
 						if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
 							throw new MethodArgumentNotValidException(parameter, binder.getBindingResult());
 						}
 					}
+					// 将绑定结果暴露在 ModelAndViewContainer 中
 					if (mavContainer != null) {
 						mavContainer.addAttribute(BindingResult.MODEL_KEY_PREFIX + name, binder.getBindingResult());
 					}
@@ -152,6 +157,7 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 			}
 		}
 
+		// 没找到参数，又要求不为空，就只有抛出异常了
 		if (arg == null && isRequired) {
 			if (!MultipartResolutionDelegate.isMultipartRequest(servletRequest)) {
 				throw new MultipartException("Current request is not a multipart request");

@@ -65,6 +65,8 @@ public class RequestHeaderMapMethodArgumentResolver implements HandlerMethodArgu
 			else {
 				result = new LinkedMultiValueMap<>();
 			}
+
+			// 保底的
 			for (Iterator<String> iterator = webRequest.getHeaderNames(); iterator.hasNext();) {
 				String headerName = iterator.next();
 				String[] headerValues = webRequest.getHeaderValues(headerName);
@@ -77,6 +79,7 @@ public class RequestHeaderMapMethodArgumentResolver implements HandlerMethodArgu
 			return result;
 		}
 		else {
+			// 保底的
 			Map<String, String> result = new LinkedHashMap<>();
 			for (Iterator<String> iterator = webRequest.getHeaderNames(); iterator.hasNext();) {
 				String headerName = iterator.next();
