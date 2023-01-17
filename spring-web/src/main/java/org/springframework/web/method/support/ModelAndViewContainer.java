@@ -234,8 +234,7 @@ public class ModelAndViewContainer {
 	}
 
 	/**
-	 * Whether binding is disabled for the given model attribute.
-	 * @since 4.3
+	 * 是否禁止参数绑定
 	 */
 	public boolean isBindingDisabled(String name) {
 		return (this.bindingDisabled.contains(name) || this.noBinding.contains(name));

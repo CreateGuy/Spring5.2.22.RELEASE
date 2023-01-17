@@ -132,8 +132,7 @@ public abstract class PropertyAccessorUtils {
 	}
 
 	/**
-	 * Determine the canonical name for the given property path.
-	 * Removes surrounding quotes from map keys:<br>
+	 * 对于属性名做一些调整:<br>
 	 * {@code map['key']} -> {@code map[key]}<br>
 	 * {@code map["key"]} -> {@code map[key]}
 	 * @param propertyName the bean property path
@@ -147,13 +146,16 @@ public abstract class PropertyAccessorUtils {
 		StringBuilder sb = new StringBuilder(propertyName);
 		int searchIndex = 0;
 		while (searchIndex != -1) {
+			// 确认呀要检索的开始位置
 			int keyStart = sb.indexOf(PropertyAccessor.PROPERTY_KEY_PREFIX, searchIndex);
 			searchIndex = -1;
 			if (keyStart != -1) {
+				// 确认呀要检索的结束位置
 				int keyEnd = sb.indexOf(
 						PropertyAccessor.PROPERTY_KEY_SUFFIX, keyStart + PropertyAccessor.PROPERTY_KEY_PREFIX.length());
 				if (keyEnd != -1) {
 					String key = sb.substring(keyStart + PropertyAccessor.PROPERTY_KEY_PREFIX.length(), keyEnd);
+					// 去除中间的 ' 或者 \" 符号
 					if ((key.startsWith("'") && key.endsWith("'")) || (key.startsWith("\"") && key.endsWith("\""))) {
 						sb.delete(keyStart + 1, keyStart + 2);
 						sb.delete(keyEnd - 2, keyEnd - 1);

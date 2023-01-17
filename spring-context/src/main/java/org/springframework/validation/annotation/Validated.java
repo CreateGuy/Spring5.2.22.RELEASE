@@ -54,13 +54,12 @@ import java.lang.annotation.Target;
 public @interface Validated {
 
 	/**
-	 * Specify one or more validation groups to apply to the validation step
-	 * kicked off by this annotation.
-	 * <p>JSR-303 defines validation groups as custom annotations which an application declares
-	 * for the sole purpose of using them as type-safe group arguments, as implemented in
-	 * {@link org.springframework.validation.beanvalidation.SpringValidatorAdapter}.
-	 * <p>Other {@link org.springframework.validation.SmartValidator} implementations may
-	 * support class arguments in other ways as well.
+	 * 指定一个或多个验证组
+	 * <ul>
+	 *     比如说有一个query，内部有id 和 name 两个参数
+	 *     <li>在新增方法中，我只需要name，那么就设置 query ->@Validated(value = AddQuery.class) name -> @NotNull(groups = AddQuery.class)，就代表只需要校验name就好了</li>
+	 *     <li>在删除方法中，我需要id，那么就设置 query ->@Validated(value = DeleteQuery.class) id -> @NotNull(groups = DeleteQuery.class)，就代表只需要校验id就好了</li>
+	 * </ul>
 	 */
 	Class<?>[] value() default {};
 

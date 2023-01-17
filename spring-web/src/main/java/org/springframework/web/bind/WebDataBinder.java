@@ -87,6 +87,9 @@ public class WebDataBinder extends DataBinder {
 	@Nullable
 	private String fieldMarkerPrefix = DEFAULT_FIELD_MARKER_PREFIX;
 
+	/**
+	 * 需要检查的属性名默认前缀
+	 */
 	@Nullable
 	private String fieldDefaultPrefix = DEFAULT_FIELD_DEFAULT_PREFIX;
 
@@ -194,36 +197,39 @@ public class WebDataBinder extends DataBinder {
 
 
 	/**
-	 * This implementation performs a field default and marker check
-	 * before delegating to the superclass binding process.
+	 * 准备绑定
 	 * @see #checkFieldDefaults
 	 * @see #checkFieldMarkers
 	 */
 	@Override
 	protected void doBind(MutablePropertyValues mpvs) {
+		// 更新属性名以指定格式开头的
 		checkFieldDefaults(mpvs);
 		checkFieldMarkers(mpvs);
+
+		// 准备绑定
 		super.doBind(mpvs);
 	}
 
 	/**
-	 * Check the given property values for field defaults,
-	 * i.e. for fields that start with the field default prefix.
-	 * <p>The existence of a field defaults indicates that the specified
-	 * value should be used if the field is otherwise not present.
-	 * @param mpvs the property values to be bound (can be modified)
-	 * @see #getFieldDefaultPrefix
+	 * 更新属性名以指定格式开头的
+	 * <p>比如说 !name -> name</p>
 	 */
 	protected void checkFieldDefaults(MutablePropertyValues mpvs) {
+		// 获得需要检查的属性名默认前缀
 		String fieldDefaultPrefix = getFieldDefaultPrefix();
 		if (fieldDefaultPrefix != null) {
 			PropertyValue[] pvArray = mpvs.getPropertyValues();
 			for (PropertyValue pv : pvArray) {
+				// 如果属性名以指定格式开始
 				if (pv.getName().startsWith(fieldDefaultPrefix)) {
+					// 去除前缀，取出真正的属性名
 					String field = pv.getName().substring(fieldDefaultPrefix.length());
+					// 看这个属性名是否可写，如果可写就添加新的
 					if (getPropertyAccessor().isWritableProperty(field) && !mpvs.contains(field)) {
 						mpvs.add(field, pv.getValue());
 					}
+					// 删除原属性
 					mpvs.removePropertyValue(pv);
 				}
 			}
@@ -231,24 +237,21 @@ public class WebDataBinder extends DataBinder {
 	}
 
 	/**
-	 * Check the given property values for field markers,
-	 * i.e. for fields that start with the field marker prefix.
-	 * <p>The existence of a field marker indicates that the specified
-	 * field existed in the form. If the property values do not contain
-	 * a corresponding field value, the field will be considered as empty
-	 * and will be reset appropriately.
-	 * @param mpvs the property values to be bound (can be modified)
-	 * @see #getFieldMarkerPrefix
-	 * @see #getEmptyValue(String, Class)
+	 * 更新属性名以指定格式开头的
 	 */
 	protected void checkFieldMarkers(MutablePropertyValues mpvs) {
+		// 获得需要检查的属性名默认前缀
 		String fieldMarkerPrefix = getFieldMarkerPrefix();
 		if (fieldMarkerPrefix != null) {
 			PropertyValue[] pvArray = mpvs.getPropertyValues();
 			for (PropertyValue pv : pvArray) {
+				// 如果属性名以指定格式开始
 				if (pv.getName().startsWith(fieldMarkerPrefix)) {
+					// 去除前缀，取出真正的属性名
 					String field = pv.getName().substring(fieldMarkerPrefix.length());
+					// 看这个属性名是否可写，如果可写就设置空值
 					if (getPropertyAccessor().isWritableProperty(field) && !mpvs.contains(field)) {
+						// 属性的类型
 						Class<?> fieldType = getPropertyAccessor().getPropertyType(field);
 						mpvs.add(field, getEmptyValue(field, fieldType));
 					}
@@ -259,7 +262,7 @@ public class WebDataBinder extends DataBinder {
 	}
 
 	/**
-	 * Determine an empty value for the specified field.
+	 * 为指定的字段类型确定一个空值。
 	 * <p>The default implementation delegates to {@link #getEmptyValue(Class)}
 	 * if the field type is known, otherwise falls back to {@code null}.
 	 * @param field the name of the field
@@ -272,7 +275,7 @@ public class WebDataBinder extends DataBinder {
 	}
 
 	/**
-	 * Determine an empty value for the specified field.
+	 * 为指定的字段类型确定一个空值
 	 * <p>The default implementation returns:
 	 * <ul>
 	 * <li>{@code Boolean.FALSE} for boolean fields

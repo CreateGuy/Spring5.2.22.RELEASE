@@ -112,6 +112,7 @@ public class ServletRequestDataBinder extends WebDataBinder {
 		if (multipartRequest != null) {
 			bindMultipart(multipartRequest.getMultiFileMap(), mpvs);
 		}
+		// 将URI变量合并到 mpvs 中
 		addBindValues(mpvs, request);
 		doBind(mpvs);
 	}

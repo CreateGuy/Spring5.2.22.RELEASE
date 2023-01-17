@@ -132,7 +132,7 @@ public interface BindingResult extends Errors {
 	void addError(ObjectError error);
 
 	/**
-	 * Record the given value for the specified field.
+	 * 记录指定字段的给定值
 	 * <p>To be used when a target object cannot be constructed, making
 	 * the original field values available through {@link #getFieldValue}.
 	 * In case of a registered error, the rejected value will be exposed
@@ -146,7 +146,7 @@ public interface BindingResult extends Errors {
 	}
 
 	/**
-	 * Mark the specified disallowed field as suppressed.
+	 * 将不允许绑定的字段标记为禁止字段。
 	 * <p>The data binder invokes this for each field value that was
 	 * detected to target a disallowed field.
 	 * @see DataBinder#setAllowedFields

@@ -66,7 +66,7 @@ public class ExtendedServletRequestDataBinder extends ServletRequestDataBinder {
 
 
 	/**
-	 * Merge URI variables into the property values to use for data binding.
+	 * 将URI变量合并到 mpvs 中
 	 */
 	@Override
 	@SuppressWarnings("unchecked")

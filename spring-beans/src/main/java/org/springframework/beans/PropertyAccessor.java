@@ -82,8 +82,8 @@ public interface PropertyAccessor {
 	boolean isReadableProperty(String propertyName);
 
 	/**
-	 * Determine whether the specified property is writable.
-	 * <p>Returns {@code false} if the property doesn't exist.
+	 * 确定指定的属性是否可写(我理解是 是否可以设置值)
+	 * <p>如果属性不存在，则返回false
 	 * @param propertyName the property to check
 	 * (may be a nested path and/or an indexed/mapped property)
 	 * @return whether the property is writable

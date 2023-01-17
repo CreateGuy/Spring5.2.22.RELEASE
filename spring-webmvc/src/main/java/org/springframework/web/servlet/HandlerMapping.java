@@ -97,8 +97,7 @@ public interface HandlerMapping {
 	String INTROSPECT_TYPE_LEVEL_MAPPING = HandlerMapping.class.getName() + ".introspectTypeLevelMapping";
 
 	/**
-	 * Name of the {@link HttpServletRequest} attribute that contains the URI
-	 * templates map, mapping variable names to values.
+	 * 请求域中的有关Rest(路径)变量的键
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. URL-based HandlerMappings will
 	 * typically support it, but handlers should not necessarily expect
@@ -107,9 +106,7 @@ public interface HandlerMapping {
 	String URI_TEMPLATE_VARIABLES_ATTRIBUTE = HandlerMapping.class.getName() + ".uriTemplateVariables";
 
 	/**
-	 * Name of the {@link HttpServletRequest} attribute that contains a map with
-	 * URI variable names and a corresponding MultiValueMap of URI matrix
-	 * variables for each.
+	 * 请求域中的有关矩阵变量的键
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations and may also not be present depending on
 	 * whether the HandlerMapping is configured to keep matrix variable content

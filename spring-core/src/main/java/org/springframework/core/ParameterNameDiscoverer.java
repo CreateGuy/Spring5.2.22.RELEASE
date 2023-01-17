@@ -35,7 +35,7 @@ import org.springframework.lang.Nullable;
 public interface ParameterNameDiscoverer {
 
 	/**
-	 * Return parameter names for a method, or {@code null} if they cannot be determined.
+	 * 返回方法的参数名，如果无法确定则返回null
 	 * <p>Individual entries in the array may be {@code null} if parameter names are only
 	 * available for some parameters of the given method but not for others. However,
 	 * it is recommended to use stub parameter names instead wherever feasible.
@@ -47,7 +47,7 @@ public interface ParameterNameDiscoverer {
 	String[] getParameterNames(Method method);
 
 	/**
-	 * Return parameter names for a constructor, or {@code null} if they cannot be determined.
+	 * 返回构造函数的参数名，如果不能确定则返回null
 	 * <p>Individual entries in the array may be {@code null} if parameter names are only
 	 * available for some parameters of the given constructor but not for others. However,
 	 * it is recommended to use stub parameter names instead wherever feasible.

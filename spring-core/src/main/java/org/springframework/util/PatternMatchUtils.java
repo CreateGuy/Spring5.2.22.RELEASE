@@ -72,12 +72,11 @@ public abstract class PatternMatchUtils {
 	}
 
 	/**
-	 * Match a String against the given patterns, supporting the following simple
-	 * pattern styles: "xxx*", "*xxx", "*xxx*" and "xxx*yyy" matches (with an
-	 * arbitrary number of pattern parts), as well as direct equality.
-	 * @param patterns the patterns to match against
-	 * @param str the String to match
-	 * @return whether the String matches any of the given patterns
+	 * 对于传入规则和字符串进行匹配
+	 * <p>支持以下简单的模式样式:"xxx*"， "*x××"， "*x×x*"和"xxx*yyy"匹配(与任意数量的模式部分)，以及直接相等。</p>
+	 * @param patterns 规则
+	 * @param str
+	 * @return
 	 */
 	public static boolean simpleMatch(@Nullable String[] patterns, String str) {
 		if (patterns != null) {

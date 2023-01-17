@@ -23,10 +23,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Exception thrown on a type mismatch when trying to set a bean property.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
+ * 设置bean属性时，因类型不匹配而引发的异常
  */
 @SuppressWarnings("serial")
 public class TypeMismatchException extends PropertyAccessException {
@@ -36,7 +33,9 @@ public class TypeMismatchException extends PropertyAccessException {
 	 */
 	public static final String ERROR_CODE = "typeMismatch";
 
-
+	/**
+	 * 出错的参数名
+	 */
 	@Nullable
 	private String propertyName;
 

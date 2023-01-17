@@ -40,6 +40,9 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 
 	private boolean autoGrowNestedPaths = false;
 
+	/**
+	 * 是否禁止写入异常
+	 */
 	boolean suppressNotWritablePropertyException = false;
 
 
@@ -88,28 +91,31 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 	public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean ignoreInvalid)
 			throws BeansException {
 
+		// 参数绑定过程中出现的异常
 		List<PropertyAccessException> propertyAccessExceptions = null;
 		List<PropertyValue> propertyValues = (pvs instanceof MutablePropertyValues ?
 				((MutablePropertyValues) pvs).getPropertyValueList() : Arrays.asList(pvs.getPropertyValues()));
 
+		// 先禁止写入异常
 		if (ignoreUnknown) {
 			this.suppressNotWritablePropertyException = true;
 		}
 		try {
 			for (PropertyValue pv : propertyValues) {
-				// setPropertyValue may throw any BeansException, which won't be caught
-				// here, if there is a critical failure such as no matching field.
-				// We can attempt to deal only with less serious exceptions.
+
 				try {
+					// 可能会抛出任何BeansException，如果出现诸如没有匹配字段之类的严重失败，则不会在这里捕获该异常。我们可以尝试只处理不太严重的例外情况。
 					setPropertyValue(pv);
 				}
 				catch (NotWritablePropertyException ex) {
+					// 如果是不可以写入值的异常，还可以不抛出
 					if (!ignoreUnknown) {
 						throw ex;
 					}
 					// Otherwise, just ignore it and continue...
 				}
 				catch (NullValueInNestedPathException ex) {
+					// 如果是字段名不存在的，还可以不抛出
 					if (!ignoreInvalid) {
 						throw ex;
 					}
@@ -124,12 +130,13 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 			}
 		}
 		finally {
+			// 最后取消禁止写入异常
 			if (ignoreUnknown) {
 				this.suppressNotWritablePropertyException = false;
 			}
 		}
 
-		// If we encountered individual exceptions, throw the composite exception.
+		// 如果抛出多个异常，则抛出复合异常
 		if (propertyAccessExceptions != null) {
 			PropertyAccessException[] paeArray = propertyAccessExceptions.toArray(new PropertyAccessException[0]);
 			throw new PropertyBatchUpdateException(paeArray);

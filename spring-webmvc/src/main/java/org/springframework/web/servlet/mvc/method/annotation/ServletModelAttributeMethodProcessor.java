@@ -63,44 +63,41 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 
 
 	/**
-	 * Instantiate the model attribute from a URI template variable or from a
-	 * request parameter if the name matches to the model attribute name and
-	 * if there is an appropriate type conversion strategy. If none of these
-	 * are true delegate back to the base class.
-	 * @see #createAttributeFromRequestValue
+	 * 获得指定参数的值，然后转换为指定类型
 	 */
 	@Override
 	protected final Object createAttribute(String attributeName, MethodParameter parameter,
 			WebDataBinderFactory binderFactory, NativeWebRequest request) throws Exception {
 
+		// 从Rest或者QueryString中获得指定属性
 		String value = getRequestValueForAttribute(attributeName, request);
 		if (value != null) {
+			// 将原参数值转换为指定类型
 			Object attribute = createAttributeFromRequestValue(
 					value, attributeName, parameter, binderFactory, request);
 			if (attribute != null) {
 				return attribute;
 			}
 		}
-
+		// 创建指定的类型的实例
 		return super.createAttribute(attributeName, parameter, binderFactory, request);
 	}
 
 	/**
-	 * Obtain a value from the request that may be used to instantiate the
-	 * model attribute through type conversion from String to the target type.
-	 * <p>The default implementation looks for the attribute name to match
-	 * a URI variable first and then a request parameter.
-	 * @param attributeName the model attribute name
-	 * @param request the current request
-	 * @return the request value to try to convert, or {@code null} if none
+	 * 从Rest或者QueryString中获得指定属性
+	 * @param attributeName
+	 * @param request
+	 * @return
 	 */
 	@Nullable
 	protected String getRequestValueForAttribute(String attributeName, NativeWebRequest request) {
+		// 获得Rest变量
 		Map<String, String> variables = getUriTemplateVariables(request);
 		String variableValue = variables.get(attributeName);
 		if (StringUtils.hasText(variableValue)) {
 			return variableValue;
 		}
+		// 从请求上拿到指定的QueryString变量
 		String parameterValue = request.getParameter(attributeName);
 		if (StringUtils.hasText(parameterValue)) {
 			return parameterValue;
@@ -108,6 +105,11 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 		return null;
 	}
 
+	/**
+	 * 获得Rest变量
+	 * @param request
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	protected final Map<String, String> getUriTemplateVariables(NativeWebRequest request) {
 		Map<String, String> variables = (Map<String, String>) request.getAttribute(
@@ -116,28 +118,27 @@ public class ServletModelAttributeMethodProcessor extends ModelAttributeMethodPr
 	}
 
 	/**
-	 * Create a model attribute from a String request value (e.g. URI template
-	 * variable, request parameter) using type conversion.
-	 * <p>The default implementation converts only if there a registered
-	 * {@link Converter} that can perform the conversion.
-	 * @param sourceValue the source value to create the model attribute from
-	 * @param attributeName the name of the attribute (never {@code null})
-	 * @param parameter the method parameter
-	 * @param binderFactory for creating WebDataBinder instance
-	 * @param request the current request
-	 * @return the created model attribute, or {@code null} if no suitable
-	 * conversion found
+	 * 将原参数值转换为指定类型
+	 * @param sourceValue 源值
+	 * @param attributeName 参数名称
+	 * @param parameter
+	 * @param binderFactory
+	 * @param request
+	 * @return 转换后的值
+	 * @throws Exception
 	 */
 	@Nullable
 	protected Object createAttributeFromRequestValue(String sourceValue, String attributeName,
 			MethodParameter parameter, WebDataBinderFactory binderFactory, NativeWebRequest request)
 			throws Exception {
 
+		// 创建专属于此参数的数据绑定器
 		DataBinder binder = binderFactory.createBinder(request, null, attributeName);
 		ConversionService conversionService = binder.getConversionService();
 		if (conversionService != null) {
 			TypeDescriptor source = TypeDescriptor.valueOf(String.class);
 			TypeDescriptor target = new TypeDescriptor(parameter);
+			// 看能否有任何一个 ConversionService 能进行转换
 			if (conversionService.canConvert(source, target)) {
 				return binder.convertIfNecessary(sourceValue, parameter.getParameterType(), parameter);
 			}

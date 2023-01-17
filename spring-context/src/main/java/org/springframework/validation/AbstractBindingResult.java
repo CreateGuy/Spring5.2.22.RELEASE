@@ -56,12 +56,24 @@ public abstract class AbstractBindingResult extends AbstractErrors implements Bi
 	 */
 	private MessageCodesResolver messageCodesResolver = new DefaultMessageCodesResolver();
 
+	/**
+	 * 绑定过程中出现的错误
+	 */
 	private final List<ObjectError> errors = new ArrayList<>();
 
+	/**
+	 * 绑定过程中出现错误的字段名和字段类型的映射关系
+	 */
 	private final Map<String, Class<?>> fieldTypes = new HashMap<>();
 
+	/**
+	 * 绑定过程中出现错误的字段名的值的映射关系
+	 */
 	private final Map<String, Object> fieldValues = new HashMap<>();
 
+	/**
+	 * 不允许绑定的字段
+	 */
 	private final Set<String> suppressedFields = new HashSet<>();
 
 

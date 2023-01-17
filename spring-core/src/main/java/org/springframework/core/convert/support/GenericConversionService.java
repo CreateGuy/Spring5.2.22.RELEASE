@@ -79,7 +79,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 	private final Converters converters = new Converters();
 
 	/**
-	 * 已经操作过的注册器缓存
+	 * 已经操作过转换的的缓存
 	 */
 	private final Map<ConverterCacheKey, GenericConverter> converterCache = new ConcurrentReferenceHashMap<>(64);
 
@@ -257,7 +257,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 
 	/**
 	 * 首先查询这个converterCache的转换器缓存。
-	 * 在缓存未命中时，对匹配的转换器执行详尽的搜索。
+	 * 在缓存未命中时，对匹配的转换器进行遍历
 	 * 如果没有匹配的转换器，则返回默认的转换器。
 	 * @param sourceType
 	 * @param targetType
@@ -271,11 +271,13 @@ public class GenericConversionService implements ConfigurableConversionService {
 			return (converter != NO_MATCH ? converter : null);
 		}
 
+		// 找到能够转换的
 		converter = this.converters.find(sourceType, targetType);
 		if (converter == null) {
 			converter = getDefaultConverter(sourceType, targetType);
 		}
 
+		// 加入缓存
 		if (converter != null) {
 			this.converterCache.put(key, converter);
 			return converter;
@@ -286,7 +288,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 	}
 
 	/**
-	 * Return the default converter if no converter is found for the given sourceType/targetType pair.
+	 * 如果没有为给定的sourceType/targetType对找到转换器，则返回默认转换器。
 	 * <p>Returns a NO_OP Converter if the source type is assignable to the target type.
 	 * Returns {@code null} otherwise, indicating no suitable converter could be found.
 	 * @param sourceType the source type to convert from
@@ -488,12 +490,18 @@ public class GenericConversionService implements ConfigurableConversionService {
 
 
 	/**
-	 * Key for use with the converter cache.
+	 * 用于转换器缓存的键
 	 */
 	private static final class ConverterCacheKey implements Comparable<ConverterCacheKey> {
 
+		/**
+		 * 转换前类型的 {@link TypeDescriptor}
+		 */
 		private final TypeDescriptor sourceType;
 
+		/**
+		 * 需要转换后的类型的 {@link TypeDescriptor}
+		 */
 		private final TypeDescriptor targetType;
 
 		public ConverterCacheKey(TypeDescriptor sourceType, TypeDescriptor targetType) {
@@ -501,6 +509,11 @@ public class GenericConversionService implements ConfigurableConversionService {
 			this.targetType = targetType;
 		}
 
+		/**
+		 * 认为转换前的类型和转换后的类型才认为是一个对象
+		 * @param other
+		 * @return
+		 */
 		@Override
 		public boolean equals(@Nullable Object other) {
 			if (this == other) {
@@ -589,7 +602,7 @@ public class GenericConversionService implements ConfigurableConversionService {
 		 */
 		@Nullable
 		public GenericConverter find(TypeDescriptor sourceType, TypeDescriptor targetType) {
-			// Search the full type hierarchy
+			// 搜索完整的类型层次结构
 			List<Class<?>> sourceCandidates = getClassHierarchy(sourceType.getType());
 			List<Class<?>> targetCandidates = getClassHierarchy(targetType.getType());
 			for (Class<?> sourceCandidate : sourceCandidates) {

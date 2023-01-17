@@ -279,7 +279,7 @@ public final class ModelFactory {
 	public static String getNameForParameter(MethodParameter parameter) {
 		ModelAttribute ann = parameter.getParameterAnnotation(ModelAttribute.class);
 		String name = (ann != null ? ann.value() : null);
-		// 要么使用注解中的参数名称，要么用参数定义的名称
+		// 要么使用注解中的参数名称，要么用参数类型名称
 		return (StringUtils.hasText(name) ? name : Conventions.getVariableNameForParameter(parameter));
 	}
 

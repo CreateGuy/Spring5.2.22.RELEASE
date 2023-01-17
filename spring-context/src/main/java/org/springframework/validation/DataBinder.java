@@ -146,7 +146,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	private boolean ignoreUnknownFields = true;
 
 	/**
-	 * 是否允许设置非法字段，即属性类似设置错误是否抛出异常，比如日期类型设置字符串
+	 * 是否允许设置非法字段，即属性类型设置错误是否抛出异常，比如日期类型设置字符串
 	 */
 	private boolean ignoreInvalidFields = false;
 
@@ -158,19 +158,19 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	private int autoGrowCollectionLimit = DEFAULT_AUTO_GROW_COLLECTION_LIMIT;
 
 	/**
-	 * 允许设置的字段
+	 * 在参数绑定的时候，能够进行绑定的字段
 	 */
 	@Nullable
 	private String[] allowedFields;
 
 	/**
-	 * 不允许设置的字段
+	 * 在参数绑定的时候，不能进行绑定的字段
 	 */
 	@Nullable
 	private String[] disallowedFields;
 
 	/**
-	 * 必须设置的字段
+	 * 在参数绑定的时候，必须设置的字段
 	 */
 	@Nullable
 	private String[] requiredFields;
@@ -184,6 +184,9 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	@Nullable
 	private MessageCodesResolver messageCodesResolver;
 
+	/**
+	 * 绑定错误处理器
+	 */
 	private BindingErrorProcessor bindingErrorProcessor = new DefaultBindingErrorProcessor();
 
 	/**
@@ -799,33 +802,32 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Actual implementation of the binding process, working with the
-	 * passed-in MutablePropertyValues instance.
-	 * @param mpvs the property values to bind,
-	 * as MutablePropertyValues instance
-	 * @see #checkAllowedFields
-	 * @see #checkRequiredFields
-	 * @see #applyPropertyValues
+	 * 开始绑定
 	 */
 	protected void doBind(MutablePropertyValues mpvs) {
+		// 检查字段名是否允许绑定，不允许就移除
 		checkAllowedFields(mpvs);
+		// 检查属性是否不能为空
 		checkRequiredFields(mpvs);
 		applyPropertyValues(mpvs);
 	}
 
 	/**
-	 * Check the given property values against the allowed fields,
-	 * removing values for fields that are not allowed.
-	 * @param mpvs the property values to be bound (can be modified)
+	 * 检查字段名是否允许绑定，不允许就移除
+	 * @param mpvs 要绑定的属性值(可以修改)
 	 * @see #getAllowedFields
 	 * @see #isAllowed(String)
 	 */
 	protected void checkAllowedFields(MutablePropertyValues mpvs) {
 		PropertyValue[] pvs = mpvs.getPropertyValues();
 		for (PropertyValue pv : pvs) {
+			// 对于属性名做一些调整
 			String field = PropertyAccessorUtils.canonicalPropertyName(pv.getName());
+			// 是否允许绑定该字段
 			if (!isAllowed(field)) {
+				// 移除不允许绑定的字段
 				mpvs.removePropertyValue(pv);
+				// 将不允许绑定的字段标记为禁止字段
 				getBindingResult().recordSuppressedField(field);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Field [" + field + "] has been removed from PropertyValues " +
@@ -836,23 +838,9 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Determine if the given field is allowed for binding.
-	 * <p>Invoked for each passed-in property value.
-	 * <p>Checks for {@code "xxx*"}, {@code "*xxx"}, {@code "*xxx*"}, and
-	 * {@code "xxx*yyy"} matches (with an arbitrary number of pattern parts), as
-	 * well as direct equality, in the configured lists of allowed field patterns
-	 * and disallowed field patterns.
-	 * <p>Matching against allowed field patterns is case-sensitive; whereas,
-	 * matching against disallowed field patterns is case-insensitive.
-	 * <p>A field matching a disallowed pattern will not be accepted even if it
-	 * also happens to match a pattern in the allowed list.
-	 * <p>Can be overridden in subclasses, but care must be taken to honor the
-	 * aforementioned contract.
-	 * @param field the field to check
-	 * @return {@code true} if the field is allowed
-	 * @see #setAllowedFields
-	 * @see #setDisallowedFields
-	 * @see org.springframework.util.PatternMatchUtils#simpleMatch(String, String)
+	 * 是否允许绑定该字段
+	 * @param field
+	 * @return
 	 */
 	protected boolean isAllowed(String field) {
 		String[] allowed = getAllowedFields();
@@ -862,39 +850,43 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	}
 
 	/**
-	 * Check the given property values against the required fields,
-	 * generating missing field errors where appropriate.
-	 * @param mpvs the property values to be bound (can be modified)
-	 * @see #getRequiredFields
-	 * @see #getBindingErrorProcessor
-	 * @see BindingErrorProcessor#processMissingFieldError
+	 * 检查属性是否不能为空
+	 * @param mpvs
 	 */
 	protected void checkRequiredFields(MutablePropertyValues mpvs) {
+		// 获得必须设置的字段
 		String[] requiredFields = getRequiredFields();
 		if (!ObjectUtils.isEmpty(requiredFields)) {
+			// 对mpvs进行转型
 			Map<String, PropertyValue> propertyValues = new HashMap<>();
 			PropertyValue[] pvs = mpvs.getPropertyValues();
 			for (PropertyValue pv : pvs) {
 				String canonicalName = PropertyAccessorUtils.canonicalPropertyName(pv.getName());
 				propertyValues.put(canonicalName, pv);
 			}
+
+			// 开始处理必须要绑定的字段
 			for (String field : requiredFields) {
 				PropertyValue pv = propertyValues.get(field);
 				boolean empty = (pv == null || pv.getValue() == null);
+				// 找到了指定值
 				if (!empty) {
+					// 字符串不能是空字符串
 					if (pv.getValue() instanceof String) {
 						empty = !StringUtils.hasText((String) pv.getValue());
 					}
+					// 不是是空数组
 					else if (pv.getValue() instanceof String[]) {
 						String[] values = (String[]) pv.getValue();
 						empty = (values.length == 0 || !StringUtils.hasText(values[0]));
 					}
 				}
+
+				// 没有找到指定值
 				if (empty) {
-					// Use bind error processor to create FieldError.
+					// 创建错误，然后注册到对应的BindingResult中
 					getBindingErrorProcessor().processMissingFieldError(field, getInternalBindingResult());
-					// Remove property from property values to bind:
-					// It has already caused a field error with a rejected value.
+					// 从属性值中移除要绑定的属性，因为这个属性值已经导致了参数绑定错误
 					if (pv != null) {
 						mpvs.removePropertyValue(pv);
 						propertyValues.remove(field);
@@ -918,11 +910,11 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 	 */
 	protected void applyPropertyValues(MutablePropertyValues mpvs) {
 		try {
-			// Bind request parameters onto target object.
+			// 将请求参数绑定到目标对象中，其中包括了WebDataBinder
 			getPropertyAccessor().setPropertyValues(mpvs, isIgnoreUnknownFields(), isIgnoreInvalidFields());
 		}
 		catch (PropertyBatchUpdateException ex) {
-			// Use bind error processor to create FieldErrors.
+			// 使用绑定错误处理器执行回调方法
 			for (PropertyAccessException pae : ex.getPropertyAccessExceptions()) {
 				getBindingErrorProcessor().processPropertyAccessException(pae, getInternalBindingResult());
 			}
@@ -957,7 +949,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 		Object target = getTarget();
 		Assert.state(target != null, "No target to validate");
 		BindingResult bindingResult = getBindingResult();
-		// 所有校验器都取校验
+		// 所有校验器都去校验
 		for (Validator validator : getValidators()) {
 			if (!ObjectUtils.isEmpty(validationHints) && validator instanceof SmartValidator) {
 				((SmartValidator) validator).validate(target, bindingResult, validationHints);

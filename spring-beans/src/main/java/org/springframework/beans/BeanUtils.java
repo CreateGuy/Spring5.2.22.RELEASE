@@ -221,13 +221,8 @@ public abstract class BeanUtils {
 	}
 
 	/**
-	 * Return the primary constructor of the provided class. For Kotlin classes, this
-	 * returns the Java constructor corresponding to the Kotlin primary constructor
-	 * (as defined in the Kotlin specification). Otherwise, in particular for non-Kotlin
-	 * classes, this simply returns {@code null}.
-	 * @param clazz the class to check
-	 * @since 5.0
-	 * @see <a href="https://kotlinlang.org/docs/reference/classes.html#constructors">Kotlin docs</a>
+	 * 返回所提供类的主构造函数
+	 * <p>对于Kotlin类，这将返回与Kotlin主构造函数(在Kotlin规范中定义)对应的Java构造函数。否则它只返回null</p>
 	 */
 	@Nullable
 	public static <T> Constructor<T> findPrimaryConstructor(Class<T> clazz) {

@@ -23,7 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Default {@link BindingErrorProcessor} implementation.
+ * 默认 {@link BindingErrorProcessor} 的实现.
  *
  * <p>Uses the "required" error code and the field name to resolve message codes
  * for a missing field error.
@@ -55,10 +55,13 @@ public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
 
 	@Override
 	public void processMissingFieldError(String missingField, BindingResult bindingResult) {
-		// Create field error with code "required".
+		// 出现错误的属性名
 		String fixedField = bindingResult.getNestedPath() + missingField;
+		// 重新生成错误信息
 		String[] codes = bindingResult.resolveMessageCodes(MISSING_FIELD_ERROR_CODE, missingField);
 		Object[] arguments = getArgumentsForBindError(bindingResult.getObjectName(), fixedField);
+
+		// 创建错误，然后注册到对应的BindingResult中
 		FieldError error = new FieldError(bindingResult.getObjectName(), fixedField, "", true,
 				codes, arguments, "Field '" + fixedField + "' is required");
 		bindingResult.addError(error);
