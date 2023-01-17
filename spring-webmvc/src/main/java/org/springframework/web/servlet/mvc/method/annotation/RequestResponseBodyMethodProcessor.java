@@ -46,9 +46,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 /**
- * Resolves method arguments annotated with {@code @RequestBody} and handles return
- * values from methods annotated with {@code @ResponseBody} by reading and writing
- * to the body of the request or response with an {@link HttpMessageConverter}.
+ *
+ * 解析带有 @{@link RequestBody} 的方法参数，并通过读写请求或响应的体来处理带有 @{@link ResponseBody} 的返回值
  *
  * <p>An {@code @RequestBody} method argument is also validated if it is annotated
  * with {@code @javax.validation.Valid}. In case of validation failure,
@@ -107,7 +106,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 
 
 	/**
-	 * 此参数解析器只支持带有 {@code RequestBody} 注解的入参
+	 * 此参数解析器只支持带有 @{@code RequestBody} 注解的入参
 	 * @param parameter
 	 * @return
 	 */
@@ -117,7 +116,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 	}
 
 	/**
-	 * 此返回值处理器只支持带有 {@code ResponseBody} 注解的返回值
+	 * 此返回值处理器只支持带有 @{@code ResponseBody} 注解的返回值
 	 * @param returnType
 	 * @return
 	 */
@@ -186,6 +185,11 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 		return arg;
 	}
 
+	/**
+	 * 是否一定要请求体里面的参数
+	 * @param parameter
+	 * @return
+	 */
 	protected boolean checkRequired(MethodParameter parameter) {
 		RequestBody requestBody = parameter.getParameterAnnotation(RequestBody.class);
 		return (requestBody != null && requestBody.required() && !parameter.isOptional());

@@ -88,13 +88,11 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 
 
 	/**
-	 * Whether the given {@linkplain MethodParameter method parameter} is a multi-part
-	 * supported. Supports the following:
+	 * 此参数解析器支持以下的情况
 	 * <ul>
-	 * <li>annotated with {@code @RequestPart}
-	 * <li>of type {@link MultipartFile} unless annotated with {@code @RequestParam}
-	 * <li>of type {@code javax.servlet.http.Part} unless annotated with
-	 * {@code @RequestParam}
+	 * <li> @{@code RequestPart}
+	 * <li> @{@code RequestParam}
+	 * <li> 是 Multipart 参数
 	 * </ul>
 	 */
 	@Override
@@ -121,6 +119,7 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 		RequestPart requestPart = parameter.getParameterAnnotation(RequestPart.class);
 		boolean isRequired = ((requestPart == null || requestPart.required()) && !parameter.isOptional());
 
+		// 获得参数名称
 		String name = getPartName(parameter, requestPart);
 		parameter = parameter.nestedIfOptional();
 		Object arg = null;
@@ -164,6 +163,12 @@ public class RequestPartMethodArgumentResolver extends AbstractMessageConverterM
 		return adaptArgumentIfNecessary(arg, parameter);
 	}
 
+	/**
+	 * 获得参数名称
+	 * @param methodParam
+	 * @param requestPart
+	 * @return
+	 */
 	private String getPartName(MethodParameter methodParam, @Nullable RequestPart requestPart) {
 		String partName = (requestPart != null ? requestPart.name() : "");
 		if (partName.isEmpty()) {

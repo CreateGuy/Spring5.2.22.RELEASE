@@ -17,6 +17,7 @@
 package org.springframework.web.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,28 +37,27 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link javax.servlet.http.HttpServletRequest} wrapper that caches all content read from
- * the {@linkplain #getInputStream() input stream} and {@linkplain #getReader() reader},
- * and allows this content to be retrieved via a {@link #getContentAsByteArray() byte array}.
- *
- * <p>Used e.g. by {@link org.springframework.web.filter.AbstractRequestLoggingFilter}.
- * Note: As of Spring Framework 5.0, this wrapper is built on the Servlet 3.1 API.
- *
- * @author Juergen Hoeller
- * @author Brian Clozel
- * @since 4.1.3
- * @see ContentCachingResponseWrapper
+ *  {@link javax.servlet.http.HttpServletRequest} 的包装类，用于缓存 InputStream 和 reader
+ *  <p>这样就可以解决无法多次读取请求体的问题了</p>
  */
 public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 
 	private static final String FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
-
+	/**
+	 * 源输入流对应字节的存储位置
+	 */
 	private final ByteArrayOutputStream cachedContent;
 
+	/**
+	 * 输入流对应字节的最大值
+	 */
 	@Nullable
 	private final Integer contentCacheLimit;
 
+	/**
+	 * 已经包装的输入流
+	 */
 	@Nullable
 	private ServletInputStream inputStream;
 
@@ -90,14 +90,37 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 
+	/**
+	 * 获得请求的请求体对应的输入流
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		if (this.inputStream == null) {
+			// 将输入流进行包装，重点也是在这个类上
 			this.inputStream = new ContentCachingInputStream(getRequest().getInputStream());
 		}
 		return this.inputStream;
+
+		/*
+			1、ContentCachingInputStream会将读取到的字节数组保存到cachedContent中
+			2、这个时候一般我们都是用 getContentAsByteArray 方法来获取对应的字节数组的，然后再转输入流
+			3、但是框架里面怎么可能用这个方法，都是用 getInputStream 方法直接获取输入流，那么在框架的角度上来说还是无法读取多次输入流
+			4、所有要对这个方法进行重写，比如像下面这样
+				if (this.inputStream == null) {
+					// 将输入流进行包装，重点也是在这个类上
+					this.inputStream = new ContentCachingInputStream(getRequest().getInputStream());
+				}
+				//这里是重新创建一个输入流
+				return new ServletInputStreamNew(getContentAsByteArray());
+		 */
 	}
 
+	/**
+	 * 返回此请求的字符编码
+	 * @return
+	 */
 	@Override
 	public String getCharacterEncoding() {
 		String enc = super.getCharacterEncoding();
@@ -182,7 +205,7 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Return the cached request content as a byte array.
+	 * 将缓存的请求体作为字节数组返回
 	 * <p>The returned array will never be larger than the content cache limit.
 	 * @see #ContentCachingRequestWrapper(HttpServletRequest, int)
 	 */
@@ -191,8 +214,7 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Template method for handling a content overflow: specifically, a request
-	 * body being read that exceeds the specified content cache limit.
+	 * 处理内容溢出的模板方法:具体来说，读取的请求体超过了指定的内容缓存限制。
 	 * <p>The default implementation is empty. Subclasses may override this to
 	 * throw a payload-too-large exception or the like.
 	 * @param contentCacheLimit the maximum number of bytes to cache per request
@@ -204,25 +226,42 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 	}
 
 
+	/**
+	 * 保存了源输入流对应字节数组的
+	 */
 	private class ContentCachingInputStream extends ServletInputStream {
 
+		/**
+		 * 外部输入流，也就是原生的输入流
+		 */
 		private final ServletInputStream is;
 
+		/**
+		 * 是否溢出
+		 */
 		private boolean overflow = false;
 
 		public ContentCachingInputStream(ServletInputStream is) {
 			this.is = is;
 		}
 
+		/**
+		 * 读取一个字节，当为-1的时候表示已读到最后了
+		 * @return
+		 * @throws IOException
+		 */
 		@Override
 		public int read() throws IOException {
+			// 读取原始输入流的一个字节
 			int ch = this.is.read();
 			if (ch != -1 && !this.overflow) {
+				// 处理溢出的情况
 				if (contentCacheLimit != null && cachedContent.size() == contentCacheLimit) {
 					this.overflow = true;
 					handleContentOverflow(contentCacheLimit);
 				}
 				else {
+					// 重点：将此输入流的数据写入缓存中
 					cachedContent.write(ch);
 				}
 			}
@@ -236,6 +275,12 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 			return count;
 		}
 
+		/**
+		 * 将读取出来的字节数组保存在缓存中
+		 * @param b
+		 * @param off
+		 * @param count
+		 */
 		private void writeToCache(final byte[] b, final int off, int count) {
 			if (!this.overflow && count > 0) {
 				if (contentCacheLimit != null &&
@@ -249,9 +294,23 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 			}
 		}
 
+		/**
+		 * 直接从指定偏移量读取指定长度的数据放入 b 中，然后返回读取数据的大小
+		 * <ul>
+		 *     <li>正常走完这个方法，输入流对应的字节数组就已经完全保存在缓存中了</li>
+		 *     <li>后面就可以直接通过缓存重新转为输入流，就可以重新读取了</li>
+		 * </ul>
+		 * @param b
+		 * @param off
+		 * @param len
+		 * @return
+		 * @throws IOException
+		 */
 		@Override
 		public int read(final byte[] b, final int off, final int len) throws IOException {
+			// 读取原输入流
 			int count = this.is.read(b, off, len);
+			// 将读取出来的字节数组保存在缓存中
 			writeToCache(b, off, count);
 			return count;
 		}

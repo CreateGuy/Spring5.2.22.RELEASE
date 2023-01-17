@@ -57,9 +57,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolve {@code @ModelAttribute} annotated method arguments and handle
- * return values from {@code @ModelAttribute} annotated methods.
- *
+ * 作为解析和处理返回值带有 {@link ModelAttribute} 的方法
  * <p>Model attributes are obtained from the model or created with a default
  * constructor (and then added to the model). Once created the attribute is
  * populated via data binding to Servlet request parameters. Validation may be
@@ -86,7 +84,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * 注解不存在时候，是否由此参数解析器解析
+	 * 注解不存在时候，是否还是由此参数解析器解析
 	 */
 	private final boolean annotationNotRequired;
 
@@ -103,7 +101,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 
 
 	/**
-	 * 此参数解析器支持：
+	 * 作为参数解析器支持：
 	 * <ul>
 	 *     <li>支持 @{@code ModelAttribute}</li>
 	 *     <li>支持 非简单类型</li>
@@ -174,6 +172,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 				if (!mavContainer.isBindingDisabled(name)) {
 					bindRequestParameters(binder, webRequest);
 				}
+				// 参数校验
 				validateIfApplicable(binder, parameter);
 				// 绑定过程中如果出现了异常并且不允许致命异常，那么抛出异常
 				if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
@@ -187,7 +186,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 			bindingResult = binder.getBindingResult();
 		}
 
-		// 在模型的最后面添加有关绑定的相关参数
+		// 在Model的最后面添加有关绑定的相关参数
 		Map<String, Object> bindingResultModel = bindingResult.getModel();
 		mavContainer.removeAttributes(bindingResultModel);
 		mavContainer.addAllAttributes(bindingResultModel);
@@ -392,7 +391,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	}
 
 	/**
-	 * Validate the model attribute if applicable.
+	 * 参数校验
 	 * <p>The default implementation checks for {@code @javax.validation.Valid},
 	 * Spring's {@link org.springframework.validation.annotation.Validated},
 	 * and custom annotations whose name starts with "Valid".
@@ -497,9 +496,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	}
 
 	/**
-	 * Return {@code true} if there is a method-level {@code @ModelAttribute}
-	 * or, in default resolution mode, for any return value type that is not
-	 * a simple type.
+	 * 作为返回值处理器，支持带有 @{@code ModelAttribute} 或者是不是简单类型的
 	 */
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
@@ -508,7 +505,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 	}
 
 	/**
-	 * Add non-null return values to the {@link ModelAndViewContainer}.
+	 * 直接将方法返回值添加到 {@link ModelAndViewContainer} 中的 Model 中
 	 */
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
@@ -522,13 +519,18 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 
 
 	/**
-	 * {@link MethodParameter} subclass which detects field annotations as well.
-	 * @since 5.1
+	 * {@link MethodParameter} 的实现类，用于从方法参数前面和方法参数自身类上获取注解
 	 */
 	private static class FieldAwareConstructorParameter extends MethodParameter {
 
+		/**
+		 * 方法参数名称
+		 */
 		private final String parameterName;
 
+		/**
+		 * 方法参数前面和方法参数自身类上的注解
+		 */
 		@Nullable
 		private volatile Annotation[] combinedAnnotations;
 
@@ -541,9 +543,11 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 		public Annotation[] getParameterAnnotations() {
 			Annotation[] anns = this.combinedAnnotations;
 			if (anns == null) {
+				// 先从方法参数前面获取所有注解
 				anns = super.getParameterAnnotations();
 				try {
 					Field field = getDeclaringClass().getDeclaredField(this.parameterName);
+					// 获得这个字段对应的类上的注解
 					Annotation[] fieldAnns = field.getAnnotations();
 					if (fieldAnns.length > 0) {
 						List<Annotation> merged = new ArrayList<>(anns.length + fieldAnns.length);
@@ -556,10 +560,12 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 									break;
 								}
 							}
+							// 当类上的注解没有在方法参数前面注解的时候，加入进去
 							if (!existingType) {
 								merged.add(fieldAnn);
 							}
 						}
+						// 最终是去重后的注解数组
 						anns = merged.toArray(new Annotation[0]);
 					}
 				}

@@ -621,7 +621,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the annotations associated with the specific method/constructor parameter.
+	 * 返回与特定方法/构造函数参数相关联的注解
 	 */
 	public Annotation[] getParameterAnnotations() {
 		Annotation[] paramAnns = this.parameterAnnotations;

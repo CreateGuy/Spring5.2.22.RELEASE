@@ -113,8 +113,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 
 
 	/**
-	 * Return the media types supported by all provided message converters sorted
-	 * by specificity via {@link MediaType#sortBySpecificity(List)}.
+	 * 返回所有 {@code HttpMessageConverter} 支持的媒体类型
 	 */
 	private static List<MediaType> getAllSupportedMediaTypes(List<HttpMessageConverter<?>> messageConverters) {
 		Set<MediaType> allSupportedMediaTypes = new LinkedHashSet<>();
@@ -252,7 +251,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	}
 
 	/**
-	 * Create a new {@link HttpInputMessage} from the given {@link NativeWebRequest}.
+	 * 创建  {@link NativeWebRequest} 对应的 {@link HttpInputMessage}
 	 * @param webRequest the web request to create an input message from
 	 * @return the input message
 	 */
@@ -284,8 +283,8 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	}
 
 	/**
-	 * 不懂具体的场景
-	 * Whether to raise a fatal bind exception on validation errors.
+	 * 当指定指定参数的后面是一个 Errors 时，返回true
+	 * <p>比如说倒数第二个参数抛出了异常，那么倒数第一个是异常类型，那么就可以丢给处理程序处理</p>
 	 * @param binder the data binder used to perform data binding
 	 * @param parameter the method parameter descriptor
 	 * @return {@code true} if the next method argument is not of type {@link Errors}
@@ -337,6 +336,7 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 		public EmptyBodyCheckingHttpInputMessage(HttpInputMessage inputMessage) throws IOException {
 			this.headers = inputMessage.getHeaders();
 			InputStream inputStream = inputMessage.getBody();
+			// 本质上是支持多次读取输入流的，但实际上取决于 markSupported 方法
 			if (inputStream.markSupported()) {
 				inputStream.mark(1);
 				this.body = (inputStream.read() != -1 ? inputStream : null);

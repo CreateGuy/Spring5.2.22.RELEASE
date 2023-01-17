@@ -63,8 +63,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * Extends {@link AbstractMessageConverterMethodArgumentResolver} with the ability to handle method
- * return values by writing to the response with {@link HttpMessageConverter HttpMessageConverters}.
+ * 扩展至 {@link AbstractMessageConverterMethodArgumentResolver}，支持通过 {@link HttpMessageConverter} 向请求要和响应中读取和写入消息
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
@@ -139,7 +138,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 
 	/**
-	 * Creates a new {@link HttpOutputMessage} from the given {@link NativeWebRequest}.
+	 * 创建 {@link NativeWebRequest} 对应的 {@link HttpOutputMessage}
 	 * @param webRequest the web request to create an output message from
 	 * @return the output message
 	 */
@@ -150,8 +149,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 	}
 
 	/**
-	 * Writes the given return value to the given web request. Delegates to
-	 * {@link #writeWithMessageConverters(Object, MethodParameter, ServletServerHttpRequest, ServletServerHttpResponse)}
+	 * 将指定值写入响应中
 	 */
 	protected <T> void writeWithMessageConverters(T value, MethodParameter returnType, NativeWebRequest webRequest)
 			throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
@@ -316,7 +314,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 			}
 		}
 
-		// 到这就说明没办法适配媒体类型，但是有需要写入到响应中的值，就需要抛出异常了
+		// 到这就说明没办法适配媒体类型，但是又需要写入到响应中的值，就需要抛出异常了
 		if (body != null) {
 			Set<MediaType> producibleMediaTypes =
 					(Set<MediaType>) inputMessage.getServletRequest()
@@ -362,7 +360,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 	}
 
 	/**
-	 * Returns the media types that can be produced.
+	 * 返回服务器可以生成的媒体类型
 	 * @see #getProducibleMediaTypes(HttpServletRequest, Class, Type)
 	 */
 	@SuppressWarnings("unused")
@@ -478,6 +476,12 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 		}
 	}
 
+	/**
+	 * 是否是安全的文件扩展名
+	 * @param request
+	 * @param extension
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private boolean safeExtension(HttpServletRequest request, @Nullable String extension) {
 		if (!StringUtils.hasText(extension)) {

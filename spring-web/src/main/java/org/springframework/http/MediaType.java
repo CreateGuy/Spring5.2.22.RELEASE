@@ -491,9 +491,7 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
-	 * Return the quality factor, as indicated by a {@code q} parameter, if any.
-	 * Defaults to {@code 1.0}.
-	 * @return the quality factor as double value
+	 * 返回q值
 	 */
 	public double getQualityValue() {
 		String qualityFactor = getParameter(PARAM_QUALITY_FACTOR);
@@ -781,7 +779,7 @@ public class MediaType extends MimeType implements Serializable {
 
 
 	/**
-	 * Comparator used by {@link #sortBySpecificity(List)}.
+	 * q值排序器
 	 */
 	public static final Comparator<MediaType> SPECIFICITY_COMPARATOR = new SpecificityComparator<MediaType>() {
 
