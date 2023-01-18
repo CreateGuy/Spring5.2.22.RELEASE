@@ -38,6 +38,7 @@ public interface ServerHttpResponse extends HttpOutputMessage, Flushable, Closea
 	void setStatusCode(HttpStatus status);
 
 	/**
+	 * <p>是将消息发送给客户端来，据说是缓存区要达到256字节才会真正的发送</p>
 	 * Ensure that the headers and the content of the response are written out.
 	 * <p>After the first flush, headers can no longer be changed.
 	 * Only further content writing and content flushing is possible.

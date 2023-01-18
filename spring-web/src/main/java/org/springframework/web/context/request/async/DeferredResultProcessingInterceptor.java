@@ -19,6 +19,8 @@ package org.springframework.web.context.request.async;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 延迟任务的拦截器
+ * <p>这个不像 {@link CallableProcessingInterceptor}, 这个没有异步线程！！！！</p>
  * Intercepts concurrent request handling, where the concurrent result is
  * obtained by waiting for a {@link DeferredResult} to be set from a thread
  * chosen by the application (e.g. in response to some external event).
@@ -43,9 +45,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 public interface DeferredResultProcessingInterceptor {
 
 	/**
-	 * Invoked immediately before the start of concurrent handling, in the same
-	 * thread that started it. This method may be used to capture state just prior
-	 * to the start of concurrent processing with the given {@code DeferredResult}.
+	 * 在并发处理开始之前立即调用
 	 * @param request the current request
 	 * @param deferredResult the DeferredResult for the current request
 	 * @throws Exception in case of errors
@@ -55,9 +55,7 @@ public interface DeferredResultProcessingInterceptor {
 	}
 
 	/**
-	 * Invoked immediately after the start of concurrent handling, in the same
-	 * thread that started it. This method may be used to detect the start of
-	 * concurrent processing with the given {@code DeferredResult}.
+	 * 在并发处理开始后立即在启动并发处理的同一个线程中调用
 	 * <p>The {@code DeferredResult} may have already been set, for example at
 	 * the time of its creation or by another thread.
 	 * @param request the current request

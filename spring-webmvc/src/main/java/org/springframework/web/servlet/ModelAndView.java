@@ -224,9 +224,8 @@ public class ModelAndView {
 	}
 
 	/**
-	 * Return whether we use a view reference, i.e. {@code true}
-	 * if the view has been specified via a name to be resolved by the
-	 * DispatcherServlet via a ViewResolver.
+	 * 是否使用视图
+	 * <p>如果视图已经通过名称指定，将由 DispatcherServlet 通过 ViewResolver解析</p>
 	 */
 	public boolean isReference() {
 		return (this.view instanceof String);

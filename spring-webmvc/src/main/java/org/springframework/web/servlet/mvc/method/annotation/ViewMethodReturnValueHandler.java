@@ -26,7 +26,8 @@ import org.springframework.web.servlet.SmartView;
 import org.springframework.web.servlet.View;
 
 /**
- * Handles return values that are of type {@link View}.
+ * 处理返回值是 {@link View} 的返回值处理器
+ * <p>直接将视图放入 {@link ModelAndViewContainer} 中</p>
  *
  * <p>A {@code null} return value is left as-is leaving it to the configured
  * {@link RequestToViewNameTranslator} to select a view name by convention.

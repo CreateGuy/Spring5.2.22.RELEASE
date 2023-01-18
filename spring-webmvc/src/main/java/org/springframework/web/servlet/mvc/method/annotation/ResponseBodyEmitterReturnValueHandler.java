@@ -127,6 +127,7 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue == null) {
+			// 标记请求已经完成
 			mavContainer.setRequestHandled(true);
 			return;
 		}
@@ -135,6 +136,7 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 		Assert.state(response != null, "No HttpServletResponse");
 		ServerHttpResponse outputMessage = new ServletServerHttpResponse(response);
 
+		// 将ResponseEntity中的信息填充进响应中
 		if (returnValue instanceof ResponseEntity) {
 			ResponseEntity<?> responseEntity = (ResponseEntity<?>) returnValue;
 			response.setStatus(responseEntity.getStatusCodeValue());
@@ -169,11 +171,11 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 		}
 		emitter.extendResponse(outputMessage);
 
-		// At this point we know we're streaming..
+		// 禁止缓存
 		ShallowEtagHeaderFilter.disableContentCaching(request);
 
-		// Wrap the response to ignore further header changes
-		// Headers will be flushed at the first write
+		// 封装响应以忽略进一步的报头更改
+		// 报头将在第一次写入时刷新
 		outputMessage = new StreamingServletServerHttpResponse(outputMessage);
 
 		HttpMessageConvertingHandler handler;
@@ -192,10 +194,13 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 
 
 	/**
-	 * ResponseBodyEmitter.Handler that writes with HttpMessageConverter's.
+	 * 使用 {@link HttpMessageConverter} 写入消息
 	 */
 	private class HttpMessageConvertingHandler implements ResponseBodyEmitter.Handler {
 
+		/**
+		 * 当时的响应
+		 */
 		private final ServerHttpResponse outputMessage;
 
 		private final DeferredResult<?> deferredResult;
@@ -210,6 +215,13 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 			sendInternal(data, mediaType);
 		}
 
+		/**
+		 * 拿到以前的响应，然后发送消息
+		 * @param data
+		 * @param mediaType
+		 * @param <T>
+		 * @throws IOException
+		 */
 		@SuppressWarnings("unchecked")
 		private <T> void sendInternal(T data, @Nullable MediaType mediaType) throws IOException {
 			for (HttpMessageConverter<?> converter : ResponseBodyEmitterReturnValueHandler.this.sseMessageConverters) {

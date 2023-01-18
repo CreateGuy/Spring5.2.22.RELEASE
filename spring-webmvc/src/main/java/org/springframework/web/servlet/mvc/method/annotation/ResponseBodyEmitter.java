@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 是针对于 http streaming 的，让请求处于一个长链接的过程，这样就服务端就可以一直想客户端发送消息了
  * A controller method return value type for asynchronous request processing
  * where one or more objects are written to the response.
  *
@@ -63,6 +64,9 @@ import org.springframework.util.ObjectUtils;
  */
 public class ResponseBodyEmitter {
 
+	/**
+	 * 超时时间
+	 */
 	@Nullable
 	private final Long timeout;
 
@@ -159,10 +163,8 @@ public class ResponseBodyEmitter {
 	}
 
 	/**
-	 * Invoked after the response is updated with the status code and headers,
-	 * if the ResponseBodyEmitter is wrapped in a ResponseEntity, but before the
-	 * response is committed, i.e. before the response body has been written to.
-	 * <p>The default implementation is empty.
+	 * 如果ResponseBodyEmitter被包装在ResponseEntity中，
+	 * 则在使用状态代码和报头更新响应之后调用，但在提交响应之前，即在向响应体写入之前。
 	 */
 	protected void extendResponse(ServerHttpResponse outputMessage) {
 	}

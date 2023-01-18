@@ -24,17 +24,20 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Assists with the invocation of {@link DeferredResultProcessingInterceptor}'s.
- *
- * @author Rossen Stoyanchev
- * @since 3.2
+ * 延迟任务拦截器链
  */
 class DeferredResultInterceptorChain {
 
 	private static final Log logger = LogFactory.getLog(DeferredResultInterceptorChain.class);
 
+	/**
+	 * 注册的延迟任务拦截器
+	 */
 	private final List<DeferredResultProcessingInterceptor> interceptors;
 
+	/**
+	 * 拦截器执行的位置
+	 */
 	private int preProcessingIndex = -1;
 
 
@@ -57,6 +60,13 @@ class DeferredResultInterceptorChain {
 		}
 	}
 
+	/**
+	 * 延迟任务执行完毕
+	 * @param request
+	 * @param deferredResult
+	 * @param concurrentResult
+	 * @return
+	 */
 	public Object applyPostProcess(NativeWebRequest request,  DeferredResult<?> deferredResult,
 			Object concurrentResult) {
 
@@ -71,6 +81,12 @@ class DeferredResultInterceptorChain {
 		return concurrentResult;
 	}
 
+	/**
+	 * 延迟任务的超时处理器
+	 * @param request
+	 * @param deferredResult
+	 * @throws Exception
+	 */
 	public void triggerAfterTimeout(NativeWebRequest request, DeferredResult<?> deferredResult) throws Exception {
 		for (DeferredResultProcessingInterceptor interceptor : this.interceptors) {
 			if (deferredResult.isSetOrExpired()) {
@@ -83,9 +99,12 @@ class DeferredResultInterceptorChain {
 	}
 
 	/**
-	 * Determine if further error handling should be bypassed.
-	 * @return {@code true} to continue error handling, or false to bypass any further
-	 * error handling
+	 * 延迟任务的错误处理器
+	 * @param request
+	 * @param deferredResult
+	 * @param ex
+	 * @return
+	 * @throws Exception
 	 */
 	public boolean triggerAfterError(NativeWebRequest request, DeferredResult<?> deferredResult, Throwable ex)
 			throws Exception {
@@ -101,6 +120,11 @@ class DeferredResultInterceptorChain {
 		return true;
 	}
 
+	/**
+	 * 延迟任务的完成处理器
+	 * @param request
+	 * @param deferredResult
+	 */
 	public void triggerAfterCompletion(NativeWebRequest request, DeferredResult<?> deferredResult) {
 		for (int i = this.preProcessingIndex; i >= 0; i--) {
 			try {

@@ -27,8 +27,7 @@ import org.springframework.web.servlet.SmartView;
 import org.springframework.web.servlet.View;
 
 /**
- * Handles return values of type {@link ModelAndView} copying view and model
- * information to the {@link ModelAndViewContainer}.
+ * 处理 {@link ModelAndView}类型的返回值，将视图和模型复制到 {@link ModelAndViewContainer} 中
  *
  * <p>If the return value is {@code null}, the
  * {@link ModelAndViewContainer#setRequestHandled(boolean)} flag is set to
@@ -44,6 +43,9 @@ import org.springframework.web.servlet.View;
  */
 public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
 
+	/**
+	 * 判断是否是重定向视图的表达式
+	 */
 	@Nullable
 	private String[] redirectPatterns;
 
@@ -74,16 +76,28 @@ public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturn
 		return ModelAndView.class.isAssignableFrom(returnType.getParameterType());
 	}
 
+	/**
+	 * 将返回的 {@code ModelAndView} 的参数填充进 {@code ModelAndViewContainer} 中
+	 * @param returnValue the value returned from the handler method
+	 * @param returnType the type of the return value. This type must have
+	 * previously been passed to {@link #supportsReturnType} which must
+	 * have returned {@code true}.
+	 * @param mavContainer the ModelAndViewContainer for the current request
+	 * @param webRequest the current request
+	 * @throws Exception
+	 */
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue == null) {
+			// 表明请求已经完成
 			mavContainer.setRequestHandled(true);
 			return;
 		}
 
 		ModelAndView mav = (ModelAndView) returnValue;
+		// 是否使用视图
 		if (mav.isReference()) {
 			String viewName = mav.getViewName();
 			mavContainer.setViewName(viewName);
@@ -103,12 +117,11 @@ public class ModelAndViewMethodReturnValueHandler implements HandlerMethodReturn
 	}
 
 	/**
-	 * Whether the given view name is a redirect view reference.
-	 * The default implementation checks the configured redirect patterns and
-	 * also if the view name starts with the "redirect:" prefix.
-	 * @param viewName the view name to check, never {@code null}
-	 * @return "true" if the given view name is recognized as a redirect view
-	 * reference; "false" otherwise.
+	 * 是否是重定向视图名，规则如下：
+	 * <ol>
+	 *     <li>以某种表达式去匹配</li>
+	 *     <li>视图名直接以 redirect: 开头</li>
+	 * </ol>
 	 */
 	protected boolean isRedirectViewName(String viewName) {
 		return (PatternMatchUtils.simpleMatch(this.redirectPatterns, viewName) || viewName.startsWith("redirect:"));

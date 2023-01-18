@@ -191,6 +191,7 @@ public class ShallowEtagHeaderFilter extends OncePerRequestFilter {
 
 
 	/**
+	 * 禁止缓存，大概率是因为使用了 http streaming
 	 * This method can be used to suppress the content caching response wrapper
 	 * of the ShallowEtagHeaderFilter. The main reason for this is streaming
 	 * scenarios which are not to be cached and do not need an eTag.

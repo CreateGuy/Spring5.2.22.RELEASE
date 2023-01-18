@@ -107,7 +107,7 @@ public class HandlerMethodReturnValueHandlerComposite implements HandlerMethodRe
 
 	/**
 	 * 判断是否有支持异步任务的返回值处理器
-	 * <p>WebAsyncTask作为返回值的时候，使用的是 AsyncTaskMethodReturnValueHandler，这个并不是下面的 HandlerMethodReturnValueHandler的实现类，不懂</p>
+	 * <p>WebAsyncTask作为返回值的时候，使用的是 AsyncTaskMethodReturnValueHandler</p>
 	 * @param value
 	 * @param returnType
 	 * @return

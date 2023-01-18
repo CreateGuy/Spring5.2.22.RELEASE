@@ -57,7 +57,9 @@ public class DeferredResult<T> {
 
 	private static final Log logger = LogFactory.getLog(DeferredResult.class);
 
-
+	/**
+	 * 以毫秒为单位返回配置的超时值
+	 */
 	@Nullable
 	private final Long timeoutValue;
 
@@ -73,6 +75,9 @@ public class DeferredResult<T> {
 
 	private volatile Object result = RESULT_NONE;
 
+	/**
+	 * 延迟任务完成即为过期
+	 */
 	private volatile boolean expired = false;
 
 
@@ -119,8 +124,7 @@ public class DeferredResult<T> {
 
 
 	/**
-	 * Return {@code true} if this DeferredResult is no longer usable either
-	 * because it was previously set or because the underlying request expired.
+	 * 如果这个DeferredResult不再可用(因为之前设置了它或因为底层请求过期)，则返回true。
 	 * <p>The result may have been set with a call to {@link #setResult(Object)},
 	 * or {@link #setErrorResult(Object)}, or as a result of a timeout, if a
 	 * timeout result was provided to the constructor. The request may also
@@ -193,7 +197,7 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Provide a handler to use to handle the result value.
+	 * 提供一个用于处理结果值的处理程序
 	 * @param resultHandler the handler
 	 * @see DeferredResultProcessingInterceptor
 	 */
@@ -205,20 +209,18 @@ public class DeferredResult<T> {
 		}
 		Object resultToHandle;
 		synchronized (this) {
-			// Got the lock in the meantime: double-check expiration status
+			// 同时拿到了锁，再次检查过期状态
 			if (this.expired) {
 				return;
 			}
 			resultToHandle = this.result;
 			if (resultToHandle == RESULT_NONE) {
-				// No result yet: store handler for processing once it comes in
+				// 表明还没有结果
 				this.resultHandler = resultHandler;
 				return;
 			}
 		}
-		// If we get here, we need to process an existing result object immediately.
-		// The decision is made within the result lock; just the handle call outside
-		// of it, avoiding any deadlock potential with Servlet container locks.
+		// 到这就说明延迟任务没有过期但是已经有了结果？不懂
 		try {
 			resultHandler.handleResult(resultToHandle);
 		}

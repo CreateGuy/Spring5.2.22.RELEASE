@@ -72,6 +72,9 @@ public final class WebAsyncManager {
 	private static final CallableProcessingInterceptor timeoutCallableInterceptor =
 			new TimeoutCallableProcessingInterceptor();
 
+	/**
+	 * 延时任务的超时拦截器
+	 */
 	private static final DeferredResultProcessingInterceptor timeoutDeferredResultInterceptor =
 			new TimeoutDeferredResultProcessingInterceptor();
 
@@ -470,11 +473,13 @@ public final class WebAsyncManager {
 		Assert.notNull(deferredResult, "DeferredResult must not be null");
 		Assert.state(this.asyncWebRequest != null, "AsyncWebRequest must not be null");
 
+		// 设置超时时间
 		Long timeout = deferredResult.getTimeoutValue();
 		if (timeout != null) {
 			this.asyncWebRequest.setTimeout(timeout);
 		}
 
+		// 配置延时任务的拦截器
 		List<DeferredResultProcessingInterceptor> interceptors = new ArrayList<>();
 		interceptors.add(deferredResult.getInterceptor());
 		interceptors.addAll(this.deferredResultInterceptors.values());
@@ -482,6 +487,7 @@ public final class WebAsyncManager {
 
 		final DeferredResultInterceptorChain interceptorChain = new DeferredResultInterceptorChain(interceptors);
 
+		// 注册延迟任务的超时拦截器
 		this.asyncWebRequest.addTimeoutHandler(() -> {
 			try {
 				interceptorChain.triggerAfterTimeout(this.asyncWebRequest, deferredResult);
@@ -491,6 +497,7 @@ public final class WebAsyncManager {
 			}
 		});
 
+		// 注册延迟任务的错误拦截器
 		this.asyncWebRequest.addErrorHandler(ex -> {
 			if (!this.errorHandlingInProgress) {
 				try {
@@ -505,6 +512,7 @@ public final class WebAsyncManager {
 			}
 		});
 
+		// 注册延迟任务的完成拦截器
 		this.asyncWebRequest.addCompletionHandler(()
 				-> interceptorChain.triggerAfterCompletion(this.asyncWebRequest, deferredResult));
 
@@ -514,7 +522,9 @@ public final class WebAsyncManager {
 		try {
 			interceptorChain.applyPreProcess(this.asyncWebRequest, deferredResult);
 			deferredResult.setResultHandler(result -> {
+				// 到这就说明延迟任务执行完毕
 				result = interceptorChain.applyPostProcess(this.asyncWebRequest, deferredResult, result);
+				// 设置并发结果和派发
 				setConcurrentResultAndDispatch(result);
 			});
 		}
