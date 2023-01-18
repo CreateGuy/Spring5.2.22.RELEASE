@@ -195,6 +195,7 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 		MultiValueMap<String, String> expectedParams = flashMap.getTargetRequestParams();
 
 		// 进行严格的比较
+		// 毕竟如果flashMap的目标Url和从请求域读取的源Url不一样，那就不匹配
 		for (Map.Entry<String, List<String>> entry : expectedParams.entrySet()) {
 			List<String> actualValues = actualParams.get(entry.getKey());
 			// 必须要包含参数

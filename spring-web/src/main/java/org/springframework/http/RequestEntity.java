@@ -29,11 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Extension of {@link HttpEntity} that adds a {@linkplain HttpMethod method} and
- * {@linkplain URI uri}. Used in {@code RestTemplate} and {@code @Controller} methods.
- *
- * <p>In {@code RestTemplate}, this class is used as parameter in
- * {@link org.springframework.web.client.RestTemplate#exchange(RequestEntity, Class) exchange()}:
+ * 继承至 {@link HttpEntity}，
+ * <p>eg: 用于{@code RestTemplate}方法：</p>
  * <pre class="code">
  * MyRequest body = ...
  * RequestEntity&lt;MyRequest&gt; request = RequestEntity
@@ -80,6 +77,9 @@ public class RequestEntity<T> extends HttpEntity<T> {
 
 	private final URI url;
 
+	/**
+	 * 请求体对应的类型，比如说请求体转换为User，那么就是User对应的Type
+	 */
 	@Nullable
 	private final Type type;
 
@@ -436,7 +436,9 @@ public class RequestEntity<T> extends HttpEntity<T> {
 		<T> RequestEntity<T> body(T body, Type type);
 	}
 
-
+	/**
+	 * 默认的对请求体和请求头操作的构建器
+	 */
 	private static class DefaultBodyBuilder implements BodyBuilder {
 
 		private final HttpMethod method;

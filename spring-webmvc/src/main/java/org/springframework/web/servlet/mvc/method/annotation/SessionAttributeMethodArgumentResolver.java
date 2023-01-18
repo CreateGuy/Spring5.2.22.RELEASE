@@ -29,13 +29,18 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver;
 
 /**
- * Resolves method arguments annotated with an @{@link SessionAttribute}.
+ * 解析 @{@link SessionAttribute} 的参数解析器
  *
  * @author Rossen Stoyanchev
  * @since 4.3
  */
 public class SessionAttributeMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
+	/**
+	 * 此参数解析器只支持 @{@code SessionAttribute}
+	 * @param parameter
+	 * @return
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.hasParameterAnnotation(SessionAttribute.class);
@@ -48,6 +53,14 @@ public class SessionAttributeMethodArgumentResolver extends AbstractNamedValueMe
 		return new NamedValueInfo(ann.name(), ann.required(), ValueConstants.DEFAULT_NONE);
 	}
 
+	/**
+	 * 直接从会话域中取参数
+	 * @param name the name of the value being resolved
+	 * @param parameter the method parameter to resolve to an argument value
+	 * (pre-nested in case of a {@link java.util.Optional} declaration)
+	 * @param request the current request
+	 * @return
+	 */
 	@Override
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest request) {

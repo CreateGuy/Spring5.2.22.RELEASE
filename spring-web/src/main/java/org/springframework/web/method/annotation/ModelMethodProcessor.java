@@ -27,7 +27,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolves {@link Model} arguments and handles {@link Model} return values.
+ * 解析 {@link Model} 类型参数和处理 {@link Model} 类型的返回值的
  *
  * <p>A {@link Model} return type has a set purpose. Therefore this handler
  * should be configured ahead of handlers that support any return value type
@@ -65,11 +65,12 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 		if (returnValue == null) {
 			return;
 		}
+		// 返回值也是Model，然后进行参数合并
 		else if (returnValue instanceof Model) {
 			mavContainer.addAllAttributes(((Model) returnValue).asMap());
 		}
 		else {
-			// should not happen
+			// 不应该发生
 			throw new UnsupportedOperationException("Unexpected return type [" +
 					returnType.getParameterType().getName() + "] in method: " + returnType.getMethod());
 		}

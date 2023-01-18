@@ -42,8 +42,7 @@ import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
- * Resolves servlet backed request-related method arguments. Supports values of the
- * following types:
+ * 解析 servlet 支持的请求相关方法参数。支持以下类型的值:
  * <ul>
  * <li>{@link WebRequest}
  * <li>{@link ServletRequest}
@@ -118,10 +117,17 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			return resolveNativeRequest(webRequest, paramType);
 		}
 
-		// HttpServletRequest required for all further argument types
+		// 解析可由 HttpServletRequest 派生出来的参数
 		return resolveArgument(paramType, resolveNativeRequest(webRequest, HttpServletRequest.class));
 	}
 
+	/**
+	 * 返回指定类型的请求
+	 * @param webRequest
+	 * @param requiredType
+	 * @param <T>
+	 * @return
+	 */
 	private <T> T resolveNativeRequest(NativeWebRequest webRequest, Class<T> requiredType) {
 		T nativeRequest = webRequest.getNativeRequest(requiredType);
 		if (nativeRequest == null) {
@@ -131,8 +137,16 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 		return nativeRequest;
 	}
 
+	/**
+	 * 解析可由 HttpServletRequest 派生出来的参数
+	 * @param paramType
+	 * @param request
+	 * @return
+	 * @throws IOException
+	 */
 	@Nullable
 	private Object resolveArgument(Class<?> paramType, HttpServletRequest request) throws IOException {
+		// HttpSession
 		if (HttpSession.class.isAssignableFrom(paramType)) {
 			HttpSession session = request.getSession();
 			if (session != null && !paramType.isInstance(session)) {
@@ -141,9 +155,11 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			}
 			return session;
 		}
+		// PushBuilder
 		else if (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) {
 			return PushBuilderDelegate.resolvePushBuilder(request, paramType);
 		}
+		// InputStream
 		else if (InputStream.class.isAssignableFrom(paramType)) {
 			InputStream inputStream = request.getInputStream();
 			if (inputStream != null && !paramType.isInstance(inputStream)) {
@@ -152,6 +168,7 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			}
 			return inputStream;
 		}
+		// Reader
 		else if (Reader.class.isAssignableFrom(paramType)) {
 			Reader reader = request.getReader();
 			if (reader != null && !paramType.isInstance(reader)) {
@@ -160,7 +177,9 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			}
 			return reader;
 		}
+		// Principal
 		else if (Principal.class.isAssignableFrom(paramType)) {
+			// Principal是有关认证对象的，像SpringSecurity就有AbstractAuthenticationToken用来封装
 			Principal userPrincipal = request.getUserPrincipal();
 			if (userPrincipal != null && !paramType.isInstance(userPrincipal)) {
 				throw new IllegalStateException(
@@ -183,7 +202,7 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 			return (timeZone != null ? timeZone.toZoneId() : ZoneId.systemDefault());
 		}
 
-		// Should never happen...
+		// 不应该发生
 		throw new UnsupportedOperationException("Unknown parameter type: " + paramType.getName());
 	}
 
@@ -195,6 +214,7 @@ public class ServletRequestMethodArgumentResolver implements HandlerMethodArgume
 
 		@Nullable
 		public static Object resolvePushBuilder(HttpServletRequest request, Class<?> paramType) {
+			// 不懂，虽然Servlet4.0支持了PushBuilder，但是默认是关闭的，是直接返回null的
 			PushBuilder pushBuilder = request.newPushBuilder();
 			if (pushBuilder != null && !paramType.isInstance(pushBuilder)) {
 				throw new IllegalStateException(

@@ -244,7 +244,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
 
 	/**
-	 * Request attribute 中保存的 当前请求的FlashMap 的key
+	 * Request attribute 中保存的 当前请求的FlashMap 的key，通常是重定向模型中会使用，最后会保存在会话中
 	 */
 	public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
 

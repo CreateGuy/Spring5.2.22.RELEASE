@@ -27,17 +27,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Resolves method arguments annotated with {@code @Value}.
- *
- * <p>An {@code @Value} does not have a name but gets resolved from the default
- * value string, which may contain ${...} placeholder or Spring Expression
- * Language #{...} expressions.
- *
- * <p>A {@link WebDataBinder} may be invoked to apply type conversion to
- * resolved argument value.
- *
- * @author Rossen Stoyanchev
- * @since 3.1
+ * 解析 @{@link Value} 的参数解析器
+ * <p>eg：@Value("#{systemProperties['java.vm.version']}") String version</p>
  */
 public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueMethodArgumentResolver {
 
@@ -67,7 +58,7 @@ public class ExpressionValueMethodArgumentResolver extends AbstractNamedValueMet
 	@Override
 	@Nullable
 	protected Object resolveName(String name, MethodParameter parameter, NativeWebRequest webRequest) throws Exception {
-		// No name to resolve
+		// 此参数解析器不依靠此方法进行解析，而是通过 resolveEmbeddedValuesAndExpressions 去解析，所以这里返回空
 		return null;
 	}
 

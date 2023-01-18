@@ -223,8 +223,8 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public static final String DATE = "Date";
 	/**
-	 * The HTTP {@code ETag} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">Section 2.3 of RFC 7232</a>
+	 * 一般表明某种资源的哈希值，通常用于缓存机制中
+	 * <p>比如说浏览器将ETag发给服务端，服务端根据这个确定是返回最新的资源，或者是302(未修改)</p>
 	 */
 	public static final String ETAG = "ETag";
 	/**
@@ -273,8 +273,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
 	/**
-	 * The HTTP {@code Last-Modified} header field name.
-	 * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.2">Section 2.2 of RFC 7232</a>
+	 * 资源最后一次修改的时间
 	 */
 	public static final String LAST_MODIFIED = "Last-Modified";
 	/**

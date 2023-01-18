@@ -30,8 +30,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolves servlet backed response-related method arguments. Supports values of the
- * following types:
+ * 解析 servlet 支持的响应相关方法参数。支持以下类型的值:
  * <ul>
  * <li>{@link ServletResponse}
  * <li>{@link OutputStream}
@@ -63,6 +62,7 @@ public class ServletResponseMethodArgumentResolver implements HandlerMethodArgum
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
+		// 解析了有关响应的参数，直接设置请求已经完成？
 		if (mavContainer != null) {
 			mavContainer.setRequestHandled(true);
 		}
@@ -74,10 +74,17 @@ public class ServletResponseMethodArgumentResolver implements HandlerMethodArgum
 			return resolveNativeResponse(webRequest, paramType);
 		}
 
-		// ServletResponse required for all further argument types
+		// ServletResponse 可以派生的参数
 		return resolveArgument(paramType, resolveNativeResponse(webRequest, ServletResponse.class));
 	}
 
+	/**
+	 * 返回指定类型的请求
+	 * @param webRequest
+	 * @param requiredType
+	 * @param <T>
+	 * @return
+	 */
 	private <T> T resolveNativeResponse(NativeWebRequest webRequest, Class<T> requiredType) {
 		T nativeResponse = webRequest.getNativeResponse(requiredType);
 		if (nativeResponse == null) {
@@ -87,6 +94,13 @@ public class ServletResponseMethodArgumentResolver implements HandlerMethodArgum
 		return nativeResponse;
 	}
 
+	/**
+	 * ServletResponse 可以派生的参数
+	 * @param paramType
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
 	private Object resolveArgument(Class<?> paramType, ServletResponse response) throws IOException {
 		if (OutputStream.class.isAssignableFrom(paramType)) {
 			return response.getOutputStream();
@@ -95,7 +109,7 @@ public class ServletResponseMethodArgumentResolver implements HandlerMethodArgum
 			return response.getWriter();
 		}
 
-		// Should never happen...
+		// 不应该
 		throw new UnsupportedOperationException("Unknown parameter type: " + paramType);
 	}
 

@@ -56,7 +56,7 @@ public final class FlashMap extends HashMap<String, Object> implements Comparabl
 	private String targetRequestPath;
 
 	/**
-	 * 参数
+	 * 原请求的参数
 	 */
 	private final MultiValueMap<String, String> targetRequestParams = new LinkedMultiValueMap<>(4);
 

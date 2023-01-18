@@ -259,7 +259,7 @@ public final class ModelFactory {
 		if (attributeName.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
 			return false;
 		}
-		// 判断属性是否满足 {@code SessionAttribute}
+		// 判断属性是否满足 @SessionAttribute
 		if (this.sessionAttributesHandler.isHandlerSessionAttribute(attributeName, value.getClass())) {
 			return true;
 		}

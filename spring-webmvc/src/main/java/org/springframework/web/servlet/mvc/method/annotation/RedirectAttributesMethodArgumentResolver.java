@@ -32,7 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 /**
- * Resolves method arguments of type {@link RedirectAttributes}.
+ * 处理 {@link RedirectAttributes} 的参数解析器
  *
  * <p>This resolver must be listed ahead of
  * {@link org.springframework.web.method.annotation.ModelMethodProcessor} and
@@ -60,11 +60,13 @@ public class RedirectAttributesMethodArgumentResolver implements HandlerMethodAr
 		ModelMap redirectAttributes;
 		if (binderFactory != null) {
 			DataBinder dataBinder = binderFactory.createBinder(webRequest, null, DataBinder.DEFAULT_OBJECT_NAME);
+			// 参数绑定器在这个模型中后，这个模型就可以支持转换了
 			redirectAttributes = new RedirectAttributesModelMap(dataBinder);
 		}
 		else {
 			redirectAttributes  = new RedirectAttributesModelMap();
 		}
+		// 重点：放到ModelAndViewContainer中，这样后面就会保存到会话中了
 		mavContainer.setRedirectModel(redirectAttributes);
 		return redirectAttributes;
 	}

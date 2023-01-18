@@ -85,6 +85,9 @@ public class ModelAndViewContainer {
 
 	private final Set<String> bindingDisabled = new HashSet<>(4);
 
+	/**
+	 * Session状态
+	 */
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
 
 	/**

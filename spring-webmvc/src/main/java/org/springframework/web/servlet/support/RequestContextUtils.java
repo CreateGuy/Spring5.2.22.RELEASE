@@ -258,10 +258,8 @@ public abstract class RequestContextUtils {
 	}
 
 	/**
-	 * Convenience method that retrieves the {@link #getOutputFlashMap "output"
-	 * FlashMap}, updates it with the path and query params of the target URL,
-	 * and then saves it using the {@link #getFlashMapManager FlashMapManager}.
-	 * @param location the target URL for the redirect
+	 * 将OutFlashMap保存到会话中
+	 * @param location 重定向的目标URL
 	 * @param request the current request
 	 * @param response the current response
 	 * @since 5.0
@@ -272,6 +270,7 @@ public abstract class RequestContextUtils {
 			return;
 		}
 
+		// 设置重定向的URL和QueryString
 		UriComponents uriComponents = UriComponentsBuilder.fromUriString(location).build();
 		flashMap.setTargetRequestPath(uriComponents.getPath());
 		flashMap.addTargetRequestParams(uriComponents.getQueryParams());

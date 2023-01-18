@@ -28,8 +28,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Resolves {@link Map} method arguments and handles {@link Map} return values.
- *
+ * 解析 Map 类型的方法参数并处理 Map 类型返回值
  * <p>A Map return value can be interpreted in more than one ways depending
  * on the presence of annotations like {@code @ModelAttribute} or
  * {@code @ResponseBody}. As of 5.2 this resolver returns false if the
@@ -52,6 +51,7 @@ public class MapMethodProcessor implements HandlerMethodArgumentResolver, Handle
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
 
 		Assert.state(mavContainer != null, "ModelAndViewContainer is required for model exposure");
+		// Model也是一个Map
 		return mavContainer.getModel();
 	}
 
@@ -66,10 +66,11 @@ public class MapMethodProcessor implements HandlerMethodArgumentResolver, Handle
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
 		if (returnValue instanceof Map){
+			// 参数合并
 			mavContainer.addAllAttributes((Map) returnValue);
 		}
 		else if (returnValue != null) {
-			// should not happen
+			// 不应该发生
 			throw new UnsupportedOperationException("Unexpected return type [" +
 					returnType.getParameterType().getName() + "] in method: " + returnType.getMethod());
 		}

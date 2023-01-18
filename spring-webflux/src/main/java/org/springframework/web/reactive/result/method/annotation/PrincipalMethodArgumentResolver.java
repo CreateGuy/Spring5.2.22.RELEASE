@@ -34,7 +34,8 @@ import org.springframework.web.server.ServerWebExchange;
  * @since 5.2
  * @see ServerWebExchangeMethodArgumentResolver
  */
-public class PrincipalMethodArgumentResolver extends HandlerMethodArgumentResolverSupport {
+public class
+PrincipalMethodArgumentResolver extends HandlerMethodArgumentResolverSupport {
 
 	public PrincipalMethodArgumentResolver(ReactiveAdapterRegistry adapterRegistry) {
 		super(adapterRegistry);

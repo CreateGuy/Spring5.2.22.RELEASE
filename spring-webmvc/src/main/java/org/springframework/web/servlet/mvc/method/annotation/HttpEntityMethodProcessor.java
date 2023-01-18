@@ -52,9 +52,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
- * Resolves {@link HttpEntity} and {@link RequestEntity} method argument values
- * and also handles {@link HttpEntity} and {@link ResponseEntity} return values.
- *
+ * <ul>
+ *     <li>解析 {@link HttpEntity} 和 {@link RequestEntity} 方法参数</li>
+ *     <li>处理 {@link HttpEntity} 和 {@link ResponseEntity} 的返回值</li>
+ * </ul>
  * <p>An {@link HttpEntity} return type has a specific purpose. Therefore this
  * handler should be configured ahead of handlers that support any return
  * value type annotated with {@code @ModelAttribute} or {@code @ResponseBody}
@@ -129,13 +130,16 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 			throws IOException, HttpMediaTypeNotSupportedException {
 
 		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);
+		// 拿到设置的 HttpEntity 的类型
 		Type paramType = getHttpEntityType(parameter);
 		if (paramType == null) {
 			throw new IllegalArgumentException("HttpEntity parameter '" + parameter.getParameterName() +
 					"' in method " + parameter.getMethod() + " is not parameterized");
 		}
 
+		// 读取请求体然后转换为指定类型
 		Object body = readWithMessageConverters(webRequest, parameter, paramType);
+		// 转换为更加详细的HttpEntity
 		if (RequestEntity.class == parameter.getParameterType()) {
 			return new RequestEntity<>(body, inputMessage.getHeaders(),
 					inputMessage.getMethod(), inputMessage.getURI());
@@ -145,16 +149,23 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 		}
 	}
 
+	/**
+	 * 拿到设置的 HttpEntity 的类型
+	 * @param parameter
+	 * @return
+	 */
 	@Nullable
 	private Type getHttpEntityType(MethodParameter parameter) {
 		Assert.isAssignable(HttpEntity.class, parameter.getParameterType());
 		Type parameterType = parameter.getGenericParameterType();
+		// 是否是参数化类型，就是泛型
 		if (parameterType instanceof ParameterizedType) {
 			ParameterizedType type = (ParameterizedType) parameterType;
 			if (type.getActualTypeArguments().length != 1) {
 				throw new IllegalArgumentException("Expected single generic parameter on '" +
 						parameter.getParameterName() + "' in method " + parameter.getMethod());
 			}
+			// 取第一个泛型
 			return type.getActualTypeArguments()[0];
 		}
 		else if (parameterType instanceof Class) {
@@ -169,6 +180,7 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
+		// 表示请求已经处理完毕
 		mavContainer.setRequestHandled(true);
 		if (returnValue == null) {
 			return;
@@ -182,8 +194,10 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 
 		HttpHeaders outputHeaders = outputMessage.getHeaders();
 		HttpHeaders entityHeaders = responseEntity.getHeaders();
+		// 合并响应头部信息
 		if (!entityHeaders.isEmpty()) {
 			entityHeaders.forEach((key, value) -> {
+				// 特殊的VARY值，进行合并VARY
 				if (HttpHeaders.VARY.equals(key) && outputHeaders.containsKey(HttpHeaders.VARY)) {
 					List<String> values = getVaryRequestHeadersToAdd(outputHeaders, entityHeaders);
 					if (!values.isEmpty()) {
@@ -191,12 +205,15 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 					}
 				}
 				else {
+					// 普通的头部直接就添加了
 					outputHeaders.put(key, value);
 				}
 			});
 		}
 
+		// 如果是 ResponseEntity 做更加详细的配置
 		if (responseEntity instanceof ResponseEntity) {
+			// 设置响应码
 			int returnStatus = ((ResponseEntity<?>) responseEntity).getStatusCodeValue();
 			outputMessage.getServletResponse().setStatus(returnStatus);
 			if (returnStatus == 200) {
@@ -207,21 +224,30 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 					return;
 				}
 			}
+			// 如果是重定向的情况
 			else if (returnStatus / 100 == 3) {
+				// 拿到要跳转的地址
 				String location = outputHeaders.getFirst("location");
 				if (location != null) {
+					// 保存重定向参数
 					saveFlashAttributes(mavContainer, webRequest, location);
 				}
 			}
 		}
 
-		// Try even with null body. ResponseBodyAdvice could get involved.
+		// 将HttpEntity中响应体的数据写入响应中. ResponseBodyAdvice 也会调用
 		writeWithMessageConverters(responseEntity.getBody(), returnType, inputMessage, outputMessage);
 
-		// Ensure headers are flushed even if no body was written.
+		// 即使没有写入正文，也会刷新头部。
 		outputMessage.flush();
 	}
 
+	/**
+	 * 合并VARY值
+	 * @param responseHeaders
+	 * @param entityHeaders
+	 * @return
+	 */
 	private List<String> getVaryRequestHeadersToAdd(HttpHeaders responseHeaders, HttpHeaders entityHeaders) {
 		List<String> entityHeadersVary = entityHeaders.getVary();
 		List<String> vary = responseHeaders.get(HttpHeaders.VARY);
@@ -244,12 +270,20 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 		return entityHeadersVary;
 	}
 
+	/**
+	 * 检查资源是否没有被修改过
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	private boolean isResourceNotModified(ServletServerHttpRequest request, ServletServerHttpResponse response) {
 		ServletWebRequest servletWebRequest =
 				new ServletWebRequest(request.getServletRequest(), response.getServletResponse());
 		HttpHeaders responseHeaders = response.getHeaders();
 		String etag = responseHeaders.getETag();
+		// 获得资源最后一次修改的时间
 		long lastModifiedTimestamp = responseHeaders.getLastModified();
+		// 清空缓存相关响应头
 		if (request.getMethod() == HttpMethod.GET || request.getMethod() == HttpMethod.HEAD) {
 			responseHeaders.remove(HttpHeaders.ETAG);
 			responseHeaders.remove(HttpHeaders.LAST_MODIFIED);
@@ -258,11 +292,19 @@ public class HttpEntityMethodProcessor extends AbstractMessageConverterMethodPro
 		return servletWebRequest.checkNotModified(etag, lastModifiedTimestamp);
 	}
 
+	/**
+	 * 保存重定向参数
+	 * @param mav
+	 * @param request
+	 * @param location 重定向Url
+	 */
 	private void saveFlashAttributes(ModelAndViewContainer mav, NativeWebRequest request, String location) {
+		// 表示是重定向
 		mav.setRedirectModelScenario(true);
 		ModelMap model = mav.getModel();
 		if (model instanceof RedirectAttributes) {
 			Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
+			// 保存重定向参数
 			if (!CollectionUtils.isEmpty(flashAttributes)) {
 				HttpServletRequest req = request.getNativeRequest(HttpServletRequest.class);
 				HttpServletResponse res = request.getNativeResponse(HttpServletResponse.class);

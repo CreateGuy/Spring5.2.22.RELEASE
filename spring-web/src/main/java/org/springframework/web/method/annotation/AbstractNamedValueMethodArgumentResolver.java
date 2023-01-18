@@ -119,7 +119,7 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		// 通过传入的参数名从 queryString 中解析值
 		Object arg = resolveName(resolvedName.toString(), nestedParameter, webRequest);
 		if (arg == null) {
-			// 使用默认值作为参数值
+			// 使用默认值作为参数名再去解析
 			if (namedValueInfo.defaultValue != null) {
 				arg = resolveEmbeddedValuesAndExpressions(namedValueInfo.defaultValue);
 			}
