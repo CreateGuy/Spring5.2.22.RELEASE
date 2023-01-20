@@ -63,6 +63,9 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 
 	private final List<HttpMessageConverter<?>> messageConverters;
 
+	/**
+	 * 后面为了将消息写入响应的
+	 */
 	private final List<HttpMessageConverter<?>> sseMessageConverters;
 
 	private final ReactiveTypeHandler reactiveHandler;
@@ -98,8 +101,14 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 		this.reactiveHandler = new ReactiveTypeHandler(registry, executor, manager);
 	}
 
+	/**
+	 * 初始化 {@code HttpMessageConverter}
+	 * @param converters
+	 * @return
+	 */
 	private static List<HttpMessageConverter<?>> initSseConverters(List<HttpMessageConverter<?>> converters) {
 		for (HttpMessageConverter<?> converter : converters) {
+			// 意思是遇到纯文本的就直接返回?
 			if (converter.canWrite(String.class, MediaType.TEXT_PLAIN)) {
 				return converters;
 			}
@@ -113,7 +122,9 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
-		Class<?> bodyType = ResponseEntity.class.isAssignableFrom(returnType.getParameterType()) ?
+		Class<?> bodyType =
+				// 如果是 ResponseEntity 就直接去响应的类型
+				ResponseEntity.class.isAssignableFrom(returnType.getParameterType()) ?
 				ResolvableType.forMethodParameter(returnType).getGeneric().resolve() :
 				returnType.getParameterType();
 
@@ -181,6 +192,7 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 		HttpMessageConvertingHandler handler;
 		try {
 			DeferredResult<?> deferredResult = new DeferredResult<>(emitter.getTimeout());
+			// 启动并发请求处理并初始化给定的 deferredResult
 			WebAsyncUtils.getAsyncManager(webRequest).startDeferredResultProcessing(deferredResult, mavContainer);
 			handler = new HttpMessageConvertingHandler(outputMessage, deferredResult);
 		}
@@ -189,6 +201,7 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 			throw ex;
 		}
 
+		// 初始化：主要是保存了响应和发送早期消息
 		emitter.initialize(handler);
 	}
 
@@ -203,6 +216,9 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 		 */
 		private final ServerHttpResponse outputMessage;
 
+		/**
+		 * 延迟任务执行的结果，比如说是否完成，是否抛出了异常
+		 */
 		private final DeferredResult<?> deferredResult;
 
 		public HttpMessageConvertingHandler(ServerHttpResponse outputMessage, DeferredResult<?> deferredResult) {
@@ -210,13 +226,19 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 			this.deferredResult = deferredResult;
 		}
 
+		/**
+		 * 发送消息
+		 * @param data
+		 * @param mediaType
+		 * @throws IOException
+		 */
 		@Override
 		public void send(Object data, @Nullable MediaType mediaType) throws IOException {
 			sendInternal(data, mediaType);
 		}
 
 		/**
-		 * 拿到以前的响应，然后发送消息
+		 * 拿到以前的响应，然后通过 {@code HttpMessageConverter将 消息写入响应中
 		 * @param data
 		 * @param mediaType
 		 * @param <T>
@@ -234,10 +256,14 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 			throw new IllegalArgumentException("No suitable converter for " + data.getClass());
 		}
 
+		/**
+		 * 任务完成
+		 */
 		@Override
 		public void complete() {
 			try {
 				this.outputMessage.flush();
+				// 设置结果为空，以为着没有出现错误
 				this.deferredResult.setResult(null);
 			}
 			catch (IOException ex) {
@@ -273,8 +299,14 @@ public class ResponseBodyEmitterReturnValueHandler implements HandlerMethodRetur
 	 */
 	private static class StreamingServletServerHttpResponse implements ServerHttpResponse {
 
+		/**
+		 * 原始的响应
+		 */
 		private final ServerHttpResponse delegate;
 
+		/**
+		 * 原始的请求头
+		 */
 		private final HttpHeaders mutableHeaders = new HttpHeaders();
 
 		public StreamingServletServerHttpResponse(ServerHttpResponse delegate) {

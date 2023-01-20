@@ -70,33 +70,40 @@ public class ResponseBodyEmitter {
 	@Nullable
 	private final Long timeout;
 
+	/**
+	 * 处理响应的发送等的处理器
+	 */
 	@Nullable
 	private Handler handler;
 
-	/** Store send data before handler is initialized. */
+	/** 在初始化的时候需要发送的早期消息 */
 	private final Set<DataWithMediaType> earlySendAttempts = new LinkedHashSet<>(8);
 
-	/** Store successful completion before the handler is initialized. */
+	/** 任务是否完成 */
 	private boolean complete;
 
-	/** Store an error before the handler is initialized. */
+	/** 在初始化处理程序之前就发生的错误。 */
 	@Nullable
 	private Throwable failure;
 
 	/**
-	 * After an I/O error, we don't call {@link #completeWithError} directly but
-	 * wait for the Servlet container to call us via {@code AsyncListener#onError}
-	 * on a container thread at which point we call completeWithError.
-	 * This flag is used to ignore further calls to complete or completeWithError
-	 * that may come for example from an application try-catch block on the
-	 * thread of the I/O error.
+	 * 消息在发送过程是否出现了异常/错误
 	 */
 	private boolean sendFailed;
 
+	/**
+	 * 任务超时回调
+	 */
 	private final DefaultCallback timeoutCallback = new DefaultCallback();
 
+	/**
+	 * 发送错误回调
+	 */
 	private final ErrorCallback errorCallback = new ErrorCallback();
 
+	/**
+	 * 任务完成回调
+	 */
 	private final DefaultCallback completionCallback = new DefaultCallback();
 
 
@@ -128,10 +135,17 @@ public class ResponseBodyEmitter {
 	}
 
 
+	/**
+	 * 初始化：主要是保存了响应和发送早期消息
+	 * @param handler
+	 * @throws IOException
+	 */
 	synchronized void initialize(Handler handler) throws IOException {
+		// 重点：这个处理器中会包含响应
 		this.handler = handler;
 
 		try {
+			// 发送早期消息
 			for (DataWithMediaType sendAttempt : this.earlySendAttempts) {
 				sendInternal(sendAttempt.getData(), sendAttempt.getMediaType());
 			}
@@ -140,7 +154,9 @@ public class ResponseBodyEmitter {
 			this.earlySendAttempts.clear();
 		}
 
+		// 任务完成
 		if (this.complete) {
+			// 中途出现了错误？
 			if (this.failure != null) {
 				this.handler.completeWithError(this.failure);
 			}
@@ -149,12 +165,17 @@ public class ResponseBodyEmitter {
 			}
 		}
 		else {
+			// 初始化各种回调
 			this.handler.onTimeout(this.timeoutCallback);
 			this.handler.onError(this.errorCallback);
 			this.handler.onCompletion(this.completionCallback);
 		}
 	}
 
+	/**
+	 * 初始化之前出现错误的方法
+	 * @param ex
+	 */
 	synchronized void initializeWithError(Throwable ex) {
 		this.complete = true;
 		this.failure = ex;
@@ -201,6 +222,12 @@ public class ResponseBodyEmitter {
 		sendInternal(object, mediaType);
 	}
 
+	/**
+	 * 发送消息给客户端
+	 * @param object
+	 * @param mediaType
+	 * @throws IOException
+	 */
 	private void sendInternal(Object object, @Nullable MediaType mediaType) throws IOException {
 		if (this.handler != null) {
 			try {
@@ -216,6 +243,8 @@ public class ResponseBodyEmitter {
 			}
 		}
 		else {
+			// handler是在 ResponseBodyEmitterReturnValueHandler 中会复制的
+			// 如果是没有那就说明在处理返回值之前发送了消息，那么就填入早期消息，等初始化处理器的时候会发送
 			this.earlySendAttempts.add(new DataWithMediaType(object, mediaType));
 		}
 	}
@@ -229,7 +258,7 @@ public class ResponseBodyEmitter {
 	 * related events such as an error while {@link #send(Object) sending}.
 	 */
 	public synchronized void complete() {
-		// Ignore, after send failure
+		// 忽略发送中途的错误
 		if (this.sendFailed) {
 			return;
 		}
@@ -298,10 +327,7 @@ public class ResponseBodyEmitter {
 
 
 	/**
-	 * Contract to handle the sending of event data, the completion of event
-	 * sending, and the registration of callbacks to be invoked in case of
-	 * timeout, error, and completion for any reason (including from the
-	 * container side).
+	 * 响应的发送、发送完成、发送完成但是出现了异常、超时、错误和由于任何原因(包括从容器端)完成时调用的回调的注册
 	 */
 	interface Handler {
 

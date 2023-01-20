@@ -454,7 +454,7 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * Start concurrent request processing and initialize the given
+	 * 启动并发请求处理并初始化给定的 {@code DeferredResult}
 	 * {@link DeferredResult} with a {@link DeferredResultHandler} that saves
 	 * the result and dispatches the request to resume processing of that
 	 * result. The {@code AsyncWebRequest} is also updated with a completion
@@ -520,6 +520,7 @@ public final class WebAsyncManager {
 		startAsyncProcessing(processingContext);
 
 		try {
+			// 启动并发请求处理并初始化给定的 deferredResult
 			interceptorChain.applyPreProcess(this.asyncWebRequest, deferredResult);
 			deferredResult.setResultHandler(result -> {
 				// 到这就说明延迟任务执行完毕

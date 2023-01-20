@@ -71,12 +71,18 @@ public class DeferredResult<T> {
 
 	private Runnable completionCallback;
 
+	/**
+	 * 延迟任务完成的处理器
+	 */
 	private DeferredResultHandler resultHandler;
 
+	/**
+	 * 延迟任务的结果，可能出现了异常
+	 */
 	private volatile Object result = RESULT_NONE;
 
 	/**
-	 * 延迟任务完成即为过期
+	 * 延迟任务完成，即为过期，会在 afterCompletion 方法中更新
 	 */
 	private volatile boolean expired = false;
 
@@ -124,7 +130,7 @@ public class DeferredResult<T> {
 
 
 	/**
-	 * 如果这个DeferredResult不再可用(因为之前设置了它或因为底层请求过期)，则返回true。
+	 * 是否已经更新过结果，或者已经过期了的
 	 * <p>The result may have been set with a call to {@link #setResult(Object)},
 	 * or {@link #setErrorResult(Object)}, or as a result of a timeout, if a
 	 * timeout result was provided to the constructor. The request may also
@@ -197,7 +203,7 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * 提供一个用于处理结果值的处理程序
+	 * 设置最后延时任务完成的处理器
 	 * @param resultHandler the handler
 	 * @see DeferredResultProcessingInterceptor
 	 */
@@ -215,12 +221,12 @@ public class DeferredResult<T> {
 			}
 			resultToHandle = this.result;
 			if (resultToHandle == RESULT_NONE) {
-				// 表明还没有结果
+				// 表明延迟任务还没有结果，就就是在延迟结果完成处理器
 				this.resultHandler = resultHandler;
 				return;
 			}
 		}
-		// 到这就说明延迟任务没有过期但是已经有了结果？不懂
+		// 到这就说明延迟任务没有过期但是已经有了结果(可能中途出现了异常)
 		try {
 			resultHandler.handleResult(resultToHandle);
 		}
@@ -230,7 +236,7 @@ public class DeferredResult<T> {
 	}
 
 	/**
-	 * Set the value for the DeferredResult and handle it.
+	 * 设置延迟任务结果
 	 * @param result the value to set
 	 * @return {@code true} if the result was set and passed on for handling;
 	 * {@code false} if the result was already set or the async request expired
@@ -240,8 +246,13 @@ public class DeferredResult<T> {
 		return setResultInternal(result);
 	}
 
+	/**
+	 * 设置延迟任务结果
+	 * @param result
+	 * @return
+	 */
 	private boolean setResultInternal(Object result) {
-		// Immediate expiration check outside of the result lock
+		// 是否已经更新过结果，或者已经过期了的
 		if (isSetOrExpired()) {
 			return false;
 		}
@@ -254,6 +265,7 @@ public class DeferredResult<T> {
 			// At this point, we got a new result to process
 			this.result = result;
 			resultHandlerToUse = this.resultHandler;
+			// 是否已经执行过延迟任务完成处理器
 			if (resultHandlerToUse == null) {
 				// No result handler set yet -> let the setResultHandler implementation
 				// pick up the result object and invoke the result handler for it.
@@ -263,7 +275,7 @@ public class DeferredResult<T> {
 			// we don't need it anymore.
 			this.resultHandler = null;
 		}
-		// If we get here, we need to process an existing result object immediately.
+		// 如果我们到达这里，我们需要立即处理延迟任务的结果
 		// The decision is made within the result lock; just the handle call outside
 		// of it, avoiding any deadlock potential with Servlet container locks.
 		resultHandlerToUse.handleResult(result);
@@ -285,6 +297,10 @@ public class DeferredResult<T> {
 	}
 
 
+	/**
+	 * 返回封装的延迟任务拦截器链
+	 * @return
+	 */
 	final DeferredResultProcessingInterceptor getInterceptor() {
 		return new DeferredResultProcessingInterceptor() {
 			@Override
@@ -338,7 +354,7 @@ public class DeferredResult<T> {
 
 
 	/**
-	 * Handles a DeferredResult value when set.
+	 * 延迟任务的结果处理器
 	 */
 	@FunctionalInterface
 	public interface DeferredResultHandler {

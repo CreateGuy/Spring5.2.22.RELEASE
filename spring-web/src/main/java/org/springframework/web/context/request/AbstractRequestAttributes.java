@@ -39,7 +39,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	protected final Map<String, Runnable> requestDestructionCallbacks = new LinkedHashMap<>(8);
 
 	/**
-	 * 原始的Session是否处于活跃状态
+	 * 原始的请求是否处于活跃状态
 	 */
 	private volatile boolean requestActive = true;
 
