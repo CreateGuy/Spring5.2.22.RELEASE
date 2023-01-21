@@ -36,9 +36,10 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Supports return values of type
+ * 支持
  * {@link org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody}
- * and also {@code ResponseEntity<StreamingResponseBody>}.
+ * 和 {@code ResponseEntity<StreamingResponseBody>}
+ * <p>本质上和WebAsyncTask没有任何区别</p>
  *
  * @author Rossen Stoyanchev
  * @since 4.2
@@ -71,6 +72,7 @@ public class StreamingResponseBodyReturnValueHandler implements HandlerMethodRet
 		Assert.state(response != null, "No HttpServletResponse");
 		ServerHttpResponse outputMessage = new ServletServerHttpResponse(response);
 
+		// 合并响应的信息
 		if (returnValue instanceof ResponseEntity) {
 			ResponseEntity<?> responseEntity = (ResponseEntity<?>) returnValue;
 			response.setStatus(responseEntity.getStatusCodeValue());
@@ -85,12 +87,14 @@ public class StreamingResponseBodyReturnValueHandler implements HandlerMethodRet
 
 		ServletRequest request = webRequest.getNativeRequest(ServletRequest.class);
 		Assert.state(request != null, "No ServletRequest");
+		// 禁止缓存
 		ShallowEtagHeaderFilter.disableContentCaching(request);
 
 		Assert.isInstanceOf(StreamingResponseBody.class, returnValue, "StreamingResponseBody expected");
 		StreamingResponseBody streamingBody = (StreamingResponseBody) returnValue;
 
 		Callable<Void> callable = new StreamingResponseBodyTask(outputMessage.getBody(), streamingBody);
+		// 启动异步线程
 		WebAsyncUtils.getAsyncManager(webRequest).startCallableProcessing(callable, mavContainer);
 	}
 

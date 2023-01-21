@@ -28,7 +28,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Handles {@link HttpHeaders} return values.
+ * 处理 {@link HttpHeaders} 类的返回值
  *
  * @author Stephane Nicoll
  * @since 4.0.1
@@ -50,6 +50,7 @@ public class HttpHeadersReturnValueHandler implements HandlerMethodReturnValueHa
 		Assert.state(returnValue instanceof HttpHeaders, "HttpHeaders expected");
 		HttpHeaders headers = (HttpHeaders) returnValue;
 
+		// 将头部信息写入响应头中
 		if (!headers.isEmpty()) {
 			HttpServletResponse servletResponse = webRequest.getNativeResponse(HttpServletResponse.class);
 			Assert.state(servletResponse != null, "No HttpServletResponse");

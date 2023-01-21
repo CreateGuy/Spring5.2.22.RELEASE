@@ -23,8 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a component is only eligible for registration when all
- * {@linkplain #value specified conditions} match.
+ * 指示组件只有在所有指定的条件都匹配时才有资格注册到容器中
  *
  * <p>A <em>condition</em> is any state that can be determined programmatically
  * before the bean definition is due to be registered (see {@link Condition} for details).
@@ -62,8 +61,7 @@ import java.lang.annotation.Target;
 public @interface Conditional {
 
 	/**
-	 * All {@link Condition} classes that must {@linkplain Condition#matches match}
-	 * in order for the component to be registered.
+	 * 检查类
 	 */
 	Class<? extends Condition>[] value();
 

@@ -388,7 +388,7 @@ class ConfigurationClassParser {
 	 * 注册在配置类本身的成员（嵌套）类
 	 * @param configClass
 	 * @param sourceClass
-	 * @param filter 排出过滤器
+	 * @param filter 排除过滤器
 	 * @throws IOException
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,

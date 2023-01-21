@@ -1227,7 +1227,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
-		//如果FactoryMethodName不为空，就说明这个一个通过@Bean注册的bean
+		//如果FactoryMethodName不为空，就说明这个一个是通过@Bean注册的bean
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}

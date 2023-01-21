@@ -971,15 +971,18 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			asyncManager.registerCallableInterceptors(this.callableInterceptors);
 			asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);
 
-			// 异步任务已经有了返回值了？，此时不应该还没有开始吗，不懂
+			// 异步任务已经有了返回值了,指的是异步任务进行了派发
 			if (asyncManager.hasConcurrentResult()) {
+				// 拿到异步任务的返回值
 				Object result = asyncManager.getConcurrentResult();
+				// 用上次开启异步任务的 ModelAndViewContainer
 				mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
 				asyncManager.clearConcurrentResult();
 				LogFormatUtils.traceDebug(logger, traceOn -> {
 					String formatted = LogFormatUtils.formatValue(result, !traceOn);
 					return "Resume with async result [" + formatted + "]";
 				});
+				// 重点：重新包装处理方法
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
 

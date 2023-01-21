@@ -20,8 +20,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * A single {@code condition} that must be {@linkplain #matches matched} in order
- * for a component to be registered.
+ * 检查类：为了注册组件，必须匹配的单个条件
  *
  * <p>Conditions are checked immediately before the bean-definition is due to be
  * registered and are free to veto registration based on any criteria that can

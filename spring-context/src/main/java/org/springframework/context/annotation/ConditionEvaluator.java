@@ -78,7 +78,7 @@ class ConditionEvaluator {
 	 * @return if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
-		//应该是携带了Conditional注解的后面再说
+		// 没有携带 Conditional 的注解不需要跳过
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
@@ -98,7 +98,7 @@ class ConditionEvaluator {
 		//获取当前类上有关@Conditional注解的信息
 		//是一个List<String[]>，list表示可能有多个@Conditional注解
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
-			//其中String[]是某个@Conditional
+			//其中String[]是因为@Conditional是可以传入多个Class，其他的衍生类，就不行了，指定了一个了
 			for (String conditionClass : conditionClasses) {
 				//将当前类所标志的@Conditional类型的注解实例化，加入候选集合中
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());

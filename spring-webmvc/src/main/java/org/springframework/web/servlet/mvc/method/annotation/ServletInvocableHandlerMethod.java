@@ -59,6 +59,9 @@ import org.springframework.web.util.NestedServletException;
  */
 public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
+	/**
+	 * 异步任务的指定方法
+	 */
 	private static final Method CALLABLE_METHOD = ClassUtils.getMethod(Callable.class, "call");
 
 	@Nullable
@@ -184,10 +187,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	}
 
 	/**
-	 * Create a nested ServletInvocableHandlerMethod subclass that returns the
-	 * the given value (or raises an Exception if the value is one) rather than
-	 * actually invoking the controller method. This is useful when processing
-	 * async return values (e.g. Callable, DeferredResult, ListenableFuture).
+	 * 创建一个处理异步任务的方法
 	 */
 	ServletInvocableHandlerMethod wrapConcurrentResult(Object result) {
 		return new ConcurrentResultHandlerMethod(result, new ConcurrentResultMethodParameter(result));
@@ -195,13 +195,13 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 
 	/**
-	 * A nested subclass of {@code ServletInvocableHandlerMethod} that uses a
-	 * simple {@link Callable} instead of the original controller as the handler in
-	 * order to return the fixed (concurrent) result value given to it. Effectively
-	 * "resumes" processing with the asynchronously produced return value.
+	 * 获得异步任务的返回值的方法
 	 */
 	private class ConcurrentResultHandlerMethod extends ServletInvocableHandlerMethod {
 
+		/**
+		 * 异步任务的返回值类型
+		 */
 		private final MethodParameter returnType;
 
 		public ConcurrentResultHandlerMethod(final Object result, ConcurrentResultMethodParameter returnType) {
@@ -212,9 +212,11 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 				else if (result instanceof Throwable) {
 					throw new NestedServletException("Async processing failed", (Throwable) result);
 				}
+				// 返回异步任务返回值
 				return result;
 			}, CALLABLE_METHOD);
 
+			// 因为封装了新的处理方法，但是返回值还是要处理的，所有用原方法带的返回值处理器
 			if (ServletInvocableHandlerMethod.this.returnValueHandlers != null) {
 				setHandlerMethodReturnValueHandlers(ServletInvocableHandlerMethod.this.returnValueHandlers);
 			}
@@ -257,9 +259,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 
 	/**
-	 * MethodParameter subclass based on the actual return value type or if
-	 * that's null falling back on the generic type within the declared async
-	 * return type, e.g. Foo instead of {@code DeferredResult<Foo>}.
+	 * 异步任务返回值参数
 	 */
 	private class ConcurrentResultMethodParameter extends HandlerMethodParameter {
 

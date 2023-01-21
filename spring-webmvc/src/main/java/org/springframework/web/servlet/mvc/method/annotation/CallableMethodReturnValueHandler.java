@@ -26,7 +26,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * Handles return values of type {@link Callable}.
+ * 处理 {@link Callable} 类型的返回值
  *
  * @author Rossen Stoyanchev
  * @since 3.2
@@ -48,6 +48,7 @@ public class CallableMethodReturnValueHandler implements HandlerMethodReturnValu
 		}
 
 		Callable<?> callable = (Callable<?>) returnValue;
+		// 本质上就是包装为 WebAsyncTask 开启异步任务
 		WebAsyncUtils.getAsyncManager(webRequest).startCallableProcessing(callable, mavContainer);
 	}
 

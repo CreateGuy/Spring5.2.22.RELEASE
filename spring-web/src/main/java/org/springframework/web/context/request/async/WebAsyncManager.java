@@ -67,13 +67,13 @@ public final class WebAsyncManager {
 	private static final Log logger = LogFactory.getLog(WebAsyncManager.class);
 
 	/**
-	 * 全局的超时拦截器，WebAsyncTask可以设置局部的
+	 * {@link WebAsyncTask} 的超时拦截器
 	 */
 	private static final CallableProcessingInterceptor timeoutCallableInterceptor =
 			new TimeoutCallableProcessingInterceptor();
 
 	/**
-	 * 延时任务的超时拦截器
+	 * {@link DeferredResult} 的超时拦截器
 	 */
 	private static final DeferredResultProcessingInterceptor timeoutDeferredResultInterceptor =
 			new TimeoutDeferredResultProcessingInterceptor();
@@ -95,6 +95,9 @@ public final class WebAsyncManager {
 	 */
 	private volatile Object concurrentResult = RESULT_NONE;
 
+	/**
+	 * 默认是准备开启异步任务的 {@link org.springframework.web.method.support.ModelAndViewContainer}
+	 */
 	private volatile Object[] concurrentResultContext;
 
 	/*
@@ -169,7 +172,7 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * 否存在一个结果值作为并发处理的结果
+	 * 否存在一个结果值作为异步处理的结果
 	 */
 	public boolean hasConcurrentResult() {
 		return (this.concurrentResult != RESULT_NONE);
@@ -425,7 +428,7 @@ public final class WebAsyncManager {
 	}
 
 	/**
-	 * 设置并发结果和派发
+	 * 设置并发结果和派发，注意：java是地址传递，也就说等异步任务结束，这里的值也会更新
 	 * @param result
 	 */
 	private void setConcurrentResultAndDispatch(Object result) {
@@ -544,6 +547,7 @@ public final class WebAsyncManager {
 			this.concurrentResultContext = processingContext;
 			this.errorHandlingInProgress = false;
 		}
+		// 重点
 		this.asyncWebRequest.startAsync();
 
 		if (logger.isDebugEnabled()) {
