@@ -326,23 +326,39 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 		return false;
 	}
 
+	/**
+	 * 将请求体转为Map
+	 * @param clazz the type of object to return. This type must have previously been passed to the
+	 * {@link #canRead canRead} method of this interface, which must have returned {@code true}.
+	 * @param inputMessage the HTTP input message to read from
+	 * @return
+	 * @throws IOException
+	 * @throws HttpMessageNotReadableException
+	 */
 	@Override
 	public MultiValueMap<String, String> read(@Nullable Class<? extends MultiValueMap<String, ?>> clazz,
 			HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
 
 		MediaType contentType = inputMessage.getHeaders().getContentType();
+		// 确定媒体类型中字符编码
 		Charset charset = (contentType != null && contentType.getCharset() != null ?
 				contentType.getCharset() : this.charset);
+		// 将请求体数据转为字符串
+		// eg：username=lzx&password=123
 		String body = StreamUtils.copyToString(inputMessage.getBody(), charset);
 
+		// 按照 & 进行切分
+		// eg：["username=lzx", "password=123"]
 		String[] pairs = StringUtils.tokenizeToStringArray(body, "&");
 		MultiValueMap<String, String> result = new LinkedMultiValueMap<>(pairs.length);
 		for (String pair : pairs) {
 			int idx = pair.indexOf('=');
+			// 如果无法找到 =，也就是无法确定键和值的分隔位置，就全部当前键
 			if (idx == -1) {
 				result.add(URLDecoder.decode(pair, charset.name()), null);
 			}
 			else {
+				// 切分出键和值，并放入指定Map中
 				String name = URLDecoder.decode(pair.substring(0, idx), charset.name());
 				String value = URLDecoder.decode(pair.substring(idx + 1), charset.name());
 				result.add(name, value);

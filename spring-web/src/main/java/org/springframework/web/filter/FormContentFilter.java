@@ -47,15 +47,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * {@code Filter} that parses form data for HTTP PUT, PATCH, and DELETE requests
- * and exposes it as Servlet request parameters. By default the Servlet spec
- * only requires this for HTTP POST.
- *
- * @author Rossen Stoyanchev
- * @since 5.1
+ * 为PUT、PATCH、DELETE这样的请求方式，将请求体转为键值对形式，然后通过 getParameter 读取
+ * <p>默认情况下，Servlet规范只要求HTTP POST这样做</p>
  */
 public class FormContentFilter extends OncePerRequestFilter {
 
+	/**
+	 * 此过滤器支持的请求方式
+	 */
 	private static final List<String> HTTP_METHODS = Arrays.asList("PUT", "PATCH", "DELETE");
 
 	private FormHttpMessageConverter formConverter = new AllEncompassingFormHttpMessageConverter();
@@ -85,7 +84,9 @@ public class FormContentFilter extends OncePerRequestFilter {
 			HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
+		// 将请求体转为Map
 		MultiValueMap<String, String> params = parseIfNecessary(request);
+		// 只有当有参数的时候，才封装为 FormContentRequestWrapper
 		if (!CollectionUtils.isEmpty(params)) {
 			filterChain.doFilter(new FormContentRequestWrapper(request, params), response);
 		}
@@ -96,6 +97,7 @@ public class FormContentFilter extends OncePerRequestFilter {
 
 	@Nullable
 	private MultiValueMap<String, String> parseIfNecessary(HttpServletRequest request) throws IOException {
+		// 是否应该解析参数
 		if (!shouldParse(request)) {
 			return null;
 		}
@@ -106,15 +108,22 @@ public class FormContentFilter extends OncePerRequestFilter {
 				return request.getInputStream();
 			}
 		};
+		// 将请求体转为Map
 		return this.formConverter.read(null, inputMessage);
 	}
 
+	/**
+	 * 是否应该解析参数
+	 * @param request
+	 * @return
+	 */
 	private boolean shouldParse(HttpServletRequest request) {
 		String contentType = request.getContentType();
 		String method = request.getMethod();
 		if (StringUtils.hasLength(contentType) && HTTP_METHODS.contains(method)) {
 			try {
 				MediaType mediaType = MediaType.parseMediaType(contentType);
+				// 只有 application/x-www-form-urlencoded 才支持
 				return MediaType.APPLICATION_FORM_URLENCODED.includes(mediaType);
 			}
 			catch (IllegalArgumentException ex) {
@@ -126,6 +135,9 @@ public class FormContentFilter extends OncePerRequestFilter {
 
 	private static class FormContentRequestWrapper extends HttpServletRequestWrapper {
 
+		/**
+		 * 解析请求体出来的参数
+		 */
 		private MultiValueMap<String, String> formParams;
 
 		public FormContentRequestWrapper(HttpServletRequest request, MultiValueMap<String, String> params) {
@@ -133,6 +145,11 @@ public class FormContentFilter extends OncePerRequestFilter {
 			this.formParams = params;
 		}
 
+		/**
+		 * 优先从原Parameter中取值
+		 * @param name
+		 * @return
+		 */
 		@Override
 		@Nullable
 		public String getParameter(String name) {

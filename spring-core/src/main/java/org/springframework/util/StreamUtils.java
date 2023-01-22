@@ -72,7 +72,7 @@ public abstract class StreamUtils {
 	}
 
 	/**
-	 * Copy the contents of the given InputStream into a String.
+	 * 将给定的InputStream的内容复制到String中
 	 * <p>Leaves the stream open when done.
 	 * @param in the InputStream to copy from (may be {@code null} or empty)
 	 * @param charset the {@link Charset} to use to decode the bytes

@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 将客户端发起的请求转换为其他的请求方式
  * {@link javax.servlet.Filter} that converts posted method parameters into HTTP methods,
  * retrievable via {@link HttpServletRequest#getMethod()}. Since browsers currently only
  * support GET and POST, a common technique - used by the Prototype library, for instance -
@@ -56,6 +57,9 @@ import org.springframework.web.util.WebUtils;
  */
 public class HiddenHttpMethodFilter extends OncePerRequestFilter {
 
+	/**
+	 * 支持转化的请求方式集合
+	 */
 	private static final List<String> ALLOWED_METHODS =
 			Collections.unmodifiableList(Arrays.asList(HttpMethod.PUT.name(),
 					HttpMethod.DELETE.name(), HttpMethod.PATCH.name()));
@@ -63,6 +67,9 @@ public class HiddenHttpMethodFilter extends OncePerRequestFilter {
 	/** Default method parameter: {@code _method}. */
 	public static final String DEFAULT_METHOD_PARAM = "_method";
 
+	/**
+	 * 真正请求方式的参数名
+	 */
 	private String methodParam = DEFAULT_METHOD_PARAM;
 
 
@@ -81,16 +88,19 @@ public class HiddenHttpMethodFilter extends OncePerRequestFilter {
 
 		HttpServletRequest requestToUse = request;
 
+		// 是POST并且没有出现错误
 		if ("POST".equals(request.getMethod()) && request.getAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE) == null) {
 			String paramValue = request.getParameter(this.methodParam);
 			if (StringUtils.hasLength(paramValue)) {
 				String method = paramValue.toUpperCase(Locale.ENGLISH);
 				if (ALLOWED_METHODS.contains(method)) {
+					// 转换请求方式
 					requestToUse = new HttpMethodRequestWrapper(request, method);
 				}
 			}
 		}
 
+		// 执行下一个过滤器
 		filterChain.doFilter(requestToUse, response);
 	}
 
