@@ -166,7 +166,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	//当前bean是否可以作为依赖注入的候选bean
 	private boolean autowireCandidate = true;
 
-	//当前bean是否作为相同类型bean的首选
+	/**
+	 * 当前bean是否作为相同类型bean的首选
+	 * <p>可通过 {@link Primary @Primary} 设置</p>
+	 */
 	private boolean primary = false;
 
 	//fixme qualifiers的设置是通过element得到的
