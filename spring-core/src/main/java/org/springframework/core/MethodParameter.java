@@ -471,7 +471,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Return the type of the method/constructor parameter.
+	 * 返回方法/构造函数参数的类型
 	 * @return the parameter type (never {@code null})
 	 */
 	public Class<?> getParameterType() {
@@ -794,7 +794,7 @@ public class MethodParameter {
 	}
 
 	/**
-	 * Create a new MethodParameter for the given method or constructor.
+	 * 为给定的方法或构造方法创建一个新的 {@link MethodParameter}
 	 * <p>This is a convenience factory method for scenarios where a
 	 * Method or Constructor reference is treated in a generic fashion.
 	 * @param executable the Method or Constructor to specify a parameter for

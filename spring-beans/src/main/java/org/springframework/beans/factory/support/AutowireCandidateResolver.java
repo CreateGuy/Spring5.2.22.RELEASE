@@ -22,12 +22,7 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for determining whether a specific bean definition
- * qualifies as an autowire candidate for a specific dependency.
- *
- * @author Juergen Hoeller
- * @author Mark Fisher
- * @since 2.5
+ * 自动装配候选Bean的解析器
  */
 public interface AutowireCandidateResolver {
 
@@ -73,7 +68,7 @@ public interface AutowireCandidateResolver {
 	}
 
 	/**
-	 * Determine whether a default value is suggested for the given dependency.
+	 * 确定是否为给定的依赖项建议使用默认值
 	 * <p>The default implementation simply returns {@code null}.
 	 * @param descriptor the descriptor for the target method parameter or field
 	 * @return the value suggested (typically an expression String),

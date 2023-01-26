@@ -433,8 +433,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * 注册依赖关系
-	 * @param beanName 依赖者
-	 * @param dependentBeanName 被依赖者
+	 * 后面在给定的bean被销毁之前销毁它
+	 * @param beanName 被依赖者
+	 * @param dependentBeanName 依赖者
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
 		String canonicalName = canonicalName(beanName);

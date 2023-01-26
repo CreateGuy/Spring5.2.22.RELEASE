@@ -39,9 +39,15 @@ import org.springframework.util.ObjectUtils;
  */
 public class InjectionPoint {
 
+	/**
+	 * 包装的方法
+	 */
 	@Nullable
 	protected MethodParameter methodParameter;
 
+	/**
+	 * 声明的字段
+	 */
 	@Nullable
 	protected Field field;
 

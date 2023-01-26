@@ -24,7 +24,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface responsible for creating instances corresponding to a root bean definition.
+ * 实例化Bean的策略
  *
  * <p>This is pulled out into a strategy as various approaches are possible,
  * including using CGLIB to create subclasses on the fly to support Method Injection.

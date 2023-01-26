@@ -184,7 +184,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
-	/** 是否允许访问非公共构造方法*/
+	/** 是否不允许访问非公共构造方法*/
 	private boolean nonPublicAccessAllowed = true;
 
 	private boolean lenientConstructorResolution = true;
@@ -197,6 +197,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private String factoryMethodName;
 
+	/**
+	 * 构造方法参数值
+	 */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
@@ -207,7 +210,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
-	/** 使用了@Lookup的方法 的集合*/
+	/** 使用了 {@link org.springframework.beans.factory.annotation.Lookup @Lookup}的方法 的集合*/
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
 	//初始方法
@@ -889,7 +892,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return if there are constructor argument values defined for this bean.
+	 * 是否为这个bean定义了构造函数参数值，则返回
 	 */
 	@Override
 	public boolean hasConstructorArgumentValues() {

@@ -32,7 +32,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Simple object instantiation strategy for use in a BeanFactory.
+ * 在BeanFactory中使用的简单对象实例化策略
  *
  * <p>Does not support Method Injection, although it provides hooks for subclasses
  * to override to add Method Injection support, for example by overriding methods.

@@ -52,14 +52,26 @@ import org.springframework.util.ObjectUtils;
 @SuppressWarnings("serial")
 public class DependencyDescriptor extends InjectionPoint implements Serializable {
 
+	/**
+	 * 声明的类型
+	 */
 	private final Class<?> declaringClass;
 
+	/**
+	 * 声明的方法名称
+	 */
 	@Nullable
 	private String methodName;
 
+	/**
+	 * 声明方法的入参类型
+	 */
 	@Nullable
 	private Class<?>[] parameterTypes;
 
+	/**
+	 * 声明方法参数的位置(索引)
+	 */
 	private int parameterIndex;
 
 	@Nullable
@@ -358,7 +370,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Initialize parameter name discovery for the underlying method parameter, if any.
+	 * 初始化参数名解析器
 	 * <p>This method does not actually try to retrieve the parameter name at
 	 * this point; it just allows discovery to happen when the application calls
 	 * {@link #getDependencyName()} (if ever).
@@ -379,10 +391,11 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	}
 
 	/**
-	 * Determine the declared (non-generic) type of the wrapped parameter/field.
+	 * 确定包装的参数/字段的声明(非泛型)类型
 	 * @return the declared type (never {@code null})
 	 */
 	public Class<?> getDependencyType() {
+		// 字段的情况
 		if (this.field != null) {
 			if (this.nestingLevel > 1) {
 				Type type = this.field.getGenericType();
@@ -408,6 +421,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 			}
 		}
 		else {
+			// 方法的情况
 			return obtainMethodParameter().getNestedParameterType();
 		}
 	}
