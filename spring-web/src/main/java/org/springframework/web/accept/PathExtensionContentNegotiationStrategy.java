@@ -32,9 +32,8 @@ import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * A {@code ContentNegotiationStrategy} that resolves the file extension in the
- * request path to a key to be used to look up a media type.
- *
+ * 将请求路径中的文件扩展名解析为媒体类型
+ * <p>如果是 ”/users.pdf“ 那么媒体类型将被解析为 "application/pdf" 而不管'Accept'头。</p>
  * <p>If the file extension is not found in the explicit registrations provided
  * to the constructor, the {@link MediaTypeFactory} is used as a fallback
  * mechanism.

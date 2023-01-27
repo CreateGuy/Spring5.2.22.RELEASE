@@ -106,12 +106,13 @@ public class ContentNegotiationManagerFactoryBean
 	private List<ContentNegotiationStrategy> strategies;
 
 	/**
-	 * 媒体类型映射是否可用
+	 * 路径扩展名映射到媒体类型是否可用
+	 * <p>如果是 ”/users.pdf“ 那么媒体类型将被解析为 "application/pdf" 而不管'Accept'头</p>
 	 */
 	private boolean favorPathExtension = true;
 
 	/**
-	 * 媒体类型映射是否可用
+	 * 是否使用请求参数(默认为“format”)来确定所请求的媒体类型。
 	 */
 	private boolean favorParameter = false;
 
@@ -360,6 +361,7 @@ public class ContentNegotiationManagerFactoryBean
 			strategies.addAll(this.strategies);
 		}
 		else {
+			// 是否开启文件扩展名映射为媒体类型
 			if (this.favorPathExtension) {
 				// 此类已经被弃用，不看
 				PathExtensionContentNegotiationStrategy strategy;

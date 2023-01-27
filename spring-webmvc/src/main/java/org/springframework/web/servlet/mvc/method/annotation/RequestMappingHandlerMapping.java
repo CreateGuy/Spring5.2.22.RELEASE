@@ -76,7 +76,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		implements MatchableHandlerMapping, EmbeddedValueResolverAware {
 
 	/**
-	 * 使用后缀模式匹配，比如说hello.do可以匹配到hello
+	 * 使用后缀模式匹配，比如说hello.do可以匹配到hello.*
 	 */
 	private boolean useSuffixPatternMatch = true;
 

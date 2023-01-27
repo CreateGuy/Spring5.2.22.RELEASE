@@ -1231,11 +1231,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// 设置参数名解析器
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
 
-		// 空类型
+		// 依赖的类型是空类型
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
-		// ObjectFactory类型
+		// 依赖的类型是ObjectFactory类型
+		// 采用延迟解析
 		else if (ObjectFactory.class == descriptor.getDependencyType() ||
 				ObjectProvider.class == descriptor.getDependencyType()) {
 			return new DependencyObjectProvider(descriptor, requestingBeanName);
@@ -1810,7 +1811,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Create an {@link Optional} wrapper for the specified dependency.
+	 * 为指定依赖项包装为 {@link Optional}
 	 */
 	private Optional<?> createOptionalDependency(
 			DependencyDescriptor descriptor, @Nullable String beanName, final Object... args) {
@@ -1941,14 +1942,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/**
-	 * Serializable ObjectFactory/ObjectProvider for lazy resolution of a dependency.
+	 * 特殊的 ObjectFactory/ObjectProvider，用于延迟解析依赖相
 	 */
 	private class DependencyObjectProvider implements BeanObjectProvider<Object> {
 
+		/**
+		 * 被依赖的Bean对应的 {@link DependencyDescriptor}
+		 */
 		private final DependencyDescriptor descriptor;
 
+		/**
+		 * 是否是 {@link Optional}
+		 */
 		private final boolean optional;
 
+		/**
+		 * 依赖Bean的名称
+		 */
 		@Nullable
 		private final String beanName;
 
@@ -1958,12 +1968,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.beanName = beanName;
 		}
 
+		/**
+		 * 获得实例，为空则抛出异常
+		 * @return
+		 * @throws BeansException
+		 */
 		@Override
 		public Object getObject() throws BeansException {
 			if (this.optional) {
 				return createOptionalDependency(this.descriptor, this.beanName);
 			}
 			else {
+				// 这里才开始解析
 				Object result = doResolveDependency(this.descriptor, this.beanName, null, null);
 				if (result == null) {
 					throw new NoSuchBeanDefinitionException(this.descriptor.getResolvableType());
@@ -1972,6 +1988,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		/**
+		 * 获得实例，为空则抛出异常
+		 * @param args 是对应实例的构造方法的入参
+		 * @return
+		 * @throws BeansException
+		 */
 		@Override
 		public Object getObject(final Object... args) throws BeansException {
 			if (this.optional) {
@@ -1992,6 +2014,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		/**
+		 * 获得实例
+		 * @return
+		 * @throws BeansException
+		 */
 		@Override
 		@Nullable
 		public Object getIfAvailable() throws BeansException {
