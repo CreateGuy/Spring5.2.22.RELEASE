@@ -27,23 +27,25 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
- * Trivial controller that always returns a pre-configured view and optionally
- * sets the response status code. The view and status can be configured using
- * the provided configuration properties.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @author Keith Donald
- * @author Rossen Stoyanchev
+ * 一个普通控制器，总是返回预先配置好的视图，并可选地设置响应状态代码
  */
 public class ParameterizableViewController extends AbstractController {
 
+	/**
+	 * 视图名称
+	 */
 	@Nullable
 	private Object view;
 
+	/**
+	 * 响应状态码
+	 */
 	@Nullable
 	private HttpStatus statusCode;
 
+	/**
+	 * 请求是否在控制器内({@link Controller})被完全处理
+	 */
 	private boolean statusOnly;
 
 
@@ -62,13 +64,13 @@ public class ParameterizableViewController extends AbstractController {
 	}
 
 	/**
-	 * Return the name of the view to delegate to, or {@code null} if using a
-	 * View instance.
+	 * 返回视图名称
 	 */
 	@Nullable
 	public String getViewName() {
 		if (this.view instanceof String) {
 			String viewName = (String) this.view;
+			// 3XX代表重定向
 			if (getStatusCode() != null && getStatusCode().is3xxRedirection()) {
 				return viewName.startsWith("redirect:") ? viewName : "redirect:" + viewName;
 			}
@@ -143,7 +145,7 @@ public class ParameterizableViewController extends AbstractController {
 
 
 	/**
-	 * Return a ModelAndView object with the specified view name.
+	 * 返回具有指定视图名称的 {@link ModelAndView}
 	 * <p>The content of the {@link RequestContextUtils#getInputFlashMap
 	 * "input" FlashMap} is also added to the model.
 	 * @see #getViewName()
@@ -152,9 +154,11 @@ public class ParameterizableViewController extends AbstractController {
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
+		// 获得视图名称
 		String viewName = getViewName();
 
 		if (getStatusCode() != null) {
+			// 如果是重定向状态码
 			if (getStatusCode().is3xxRedirection()) {
 				request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, getStatusCode());
 			}

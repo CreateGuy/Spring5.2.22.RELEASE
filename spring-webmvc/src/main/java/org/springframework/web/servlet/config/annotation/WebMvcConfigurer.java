@@ -32,6 +32,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
+ * SpringMvc配置类
  * Defines callback methods to customize the Java-based configuration for
  * Spring MVC enabled via {@code @EnableWebMvc}.
  *
@@ -47,6 +48,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public interface WebMvcConfigurer {
 
 	/**
+	 * <p>配置一些访问路径的东西，比如项目路径前缀，是否忽略尾部斜杠</p>
 	 * Helps with configuring HandlerMappings path matching options such as trailing slash match,
 	 * suffix registration, path matcher and path helper.
 	 * Configured path matcher and path helper instances are shared for:
@@ -61,13 +63,13 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Configure content negotiation options.
+	 * 配置内容协商属性
 	 */
 	default void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 	}
 
 	/**
-	 * Configure asynchronous request handling options.
+	 * 配置异步请求处理选项
 	 */
 	default void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 	}
@@ -82,17 +84,15 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Add {@link Converter Converters} and {@link Formatter Formatters} in addition to the ones
-	 * registered by default.
+	 * 添加 {@link Converter Converters} and {@link Formatter Formatters} 到 {@link FormatterRegistry}
+	 * <p>在SpringBoot的情况下这个也会被添加到 {@link WebConversionService}中</p>
 	 */
 	default void addFormatters(FormatterRegistry registry) {
 	}
 
 	/**
-	 * Add Spring MVC lifecycle interceptors for pre- and post-processing of
-	 * controller method invocations and resource handler requests.
-	 * Interceptors can be registered to apply to all requests or be limited
-	 * to a subset of URL patterns.
+	 * 添加 Spring MVC 的拦截器
+	 * <p>后续会被添加到 {@link org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping} 中</p>
 	 */
 	default void addInterceptors(InterceptorRegistry registry) {
 	}
@@ -106,18 +106,14 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Configure cross origin requests processing.
+	 * 配置跨源规则
 	 * @since 4.2
 	 */
 	default void addCorsMappings(CorsRegistry registry) {
 	}
 
 	/**
-	 * Configure simple automated controllers pre-configured with the response
-	 * status code and/or a view to render the response body. This is useful in
-	 * cases where there is no need for custom controller logic -- e.g. render a
-	 * home page, perform simple site URL redirects, return a 404 status with
-	 * HTML content, a 204 with no content, and more.
+	 * 配置使用响应状态代码和/或视图预配置的简单自动控制器，以呈现响应体。
 	 */
 	default void addViewControllers(ViewControllerRegistry registry) {
 	}

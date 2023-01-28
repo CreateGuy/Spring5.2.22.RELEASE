@@ -27,22 +27,30 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
 /**
- * Assists with the registration of simple automated controllers pre-configured
- * with status code and/or a view.
- *
- * @author Rossen Stoyanchev
- * @author Keith Donald
- * @since 3.1
+ * 预先配置状态代码和/或视图
+ * <ul>
+ *     <li>是和 {@link SimpleUrlHandlerMapping} 配合使用的</li>
+ *     <li>比如说访问1hello，直接返回login.html</li>
+ * </ul>
  */
 public class ViewControllerRegistry {
 
 	@Nullable
 	private ApplicationContext applicationContext;
 
+	/**
+	 * 已经注册的映射关系
+	 */
 	private final List<ViewControllerRegistration> registrations = new ArrayList<>(4);
 
+	/**
+	 * 已经注册的重定向映射关系
+	 */
 	private final List<RedirectViewControllerRegistration> redirectRegistrations = new ArrayList<>(10);
 
+	/**
+	 * {@link SimpleUrlHandlerMapping} 在整个 {@link org.springframework.web.servlet.HandlerMapping}的位置
+	 */
 	private int order = 1;
 
 
@@ -56,8 +64,7 @@ public class ViewControllerRegistry {
 
 
 	/**
-	 * Map a view controller to the given URL path (or pattern) in order to render
-	 * a response with a pre-configured status code and view.
+	 * 将视图控制器映射到给定的URL路径(或模式)，以呈现带有预先配置的状态代码和视图
 	 * <p>Patterns like {@code "/admin/**"} or {@code "/articles/{articlename:\\w+}"}
 	 * are allowed. See {@link org.springframework.util.AntPathMatcher} for more details on the
 	 * syntax.
@@ -100,10 +107,7 @@ public class ViewControllerRegistry {
 	}
 
 	/**
-	 * Specify the order to use for the {@code HandlerMapping} used to map view
-	 * controllers relative to other handler mappings configured in Spring MVC.
-	 * <p>By default this is set to 1, i.e. right after annotated controllers,
-	 * which are ordered at 0.
+	 * 设置 {@link SimpleUrlHandlerMapping} 在整个 {@link org.springframework.web.servlet.HandlerMapping}的位置
 	 */
 	public void setOrder(int order) {
 		this.order = order;

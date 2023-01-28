@@ -474,9 +474,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * Return a handler mapping ordered at 1 to map URL paths directly to
-	 * view names. To configure view controllers, override
-	 * {@link #addViewControllers}.
+	 * 返回一个顺序为1的 {@link HandlerMapping}，是将URL路径直接映射到视图名称
 	 */
 	@Bean
 	@Nullable

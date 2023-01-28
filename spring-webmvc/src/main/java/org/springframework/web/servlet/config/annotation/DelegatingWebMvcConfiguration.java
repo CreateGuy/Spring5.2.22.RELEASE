@@ -42,9 +42,16 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Configuration(proxyBeanMethods = false)
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 
+	/**
+	 * 包含了容器中所有 {@link WebMvcConfigurer} 的委托类
+	 */
 	private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
 
 
+	/**
+	 * 将容器中的所有 {@link WebMvcConfigurer} 保存起来
+	 * @param configurers
+	 */
 	@Autowired(required = false)
 	public void setConfigurers(List<WebMvcConfigurer> configurers) {
 		if (!CollectionUtils.isEmpty(configurers)) {

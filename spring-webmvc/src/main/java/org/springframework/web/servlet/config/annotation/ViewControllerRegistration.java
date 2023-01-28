@@ -32,6 +32,9 @@ import org.springframework.web.servlet.mvc.ParameterizableViewController;
  */
 public class ViewControllerRegistration {
 
+	/**
+	 * 匹配的Url
+	 */
 	private final String urlPath;
 
 	private final ParameterizableViewController controller = new ParameterizableViewController();

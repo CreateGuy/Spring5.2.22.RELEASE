@@ -26,10 +26,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Implementation of the {@link org.springframework.web.servlet.HandlerMapping}
- * interface that maps from URLs to request handler beans. Supports both mapping to bean
- * instances and mapping to bean names; the latter is required for non-singleton handlers.
- *
+ * 从url映射到请求处理程序bean。支持到bean实例的映射和到bean名称的映射:对于非单例处理程序，后者是必需的
  * <p>The "urlMap" property is suitable for populating the handler map with
  * bean references, e.g. via the map element in XML bean definitions.
  *

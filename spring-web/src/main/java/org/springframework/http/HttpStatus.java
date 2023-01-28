@@ -472,11 +472,7 @@ public enum HttpStatus {
 	}
 
 	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.springframework.http.HttpStatus.Series#REDIRECTION}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 * @since 4.0
-	 * @see #series()
+	 * 是否是重定向状态码
 	 */
 	public boolean is3xxRedirection() {
 		return (series() == Series.REDIRECTION);

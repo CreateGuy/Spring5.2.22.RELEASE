@@ -369,7 +369,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		}
 
 		// 如果是请求路径出现了重复，并且不是同一个处理程序，直接抛出异常
-		// 注意当前类并不是他(RequestMappingHandlerMapping)的父类，他有自己的注册逻辑
+		// 注意当前类并不是(RequestMappingHandlerMapping)的父类，他有自己的注册逻辑
 		Object mappedHandler = this.handlerMap.get(urlPath);
 		if (mappedHandler != null) {
 			if (mappedHandler != resolvedHandler) {

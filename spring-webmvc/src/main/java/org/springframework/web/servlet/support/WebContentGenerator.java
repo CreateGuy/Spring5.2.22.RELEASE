@@ -177,7 +177,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 
 	/**
-	 * Set the HTTP methods that this content generator should support.
+	 * 设置此内容生成器应支持的HTTP请求方式
 	 * <p>Default is GET, HEAD and POST for simple form controller types;
 	 * unrestricted for general controllers and interceptors.
 	 */

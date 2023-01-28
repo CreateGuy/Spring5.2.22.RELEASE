@@ -34,9 +34,7 @@ import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 import org.springframework.web.accept.ParameterContentNegotiationStrategy;
 
 /**
- * Creates a {@code ContentNegotiationManager} and configures it with
- * one or more {@link ContentNegotiationStrategy} instances.
- *
+ * 创建一个 {@code ContentNegotiationManager} 和 创建一个或多个 {@link ContentNegotiationStrategy} 实例
  * <p>This factory offers properties that in turn result in configuring the
  * underlying strategies. The table below shows the property names, their
  * default settings, as well as the strategies that they help to configure:

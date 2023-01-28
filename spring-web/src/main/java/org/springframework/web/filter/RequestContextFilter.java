@@ -28,6 +28,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
+ * 用于初始化 {@link LocaleContextHolder} 和 {@link RequestContextHolder} 的过滤器
+ * <p>疑惑：{@link org.springframework.web.servlet.DispatcherServlet}中 也会初始化</p>
  * Servlet Filter that exposes the request to the current thread,
  * through both {@link org.springframework.context.i18n.LocaleContextHolder} and
  * {@link RequestContextHolder}. To be registered as filter in {@code web.xml}.
@@ -50,6 +52,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class RequestContextFilter extends OncePerRequestFilter {
 
+	/**
+	 * 上下文是保存到 {@link InheritableThreadLocal} 中，还是保存在 {@link ThreadLocal}中
+	 */
 	private boolean threadContextInheritable = false;
 
 
@@ -94,12 +99,14 @@ public class RequestContextFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
+		// 初始化上下文
 		initContextHolders(request, attributes);
 
 		try {
 			filterChain.doFilter(request, response);
 		}
 		finally {
+			// 清空上下文
 			resetContextHolders();
 			if (logger.isTraceEnabled()) {
 				logger.trace("Cleared thread-bound request context: " + request);
@@ -108,6 +115,11 @@ public class RequestContextFilter extends OncePerRequestFilter {
 		}
 	}
 
+	/**
+	 * 初始化 {@link LocaleContextHolder} 和 {@link RequestContextHolder}
+	 * @param request
+	 * @param requestAttributes
+	 */
 	private void initContextHolders(HttpServletRequest request, ServletRequestAttributes requestAttributes) {
 		LocaleContextHolder.setLocale(request.getLocale(), this.threadContextInheritable);
 		RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
@@ -116,6 +128,9 @@ public class RequestContextFilter extends OncePerRequestFilter {
 		}
 	}
 
+	/**
+	 * 清空 {@link LocaleContextHolder} 和 {@link RequestContextHolder}
+	 */
 	private void resetContextHolders() {
 		LocaleContextHolder.resetLocaleContext();
 		RequestContextHolder.resetRequestAttributes();
