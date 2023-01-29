@@ -34,8 +34,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * URL路径匹配的帮助类。在@{@code RequestDispatcher include中提供对uRL路径的支持，并支持一致的URL解码。
- *
+ * URL路径匹配的帮助类
+ * <p>比如说获取请求的真正地址</p>
  * <p>Used by {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}
  * and {@link org.springframework.web.servlet.support.RequestContext} for path matching
  * and/or URI determination.

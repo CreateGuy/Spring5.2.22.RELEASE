@@ -170,7 +170,11 @@ public class AntPathMatcher implements PathMatcher {
 		this.stringMatcherCache.clear();
 	}
 
-
+	/**
+	 * 此路径匹配器是否支持指定路径
+	 * @param path the path to check
+	 * @return
+	 */
 	@Override
 	public boolean isPattern(@Nullable String path) {
 		if (path == null) {
@@ -179,6 +183,7 @@ public class AntPathMatcher implements PathMatcher {
 		boolean uriVar = false;
 		for (int i = 0; i < path.length(); i++) {
 			char c = path.charAt(i);
+			// 此路径匹配器支持 * 和 ?, 认为能够匹配
 			if (c == '*' || c == '?') {
 				return true;
 			}
@@ -186,6 +191,7 @@ public class AntPathMatcher implements PathMatcher {
 				uriVar = true;
 				continue;
 			}
+			// 如果有左括号和右括号，那就认为能够匹配
 			if (c == '}' && uriVar) {
 				return true;
 			}
@@ -204,7 +210,7 @@ public class AntPathMatcher implements PathMatcher {
 	}
 
 	/**
-	 * Actually match the given {@code path} against the given {@code pattern}.
+	 * 将给定的路径与给定的模式进行匹配。
 	 * @param pattern the pattern to match against
 	 * @param path the path to test
 	 * @param fullMatch whether a full pattern match is required (else a pattern match

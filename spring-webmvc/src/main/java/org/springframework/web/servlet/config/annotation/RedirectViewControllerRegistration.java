@@ -24,13 +24,13 @@ import org.springframework.web.servlet.mvc.ParameterizableViewController;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
- * Assist with the registration of a single redirect view controller.
- *
- * @author Rossen Stoyanchev
- * @since 4.1
+ *  Uri 和 重定向{@link org.springframework.web.servlet.mvc.Controller} 的绑定
  */
 public class RedirectViewControllerRegistration {
 
+	/**
+	 * 我觉得应该叫Uri
+	 */
 	private final String urlPath;
 
 	private final RedirectView redirectView;

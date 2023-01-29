@@ -31,13 +31,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
- * A subclass of {@code WebMvcConfigurationSupport} that detects and delegates
- * to all beans of type {@link WebMvcConfigurer} allowing them to customize the
- * configuration provided by {@code WebMvcConfigurationSupport}. This is the
- * class actually imported by {@link EnableWebMvc @EnableWebMvc}.
- *
- * @author Rossen Stoyanchev
- * @since 3.1
+ * {@code WebMvcConfigurationSupport} 的子类，是一个委托类，代理内部的 {@link WebMvcConfigurer} 列表
  */
 @Configuration(proxyBeanMethods = false)
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {

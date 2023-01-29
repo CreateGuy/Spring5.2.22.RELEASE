@@ -44,22 +44,23 @@ import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 
 /**
- * Assist with the configuration of a chain of
- * {@link org.springframework.web.servlet.ViewResolver ViewResolver} instances.
- * This class is expected to be used via {@link WebMvcConfigurer#configureViewResolvers}.
- *
- * @author Sebastien Deleuze
- * @author Rossen Stoyanchev
- * @since 4.1
+ * 视图解析器配置类
+ * @see ViewResolver
  */
 public class ViewResolverRegistry {
 
+	/**
+	 * 内容协商管理器
+	 */
 	@Nullable
 	private ContentNegotiationManager contentNegotiationManager;
 
 	@Nullable
 	private ApplicationContext applicationContext;
 
+	/**
+	 * ViewResolver的一个实现，它基于视图名或 Accept 请求头
+	 */
 	@Nullable
 	private ContentNegotiatingViewResolver contentNegotiatingResolver;
 
@@ -82,7 +83,7 @@ public class ViewResolverRegistry {
 
 
 	/**
-	 * Whether any view resolvers have been registered.
+	 * 是否注册了任何视图解析器
 	 */
 	public boolean hasRegistrations() {
 		return (this.contentNegotiatingResolver != null || !this.viewResolvers.isEmpty());
@@ -113,8 +114,13 @@ public class ViewResolverRegistry {
 		vr.setUseNotAcceptableStatusCode(useNotAcceptableStatus);
 	}
 
+	/**
+	 * 初始化 {@link ContentNegotiatingViewResolver}
+	 * @param defaultViews
+	 * @return
+	 */
 	private ContentNegotiatingViewResolver initContentNegotiatingViewResolver(View[] defaultViews) {
-		// ContentNegotiatingResolver in the registry: elevate its precedence!
+		// 由于ContentNegotiatingViewResolver是借助其他的视图解析器的，所以它应该在最前面
 		this.order = (this.order != null ? this.order : Ordered.HIGHEST_PRECEDENCE);
 
 		if (this.contentNegotiatingResolver != null) {

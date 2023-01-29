@@ -33,9 +33,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 /**
  * SpringMvc配置类
- * Defines callback methods to customize the Java-based configuration for
- * Spring MVC enabled via {@code @EnableWebMvc}.
- *
+ * <p>Defines callback methods to customize the Java-based configuration for
+ *  Spring MVC enabled via {@code @EnableWebMvc}.</p>
  * <p>{@code @EnableWebMvc}-annotated configuration classes may implement
  * this interface to be called back and given a chance to customize the
  * default configuration.
@@ -119,56 +118,40 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Configure view resolvers to translate String-based view names returned from
-	 * controllers into concrete {@link org.springframework.web.servlet.View}
-	 * implementations to perform rendering with.
-	 * @since 4.1
+	 * 配置视图解析器，将控制器返回的字符串类型的视图名称转换为具体的 {@link org.springframework.web.servlet.View}
 	 */
 	default void configureViewResolvers(ViewResolverRegistry registry) {
 	}
 
 	/**
-	 * Add resolvers to support custom controller method argument types.
-	 * <p>This does not override the built-in support for resolving handler
-	 * method arguments. To customize the built-in support for argument
-	 * resolution, configure {@link RequestMappingHandlerAdapter} directly.
-	 * @param resolvers initially an empty list
+	 * 添加参数解析器
+	 * <p>但这不会覆盖框架内部的，可以直接操作 {@link RequestMappingHandlerAdapter}</p>
 	 */
 	default void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 	}
 
 	/**
-	 * Add handlers to support custom controller method return value types.
-	 * <p>Using this option does not override the built-in support for handling
-	 * return values. To customize the built-in support for handling return
-	 * values, configure RequestMappingHandlerAdapter directly.
-	 * @param handlers initially an empty list
+	 * 添加返回值处理器
+	 * <p>但这不会覆盖框架内部的，可以直接操作 {@link RequestMappingHandlerAdapter}</p>
 	 */
 	default void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
 	}
 
 	/**
-	 * Configure the {@link HttpMessageConverter HttpMessageConverters} to use for reading or writing
-	 * to the body of the request or response. If no converters are added, a
-	 * default list of converters is registered.
-	 * <p><strong>Note</strong> that adding converters to the list, turns off
-	 * default converter registration. To simply add a converter without impacting
-	 * default registration, consider using the method
-	 * {@link #extendMessageConverters(java.util.List)} instead.
-	 * @param converters initially an empty list of converters
+	 * 配置 {@link HttpMessageConverter}
 	 */
 	default void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 	}
 
 	/**
-	 * 钩子方法，用于在配置后扩展或修改 HttpMessageConverter 列表
-	 * @param converters 已经注册好的 HttpMessageConverter 列表
+	 * 钩子方法，用于在配置后扩展或修改 {@link HttpMessageConverter} 列表
+	 * @param converters 已经注册好的 {@link HttpMessageConverter} 列表
 	 */
 	default void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 	}
 
 	/**
-	 * Configure exception resolvers.
+	 * 配置异常解析器
 	 * <p>The given list starts out empty. If it is left empty, the framework
 	 * configures a default set of resolvers, see
 	 * {@link WebMvcConfigurationSupport#addDefaultHandlerExceptionResolvers(List, org.springframework.web.accept.ContentNegotiationManager)}.
@@ -186,9 +169,7 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Extending or modify the list of exception resolvers configured by default.
-	 * This can be useful for inserting a custom exception resolver without
-	 * interfering with default ones.
+	 * 钩子方法，用于在配置后扩展或修改 {@link HandlerExceptionResolver} 列表
 	 * @param resolvers the list of configured resolvers to extend
 	 * @since 4.3
 	 * @see WebMvcConfigurationSupport#addDefaultHandlerExceptionResolvers(List, org.springframework.web.accept.ContentNegotiationManager)
@@ -197,10 +178,7 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Provide a custom {@link Validator} instead of the one created by default.
-	 * The default implementation, assuming JSR-303 is on the classpath, is:
-	 * {@link org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean}.
-	 * Leave the return value as {@code null} to keep the default.
+	 * 配置 {@link Validator}
 	 */
 	@Nullable
 	default Validator getValidator() {
@@ -208,9 +186,7 @@ public interface WebMvcConfigurer {
 	}
 
 	/**
-	 * Provide a custom {@link MessageCodesResolver} for building message codes
-	 * from data binding and validation error codes. Leave the return value as
-	 * {@code null} to keep the default.
+	 * 配置 {@link MessageCodesResolver}
 	 */
 	@Nullable
 	default MessageCodesResolver getMessageCodesResolver() {

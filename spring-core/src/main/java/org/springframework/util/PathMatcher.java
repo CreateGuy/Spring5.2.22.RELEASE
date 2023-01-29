@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Strategy interface for {@code String}-based path matching.
+ * 路径匹配器：基于字符串的路径匹配策略接口
  *
  * <p>Used by {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver},
  * {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping},
@@ -36,8 +36,8 @@ import java.util.Map;
 public interface PathMatcher {
 
 	/**
-	 * Does the given {@code path} represent a pattern that can be matched
-	 * by an implementation of this interface?
+	 * 此路径匹配器是否支持传入的路径
+	 * <p>比如说 {@link AntPathMatcher} 只支持 * ? { },如果是都没有这四个字符就不支持</p>
 	 * <p>If the return value is {@code false}, then the {@link #match}
 	 * method does not have to be used because direct equality comparisons
 	 * on the static path Strings will lead to the same result.
@@ -47,8 +47,7 @@ public interface PathMatcher {
 	boolean isPattern(String path);
 
 	/**
-	 * Match the given {@code path} against the given {@code pattern},
-	 * according to this PathMatcher's matching strategy.
+	 * 两个路径是否匹配
 	 * @param pattern the pattern to match against
 	 * @param path the path to test
 	 * @return {@code true} if the supplied {@code path} matched,

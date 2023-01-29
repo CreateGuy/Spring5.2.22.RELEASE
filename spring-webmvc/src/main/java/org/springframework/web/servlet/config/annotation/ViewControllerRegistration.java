@@ -24,19 +24,18 @@ import org.springframework.web.servlet.RequestToViewNameTranslator;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 /**
- * Assist with the registration of a single view controller.
- *
- * @author Rossen Stoyanchev
- * @author Keith Donald
- * @since 3.1
+ * Uri 和 {@link org.springframework.web.servlet.mvc.Controller} 的绑定
  */
 public class ViewControllerRegistration {
 
 	/**
-	 * 匹配的Url
+	 * 匹配的Uri
 	 */
 	private final String urlPath;
 
+	/**
+	 * 对应的 {@link org.springframework.web.servlet.mvc.Controller}
+	 */
 	private final ParameterizableViewController controller = new ParameterizableViewController();
 
 

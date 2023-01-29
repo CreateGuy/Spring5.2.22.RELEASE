@@ -29,7 +29,6 @@ import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapt
 
 /**
  * 拦截器注册中心
- *
  * @author Rossen Stoyanchev
  * @author Keith Donald
  * @since 3.1

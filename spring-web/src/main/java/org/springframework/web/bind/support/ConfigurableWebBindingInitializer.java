@@ -25,12 +25,8 @@ import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 
 /**
- * Convenient {@link WebBindingInitializer} for declarative configuration
- * in a Spring application context. Allows for reusing pre-configured
- * initializers with multiple controller/handlers.
- *
- * @author Juergen Hoeller
- * @since 2.5
+ * 每一个 {@link WebDataBinder} 都是用 {@link WebBindingInitializer} 初始化的
+ * 而这个又是用当前配置类配置的
  * @see #setDirectFieldAccess
  * @see #setMessageCodesResolver
  * @see #setBindingErrorProcessor
@@ -50,6 +46,9 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	@Nullable
 	private MessageCodesResolver messageCodesResolver;
 
+	/**
+	 * 绑定错误处理器
+	 */
 	@Nullable
 	private BindingErrorProcessor bindingErrorProcessor;
 
@@ -59,9 +58,15 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	@Nullable
 	private Validator validator;
 
+	/**
+	 * 转换服务
+	 */
 	@Nullable
 	private ConversionService conversionService;
 
+	/**
+	 * 属性编辑器注册中心
+	 */
 	@Nullable
 	private PropertyEditorRegistrar[] propertyEditorRegistrars;
 
@@ -211,13 +216,19 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 		if (this.messageCodesResolver != null) {
 			binder.setMessageCodesResolver(this.messageCodesResolver);
 		}
+
+		// 设置绑定错误处理器
 		if (this.bindingErrorProcessor != null) {
 			binder.setBindingErrorProcessor(this.bindingErrorProcessor);
 		}
+
+		// 设置校验器
 		if (this.validator != null && binder.getTarget() != null &&
 				this.validator.supports(binder.getTarget().getClass())) {
 			binder.setValidator(this.validator);
 		}
+
+		// 设置转换服务
 		if (this.conversionService != null) {
 			binder.setConversionService(this.conversionService);
 		}

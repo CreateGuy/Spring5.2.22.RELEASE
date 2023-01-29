@@ -17,7 +17,7 @@
 package org.springframework.beans;
 
 /**
- * {@link java.beans.PropertyEditor} 的注册中心*
+ * {@link java.beans.PropertyEditor} 的注册中心
  * <p>This is particularly useful when you need to use the same set of
  * property editors in several different situations: write a corresponding
  * registrar and reuse that in each case.
@@ -30,9 +30,8 @@ package org.springframework.beans;
 public interface PropertyEditorRegistrar {
 
 	/**
-	 * Register custom {@link java.beans.PropertyEditor PropertyEditors} with
-	 * the given {@code PropertyEditorRegistry}.
-	 * <p>The passed-in registry will usually be a {@link BeanWrapper} or a
+	 * 将 {@link java.beans.PropertyEditor}注册到 {@link PropertyEditorRegistry}
+	 * <p> registry 通常是{@link BeanWrapper} 或者是
 	 * {@link org.springframework.validation.DataBinder DataBinder}.
 	 * <p>It is expected that implementations will create brand new
 	 * {@code PropertyEditors} instances for each invocation of this

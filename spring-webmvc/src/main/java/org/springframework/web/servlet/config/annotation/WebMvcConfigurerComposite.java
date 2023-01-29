@@ -34,6 +34,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
  */
 class WebMvcConfigurerComposite implements WebMvcConfigurer {
 
+	/**
+	 * 容器中所有的 {@link WebMvcConfigurer}
+	 */
 	private final List<WebMvcConfigurer> delegates = new ArrayList<>();
 
 
@@ -156,6 +159,10 @@ class WebMvcConfigurerComposite implements WebMvcConfigurer {
 		}
 	}
 
+	/**
+	 * 只能有一个验证器
+	 * @return
+	 */
 	@Override
 	public Validator getValidator() {
 		Validator selected = null;

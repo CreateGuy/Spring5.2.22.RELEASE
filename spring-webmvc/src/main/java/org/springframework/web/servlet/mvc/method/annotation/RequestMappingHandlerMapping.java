@@ -90,6 +90,9 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	 */
 	private boolean useTrailingSlashMatch = true;
 
+	/**
+	 * 路径前缀的函数
+	 */
 	private Map<String, Predicate<Class<?>>> pathPrefixes = new LinkedHashMap<>();
 
 	/**
@@ -283,6 +286,11 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		return info;
 	}
 
+	/**
+	 * 返回路径前缀
+	 * @param handlerType
+	 * @return
+	 */
 	@Nullable
 	String getPathPrefix(Class<?> handlerType) {
 		for (Map.Entry<String, Predicate<Class<?>>> entry : this.pathPrefixes.entrySet()) {

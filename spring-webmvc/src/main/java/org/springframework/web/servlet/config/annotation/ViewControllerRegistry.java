@@ -27,7 +27,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
 /**
- * 预先配置状态代码和/或视图
+ * 预先配置Uri和 状态代码/或视图的关系
  * <ul>
  *     <li>是和 {@link SimpleUrlHandlerMapping} 配合使用的</li>
  *     <li>比如说访问1hello，直接返回login.html</li>
@@ -64,7 +64,7 @@ public class ViewControllerRegistry {
 
 
 	/**
-	 * 将视图控制器映射到给定的URL路径(或模式)，以呈现带有预先配置的状态代码和视图
+	 * 将Url映射到指定的 {@link org.springframework.web.servlet.mvc.Controller}，以呈现带有预先配置的状态代码和视图
 	 * <p>Patterns like {@code "/admin/**"} or {@code "/articles/{articlename:\\w+}"}
 	 * are allowed. See {@link org.springframework.util.AntPathMatcher} for more details on the
 	 * syntax.
@@ -81,10 +81,7 @@ public class ViewControllerRegistry {
 	}
 
 	/**
-	 * Map a view controller to the given URL path (or pattern) in order to redirect
-	 * to another URL. By default the redirect URL is expected to be relative to
-	 * the current ServletContext, i.e. as relative to the web application root.
-	 * @since 4.1
+	 *
 	 */
 	public RedirectViewControllerRegistration addRedirectViewController(String urlPath, String redirectUrl) {
 		RedirectViewControllerRegistration registration = new RedirectViewControllerRegistration(urlPath, redirectUrl);
@@ -94,9 +91,7 @@ public class ViewControllerRegistry {
 	}
 
 	/**
-	 * Map a simple controller to the given URL path (or pattern) in order to
-	 * set the response status to the given code without rendering a body.
-	 * @since 4.1
+	 * 将Url映射到指定的 {@link org.springframework.web.servlet.mvc.Controller}，以呈现带有预先配置的状态代码和视图
 	 */
 	public void addStatusController(String urlPath, HttpStatus statusCode) {
 		ViewControllerRegistration registration = new ViewControllerRegistration(urlPath);
@@ -115,9 +110,7 @@ public class ViewControllerRegistry {
 
 
 	/**
-	 * Return the {@code HandlerMapping} that contains the registered view
-	 * controller mappings, or {@code null} for no registrations.
-	 * @since 4.3.12
+	 * 返回注册了指定Uri和 {@link org.springframework.web.servlet.mvc.Controller} 的关系的 {@link org.springframework.web.servlet.HandlerMapping}
 	 */
 	@Nullable
 	protected SimpleUrlHandlerMapping buildHandlerMapping() {

@@ -61,6 +61,9 @@ public class PathMatchConfigurer {
 	@Nullable
 	private UrlPathHelper urlPathHelper;
 
+	/**
+	 * 路径匹配器
+	 */
 	@Nullable
 	private PathMatcher pathMatcher;
 

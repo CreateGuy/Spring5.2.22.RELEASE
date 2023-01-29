@@ -25,6 +25,8 @@ import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
+ * 处理 {@link HttpRequestHandler}
+ * <p>比如说 {@code PreFlightHandler}，这是一个有关Cors的</p>
  * Adapter to use the plain {@link org.springframework.web.HttpRequestHandler}
  * interface with the generic {@link org.springframework.web.servlet.DispatcherServlet}.
  * Supports handlers that implement the {@link LastModified} interface.
