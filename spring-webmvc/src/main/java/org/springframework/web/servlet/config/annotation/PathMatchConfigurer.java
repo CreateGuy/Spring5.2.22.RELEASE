@@ -26,8 +26,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * Helps with configuring HandlerMappings path matching options such as trailing
- * slash match, suffix registration, path matcher and path helper.
+ * 帮助配置HandlerMappings路径匹配选项
+ * <p>比如说hello.do可以匹配到hello</p>
  *
  * <p>Configured path matcher and path helper instances are shared for:
  * <ul>

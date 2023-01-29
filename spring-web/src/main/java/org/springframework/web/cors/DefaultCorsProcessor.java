@@ -81,7 +81,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			response.addHeader(HttpHeaders.VARY, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
 		}
 
-		//确定是否是一个跨域请求
+		// 不是跨域请求直接放行
 		if (!CorsUtils.isCorsRequest(request)) {
 			return true;
 		}
@@ -91,7 +91,9 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			return true;
 		}
 
+		// 是否是跨域请求
 		boolean preFlightRequest = CorsUtils.isPreFlightRequest(request);
+		// 如果是预检查请求，但是又没有Cors数据源，就直接返回false
 		if (config == null) {
 			if (preFlightRequest) {
 				rejectRequest(new ServletServerHttpResponse(response));
@@ -102,13 +104,12 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			}
 		}
 
+		//  如果是预检查请求检查是否支持，其他类型的直接返回True
 		return handleInternal(new ServletServerHttpRequest(request), new ServletServerHttpResponse(response), config, preFlightRequest);
 	}
 
 	/**
-	 * Invoked when one of the CORS checks failed.
-	 * The default implementation sets the response status to 403 and writes
-	 * "Invalid CORS request" to the response.
+	 * 当一个CORS检查失败时调用
 	 */
 	protected void rejectRequest(ServerHttpResponse response) throws IOException {
 		response.setStatusCode(HttpStatus.FORBIDDEN);
@@ -117,30 +118,39 @@ public class DefaultCorsProcessor implements CorsProcessor {
 	}
 
 	/**
-	 * Handle the given request.
+	 * 如果是预检查请求检查是否支持，其他类型的直接返回True
 	 */
 	protected boolean handleInternal(ServerHttpRequest request, ServerHttpResponse response,
 			CorsConfiguration config, boolean preFlightRequest) throws IOException {
 
 		String requestOrigin = request.getHeaders().getOrigin();
-		String allowOrigin = checkOrigin(config, requestOrigin);
-		HttpHeaders responseHeaders = response.getHeaders();
 
+		// 检查来源
+		// 获得请求来源
+		String allowOrigin = checkOrigin(config, requestOrigin);
 		if (allowOrigin == null) {
 			logger.debug("Reject: '" + requestOrigin + "' origin is not allowed");
 			rejectRequest(response);
 			return false;
 		}
 
+		HttpHeaders responseHeaders = response.getHeaders();
+
+		// 检查请求方式
+		// 拿到此次预检查请求代表的真正请求的请求方式
 		HttpMethod requestMethod = getMethodToUse(request, preFlightRequest);
 		List<HttpMethod> allowMethods = checkMethods(config, requestMethod);
+		// 检查请求方式是否允许，为空就代表不支持
 		if (allowMethods == null) {
 			logger.debug("Reject: HTTP '" + requestMethod + "' is not allowed");
 			rejectRequest(response);
 			return false;
 		}
 
+		// 检查请求头
+		// 拿到预检查请求对应的的真正请求会携带的请求头
 		List<String> requestHeaders = getHeadersToUse(request, preFlightRequest);
+		// 检查请求头是否允许，为空就代表不支持
 		List<String> allowHeaders = checkHeaders(config, requestHeaders);
 		if (preFlightRequest && allowHeaders == null) {
 			logger.debug("Reject: headers '" + requestHeaders + "' are not allowed");
@@ -148,8 +158,10 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			return false;
 		}
 
+		// 告诉客户端允许来自这的请求
 		responseHeaders.setAccessControlAllowOrigin(allowOrigin);
 
+		// 是预检查请求, 告诉客户端允许这种请求方式
 		if (preFlightRequest) {
 			responseHeaders.setAccessControlAllowMethods(allowMethods);
 		}
@@ -162,10 +174,12 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			responseHeaders.setAccessControlExposeHeaders(config.getExposedHeaders());
 		}
 
+		// 估计是允许Cookie
 		if (Boolean.TRUE.equals(config.getAllowCredentials())) {
 			responseHeaders.setAccessControlAllowCredentials(true);
 		}
 
+		// 是预检查请求, 设置预检查请求有效期
 		if (preFlightRequest && config.getMaxAge() != null) {
 			responseHeaders.setAccessControlMaxAge(config.getMaxAge());
 		}
@@ -175,8 +189,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 	}
 
 	/**
-	 * Check the origin and determine the origin for the response. The default
-	 * implementation simply delegates to
+	 * 检查此Cors数据源是否支持这种来源
 	 * {@link org.springframework.web.cors.CorsConfiguration#checkOrigin(String)}.
 	 */
 	@Nullable
@@ -185,8 +198,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 	}
 
 	/**
-	 * Check the HTTP method and determine the methods for the response of a
-	 * pre-flight request. The default implementation simply delegates to
+	 * 检查此Cors数据源是否支持这种请求方式
 	 * {@link org.springframework.web.cors.CorsConfiguration#checkHttpMethod(HttpMethod)}.
 	 */
 	@Nullable
@@ -200,8 +212,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 	}
 
 	/**
-	 * Check the headers and determine the headers for the response of a
-	 * pre-flight request. The default implementation simply delegates to
+	 * 检查此Cors数据源是否支持携带这些请求头
 	 * {@link org.springframework.web.cors.CorsConfiguration#checkOrigin(String)}.
 	 */
 	@Nullable
@@ -209,6 +220,12 @@ public class DefaultCorsProcessor implements CorsProcessor {
 		return config.checkHeaders(requestHeaders);
 	}
 
+	/**
+	 * 拿到预检查请求对应的的真正请求会携带的请求头
+	 * @param request
+	 * @param isPreFlight
+	 * @return
+	 */
 	private List<String> getHeadersToUse(ServerHttpRequest request, boolean isPreFlight) {
 		HttpHeaders headers = request.getHeaders();
 		return (isPreFlight ? headers.getAccessControlRequestHeaders() : new ArrayList<>(headers.keySet()));

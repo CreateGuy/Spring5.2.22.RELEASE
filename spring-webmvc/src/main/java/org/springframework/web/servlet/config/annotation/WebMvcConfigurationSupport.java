@@ -335,6 +335,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 			mapping.setUseTrailingSlashMatch(useTrailingSlashMatch);
 		}
 
+		// 配置 UrlPathHelper
 		UrlPathHelper pathHelper = configurer.getUrlPathHelper();
 		if (pathHelper != null) {
 			mapping.setUrlPathHelper(pathHelper);
@@ -365,7 +366,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * 注册能拦截器
+	 * 注册拦截器
 	 * {@link HandlerMapping} instances with.
 	 * <p>This method cannot be overridden; use {@link #addInterceptors} instead.
 	 */
@@ -648,7 +649,9 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * 注入 {@link RequestMappingHandlerAdapter}
+	 * 注册 {@link RequestMappingHandlerAdapter}
+	 * Consider overriding one of these
+	 * other more fine-grained methods:
 	 * <ul>
 	 * <li>{@link #addArgumentResolvers} for adding custom argument resolvers.
 	 * <li>{@link #addReturnValueHandlers} for adding custom return value handlers.
@@ -719,7 +722,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	}
 
 	/**
-	 * 返回 {@link ConfigurableWebBindingInitializer}
+	 * 返回用于初始化 {@link WebDataBinder} 的 {@link ConfigurableWebBindingInitializer}
 	 */
 	protected ConfigurableWebBindingInitializer getConfigurableWebBindingInitializer(
 			FormattingConversionService mvcConversionService, Validator mvcValidator) {

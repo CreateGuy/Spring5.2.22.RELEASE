@@ -105,7 +105,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public static final String ACCEPT_RANGES = "Accept-Ranges";
 	/**
-	 * The CORS {@code Access-Control-Allow-Credentials} response header field name.
+	 * 默认情况下，Cookie不包括在CORS请求之中；如果设为true，即表示服务器允许在请求中包含Cookie，一起发给服务器
 	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
 	 */
 	public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
@@ -130,17 +130,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
 	/**
-	 * The CORS {@code Access-Control-Max-Age} response header field name.
+	 * 预检查请求有效期
 	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
 	 */
 	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 	/**
-	 * The CORS {@code Access-Control-Request-Headers} request header field name.
+	 * 预检查的时候，请求中保存的真正请求会携带的请求头
 	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
 	 */
 	public static final String ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers";
 	/**
-	 * The CORS {@code Access-Control-Request-Method} request header field name.
+	 * 预检查的时候，请求中保存的真正请求的请求方式
 	 * @see <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>
 	 */
 	public static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";

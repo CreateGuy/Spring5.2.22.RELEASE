@@ -60,24 +60,45 @@ public class CorsConfiguration {
 	private static final List<String> DEFAULT_PERMIT_ALL = Collections.singletonList(ALL);
 
 
+	/**
+	 * 允许的来源
+	 */
 	@Nullable
 	private List<String> allowedOrigins;
 
+	/**
+	 * 允许的请求方式
+	 */
 	@Nullable
 	private List<String> allowedMethods;
 
+	/**
+	 * 允许的请求方式
+	 */
 	@Nullable
 	private List<HttpMethod> resolvedMethods = DEFAULT_METHODS;
 
+	/**
+	 * 跨域请求允许携带的请求头
+	 */
 	@Nullable
 	private List<String> allowedHeaders;
 
+	/**
+	 * 不懂
+	 */
 	@Nullable
 	private List<String> exposedHeaders;
 
+	/**
+	 * 应该是客户端是否允许发送Cookie
+	 */
 	@Nullable
 	private Boolean allowCredentials;
 
+	/**
+	 * 预检查请求的有效期
+	 */
 	@Nullable
 	private Long maxAge;
 
@@ -422,7 +443,7 @@ public class CorsConfiguration {
 	}
 
 	/**
-	 * Check the origin of the request against the configured allowed origins.
+	 * 检查来源
 	 * @param requestOrigin the origin to check
 	 * @return the origin to use for the response, or {@code null} which
 	 * means the request origin is not allowed
@@ -436,6 +457,7 @@ public class CorsConfiguration {
 			return null;
 		}
 
+		// 如果来源都允许
 		if (this.allowedOrigins.contains(ALL)) {
 			if (this.allowCredentials != Boolean.TRUE) {
 				return ALL;
@@ -444,6 +466,8 @@ public class CorsConfiguration {
 				return requestOrigin;
 			}
 		}
+
+		// 忽略大小写的比较
 		for (String allowedOrigin : this.allowedOrigins) {
 			if (requestOrigin.equalsIgnoreCase(allowedOrigin)) {
 				return requestOrigin;
@@ -454,9 +478,7 @@ public class CorsConfiguration {
 	}
 
 	/**
-	 * Check the HTTP request method (or the method from the
-	 * {@code Access-Control-Request-Method} header on a pre-flight request)
-	 * against the configured allowed methods.
+	 * 检查当前Cors数据源是否支持这种请求方式
 	 * @param requestMethod the HTTP request method to check
 	 * @return the list of HTTP methods to list in the response of a pre-flight
 	 * request, or {@code null} if the supplied {@code requestMethod} is not allowed
@@ -473,12 +495,11 @@ public class CorsConfiguration {
 	}
 
 	/**
-	 * Check the supplied request headers (or the headers listed in the
+	 * 检查当前Cors数据源是否支持携带这些请求头
 	 * {@code Access-Control-Request-Headers} of a pre-flight request) against
 	 * the configured allowed headers.
 	 * @param requestHeaders the request headers to check
-	 * @return the list of allowed headers to list in the response of a pre-flight
-	 * request, or {@code null} if none of the supplied request headers is allowed
+	 * @return 支持的请求头
 	 */
 	@Nullable
 	public List<String> checkHeaders(@Nullable List<String> requestHeaders) {
@@ -497,6 +518,7 @@ public class CorsConfiguration {
 		for (String requestHeader : requestHeaders) {
 			if (StringUtils.hasText(requestHeader)) {
 				requestHeader = requestHeader.trim();
+				// ALL的情况都支持
 				if (allowAnyHeader) {
 					result.add(requestHeader);
 				}

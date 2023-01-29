@@ -438,9 +438,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 		// 如果请求是CORS预检请求，进行检查
 		if (hasCorsConfigurationSource(handler) || CorsUtils.isPreFlightRequest(request)) {
+			// 从Cors数据源中获取规则
 			CorsConfiguration config = (this.corsConfigurationSource != null ? this.corsConfigurationSource.getCorsConfiguration(request) : null);
+			// 从处理方法上获取规则
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
 			config = (config != null ? config.combine(handlerConfig) : handlerConfig);
+			// 包装拦截器链
+			// 不懂，这里只是处理预请求，那么真正的跨域请求在那判断呢
 			executionChain = getCorsHandlerExecutionChain(request, executionChain, config);
 		}
 

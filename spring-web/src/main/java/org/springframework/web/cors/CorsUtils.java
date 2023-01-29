@@ -26,7 +26,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Utility class for CORS request handling based on the
+ * 通过请求头中的 Origin，判断是否是一个预检查请求
  * <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>.
  *
  * @author Sebastien Deleuze
@@ -40,13 +40,15 @@ public abstract class CorsUtils {
 	 * @return
 	 */
 	public static boolean isCorsRequest(HttpServletRequest request) {
-		//一般跨域请求就会携带这个请求头
+		// 一般跨域请求就会携带这个请求头
 		String origin = request.getHeader(HttpHeaders.ORIGIN);
 		if (origin == null) {
 			return false;
 		}
 		UriComponents originUrl = UriComponentsBuilder.fromOriginHeader(origin).build();
+		// 请求协议
 		String scheme = request.getScheme();
+		// 域名或者地址
 		String host = request.getServerName();
 		int port = request.getServerPort();
 		return !(ObjectUtils.nullSafeEquals(scheme, originUrl.getScheme()) &&
