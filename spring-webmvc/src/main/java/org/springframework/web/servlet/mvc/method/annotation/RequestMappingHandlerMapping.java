@@ -431,10 +431,18 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 		return new RequestMatchResult(patterns.iterator().next(), lookupPath, getPathMatcher());
 	}
 
+	/**
+	 * 在处理方法和类上提取Cors配置
+	 * @param handler
+	 * @param method
+	 * @param mappingInfo
+	 * @return
+	 */
 	@Override
 	protected CorsConfiguration initCorsConfiguration(Object handler, Method method, RequestMappingInfo mappingInfo) {
 		HandlerMethod handlerMethod = createHandlerMethod(handler, method);
 		Class<?> beanType = handlerMethod.getBeanType();
+		// 提取Cors配置
 		CrossOrigin typeAnnotation = AnnotatedElementUtils.findMergedAnnotation(beanType, CrossOrigin.class);
 		CrossOrigin methodAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, CrossOrigin.class);
 
@@ -442,18 +450,26 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 			return null;
 		}
 
+		// 合并Cors配置
 		CorsConfiguration config = new CorsConfiguration();
 		updateCorsConfig(config, typeAnnotation);
 		updateCorsConfig(config, methodAnnotation);
 
+		// 如果没有配置Cors允许的请求类型，那么就用具体处理方法的请求类型
 		if (CollectionUtils.isEmpty(config.getAllowedMethods())) {
 			for (RequestMethod allowedMethod : mappingInfo.getMethodsCondition().getMethods()) {
 				config.addAllowedMethod(allowedMethod.name());
 			}
 		}
+		// 如果必要的Cors参数为空，就设置默认的
 		return config.applyPermitDefaultValues();
 	}
 
+	/**
+	 * 将 {@link CrossOrigin @CrossOrigin} 中的配置转到 {@link CorsConfiguration}中
+	 * @param config
+	 * @param annotation
+	 */
 	private void updateCorsConfig(CorsConfiguration config, @Nullable CrossOrigin annotation) {
 		if (annotation == null) {
 			return;
@@ -471,6 +487,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 			config.addExposedHeader(resolveCorsAnnotationValue(header));
 		}
 
+		// 不懂
 		String allowCredentials = resolveCorsAnnotationValue(annotation.allowCredentials());
 		if ("true".equalsIgnoreCase(allowCredentials)) {
 			config.setAllowCredentials(true);

@@ -97,15 +97,18 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 
 	/**
-	 * Cors数据源
+	 * 通过 {@link org.springframework.web.servlet.config.annotation.WebMvcConfigurer} 添加的 {@link CorsConfiguration}
 	 */
 	@Nullable
 	private CorsConfigurationSource corsConfigurationSource;
 
+	/**
+	 * Cors处理器
+	 */
 	private CorsProcessor corsProcessor = new DefaultCorsProcessor();
 
 	/**
-	 * 当前 HandlerMapping 的顺序
+	 * 当前 {@link HandlerMapping} 的顺序
 	 */
 	private int order = Ordered.LOWEST_PRECEDENCE;  // default: same as non-Ordered
 
@@ -438,13 +441,14 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 		// 如果请求是CORS预检请求，进行检查
 		if (hasCorsConfigurationSource(handler) || CorsUtils.isPreFlightRequest(request)) {
-			// 从Cors数据源中获取规则
+			// 从WebMvcConfigurer配置的CorsConfigurationSource获取Cors配置
 			CorsConfiguration config = (this.corsConfigurationSource != null ? this.corsConfigurationSource.getCorsConfiguration(request) : null);
-			// 从处理方法上获取规则
+			// 从处理方法中获取获取Cors配置
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
+			// 结合所有非空的Cors属性
 			config = (config != null ? config.combine(handlerConfig) : handlerConfig);
 			// 包装拦截器链
-			// 不懂，这里只是处理预请求，那么真正的跨域请求在那判断呢
+			// 主要是修改内部的处理方法，变为Cors的一个处理方法
 			executionChain = getCorsHandlerExecutionChain(request, executionChain, config);
 		}
 
@@ -540,25 +544,19 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * Update the HandlerExecutionChain for CORS-related handling.
-	 * <p>For pre-flight requests, the default implementation replaces the selected
-	 * handler with a simple HttpRequestHandler that invokes the configured
-	 * {@link #setCorsProcessor}.
-	 * <p>For actual requests, the default implementation inserts a
-	 * HandlerInterceptor that makes CORS-related checks and adds CORS headers.
-	 * @param request the current request
-	 * @param chain the handler chain
-	 * @param config the applicable CORS configuration (possibly {@code null})
-	 * @since 4.2
+	 * 更新处理器执行链
+	 * <li>修改内部的处理方法，变为 {@link PreFlightHandler}</li>
 	 */
 	protected HandlerExecutionChain getCorsHandlerExecutionChain(HttpServletRequest request,
 			HandlerExecutionChain chain, @Nullable CorsConfiguration config) {
 
+		// 是否是一个预检查请求
 		if (CorsUtils.isPreFlightRequest(request)) {
 			HandlerInterceptor[] interceptors = chain.getInterceptors();
 			return new HandlerExecutionChain(new PreFlightHandler(config), interceptors);
 		}
 		else {
+			// 不是预检查请求，但是还有需要过Cors，直接添加一个拦截器
 			chain.addInterceptor(0, new CorsInterceptor(config));
 			return chain;
 		}
@@ -587,6 +585,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 
+	/**
+	 * 为不是预检查请求的请求，做Cors检查
+	 */
 	private class CorsInterceptor extends HandlerInterceptorAdapter implements CorsConfigurationSource {
 
 		@Nullable
@@ -606,6 +607,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				return true;
 			}
 
+			// 开始处理Cors
 			return corsProcessor.processRequest(this.config, request, response);
 		}
 

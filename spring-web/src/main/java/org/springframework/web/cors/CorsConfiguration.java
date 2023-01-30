@@ -32,7 +32,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * 保存了所有Cors配置规则的容器
+ * 保存了所有Cors配置规则
  * <p>By default a newly created {@code CorsConfiguration} does not permit any
  * cross-origin requests and must be configured explicitly to indicate what
  * should be allowed. Use {@link #applyPermitDefaultValues()} to flip the
@@ -54,9 +54,15 @@ public class CorsConfiguration {
 	private static final List<HttpMethod> DEFAULT_METHODS = Collections.unmodifiableList(
 			Arrays.asList(HttpMethod.GET, HttpMethod.HEAD));
 
+	/**
+	 * Cors配置默认的允许的请求方式
+	 */
 	private static final List<String> DEFAULT_PERMIT_METHODS = Collections.unmodifiableList(
 			Arrays.asList(HttpMethod.GET.name(), HttpMethod.HEAD.name(), HttpMethod.POST.name()));
 
+	/**
+	 * 默认允许全部
+	 */
 	private static final List<String> DEFAULT_PERMIT_ALL = Collections.singletonList(ALL);
 
 
@@ -349,20 +355,7 @@ public class CorsConfiguration {
 
 
 	/**
-	 * By default a newly created {@code CorsConfiguration} does not permit any
-	 * cross-origin requests and must be configured explicitly to indicate what
-	 * should be allowed.
-	 * <p>Use this method to flip the initialization model to start with open
-	 * defaults that permit all cross-origin requests for GET, HEAD, and POST
-	 * requests. Note however that this method will not override any existing
-	 * values already set.
-	 * <p>The following defaults are applied if not already set:
-	 * <ul>
-	 * <li>Allow all origins.</li>
-	 * <li>Allow "simple" methods {@code GET}, {@code HEAD} and {@code POST}.</li>
-	 * <li>Allow all headers.</li>
-	 * <li>Set max age to 1800 seconds (30 minutes).</li>
-	 * </ul>
+	 * 如果必要的Cors参数为空，就设置默认的
 	 */
 	public CorsConfiguration applyPermitDefaultValues() {
 		if (this.allowedOrigins == null) {
@@ -383,7 +376,7 @@ public class CorsConfiguration {
 	}
 
 	/**
-	 * Combine the non-null properties of the supplied
+	 * 结合所有非空的Cors属性
 	 * {@code CorsConfiguration} with this one.
 	 * <p>When combining single values like {@code allowCredentials} or
 	 * {@code maxAge}, {@code this} properties are overridden by non-null

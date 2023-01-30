@@ -39,17 +39,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * The default implementation of {@link CorsProcessor}, as defined by the
- * <a href="https://www.w3.org/TR/cors/">CORS W3C recommendation</a>.
- *
- * <p>Note that when input {@link CorsConfiguration} is {@code null}, this
- * implementation does not reject simple or actual requests outright but simply
- * avoid adding CORS headers to the response. CORS processing is also skipped
- * if the response already contains CORS headers.
- *
- * @author Sebastien Deleuze
- * @author Rossen Stoyanchev
- * @since 4.2
+ * 默认的Cors处理器
  */
 public class DefaultCorsProcessor implements CorsProcessor {
 
@@ -57,7 +47,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 
 
 	/**
-	 * 没懂，估计是校验请求类型，请求头等等的
+	 * 校验Cors规则
 	 * @param config
 	 * @param request the current request
 	 * @param response the current response

@@ -558,6 +558,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
 
+		/**
+		 * 处理方法和处理方法对应的Cors配置
+		 * <li>比如说方法上带有了 {@link org.springframework.web.bind.annotation.CrossOrigin @CrossOrigin}</li>
+		 */
 		private final Map<HandlerMethod, CorsConfiguration> corsLookup = new ConcurrentHashMap<>();
 
 		/**
@@ -622,7 +626,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			this.readWriteLock.writeLock().lock();
 			try {
-				// 创建HandlerMethod实例。
+				// 创建HandlerMethod实例
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
 				// 校验HandlerMethod
 				validateMethodMapping(handlerMethod, mapping);
@@ -639,11 +643,13 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 					addMappingName(name, handlerMethod);
 				}
 
+				// 提取有关CORS的配置
 				CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
 				if (corsConfig != null) {
 					this.corsLookup.put(handlerMethod, corsConfig);
 				}
 
+				// 注册
 				this.registry.put(mapping, new MappingRegistration<>(mapping, handlerMethod, directUrls, name));
 			}
 			finally {
