@@ -265,7 +265,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
 
 	/**
-	 * DispatcherServlet配置类文件的名称
+	 * DispatcherServlet的配置类文件的名称
 	 */
 	private static final String DEFAULT_STRATEGIES_PATH = "DispatcherServlet.properties";
 
@@ -278,13 +278,13 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
 
 	/**
-	 * 从配置文件中加载的有关 DispatcherServlet 的配置
+	 * 从配置文件中记载有关 {@link DispatcherServlet} 中八大组件的默认配置，默认没有 {@link RequestToViewNameTranslator}
+	 * <p>比如说 {@link HandlerMapping} 默认有用逗号分隔的多个</p>
 	 */
 	private static final Properties defaultStrategies;
 
 	static {
-		// 从配置文件中记载有关 DispatcherServlet 的配置
-		// 比如说加载 国际化解析器(LocaleResolver), 主题解析器(ThemeResolver)
+		// 从配置文件中记载有关 DispatcherServlet 中九大组件的默认配置
 		try {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
@@ -505,7 +505,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the strategy objects that this servlet uses.
+	 * 初始化此 {@link javax.servlet.Servlet} 使用的九大对象
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
@@ -521,9 +521,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the MultipartResolver used by this class.
-	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
-	 * no multipart handling is provided.
+	 * 初始化 {@link MultipartResolver}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则不提供多部分处理</p>
 	 */
 	private void initMultipartResolver(ApplicationContext context) {
 		try {
@@ -545,9 +544,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the LocaleResolver used by this class.
-	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
-	 * we default to AcceptHeaderLocaleResolver.
+	 * 初始化 {@link LocaleResolver}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initLocaleResolver(ApplicationContext context) {
 		try {
@@ -560,7 +558,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 		catch (NoSuchBeanDefinitionException ex) {
-			// We need to use the default.
+			// 使用默认的LocaleResolver
 			this.localeResolver = getDefaultStrategy(context, LocaleResolver.class);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No LocaleResolver '" + LOCALE_RESOLVER_BEAN_NAME +
@@ -570,9 +568,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the ThemeResolver used by this class.
-	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
-	 * we default to a FixedThemeResolver.
+	 * 初始化 {@link ThemeResolver}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initThemeResolver(ApplicationContext context) {
 		try {
@@ -595,9 +592,9 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the HandlerMappings used by this class.
-	 * <p>If no HandlerMapping beans are defined in the BeanFactory for this namespace,
-	 * we default to BeanNameUrlHandlerMapping.
+	 /**
+	 * 初始化 {@link HandlerMapping}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
@@ -634,9 +631,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the HandlerAdapters used by this class.
-	 * <p>If no HandlerAdapter beans are defined in the BeanFactory for this namespace,
-	 * we default to SimpleControllerHandlerAdapter.
+	 * 初始化 {@link HandlerAdapter}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initHandlerAdapters(ApplicationContext context) {
 		this.handlerAdapters = null;
@@ -673,9 +669,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the HandlerExceptionResolver used by this class.
-	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
-	 * we default to no exception resolver.
+	 * 初始化 {@link HandlerExceptionResolver}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initHandlerExceptionResolvers(ApplicationContext context) {
 		this.handlerExceptionResolvers = null;
@@ -713,8 +708,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the RequestToViewNameTranslator used by this servlet instance.
-	 * <p>If no implementation is configured then we default to DefaultRequestToViewNameTranslator.
+	 * 初始化 {@link RequestToViewNameTranslator}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initRequestToViewNameTranslator(ApplicationContext context) {
 		try {
@@ -738,9 +733,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the ViewResolvers used by this class.
-	 * <p>If no ViewResolver beans are defined in the BeanFactory for this
-	 * namespace, we default to InternalResourceViewResolver.
+	 * 初始化 {@link ViewResolver}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initViewResolvers(ApplicationContext context) {
 		this.viewResolvers = null;
@@ -777,9 +771,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Initialize the {@link FlashMapManager} used by this servlet instance.
-	 * <p>If no implementation is configured then we default to
-	 * {@code org.springframework.web.servlet.support.DefaultFlashMapManager}.
+	 * 初始化 {@link FlashMapManager}
+	 * <p>如果在 {@link org.springframework.beans.factory.BeanFactory} 中没有改Bean，则使用默认的</p>
 	 */
 	private void initFlashMapManager(ApplicationContext context) {
 		try {
@@ -836,15 +829,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Return the default strategy object for the given strategy interface.
-	 * <p>The default implementation delegates to {@link #getDefaultStrategies},
-	 * expecting a single object in the list.
-	 * @param context the current WebApplicationContext
-	 * @param strategyInterface the strategy interface
-	 * @return the corresponding strategy object
-	 * @see #getDefaultStrategies
+	 * 根据给定的类型，返回对应的默认实现对象
 	 */
 	protected <T> T getDefaultStrategy(ApplicationContext context, Class<T> strategyInterface) {
+		// 从配置中读取此类默认的实现类名称，然后创建实例并返回
 		List<T> strategies = getDefaultStrategies(context, strategyInterface);
 		if (strategies.size() != 1) {
 			throw new BeanInitializationException(
@@ -854,21 +842,23 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Create a List of default strategy objects for the given strategy interface.
-	 * <p>The default implementation uses the "DispatcherServlet.properties" file (in the same
-	 * package as the DispatcherServlet class) to determine the class names. It instantiates
-	 * the strategy objects through the context's BeanFactory.
-	 * @param context the current WebApplicationContext
-	 * @param strategyInterface the strategy interface
-	 * @return the List of corresponding strategy objects
+	 * 从配置中读取此类默认的实现类名称，然后创建实例并返回
+	 * @param context
+	 * @param strategyInterface
+	 * @param <T>
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> List<T> getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) {
+		// 获得全类名
 		String key = strategyInterface.getName();
+		// 从配置中读取此类默认的实现类名称
 		String value = defaultStrategies.getProperty(key);
 		if (value != null) {
+			// 逗号切分
 			String[] classNames = StringUtils.commaDelimitedListToStringArray(value);
 			List<T> strategies = new ArrayList<>(classNames.length);
+			// 创建默认的实现类
 			for (String className : classNames) {
 				try {
 					Class<?> clazz = ClassUtils.forName(className, DispatcherServlet.class.getClassLoader());
@@ -894,7 +884,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Create a default strategy.
+	 * 创建指定的类的实例
 	 * <p>The default implementation uses
 	 * {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory#createBean}.
 	 * @param context the current WebApplicationContext
@@ -964,6 +954,10 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 	}
 
+	/**
+	 * 打印日志
+	 * @param request
+	 */
 	private void logRequest(HttpServletRequest request) {
 		LogFormatUtils.traceDebug(logger, traceOn -> {
 			String params;
@@ -1002,7 +996,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
-	 * Process the actual dispatching to the handler.
+	 * 处理请求
 	 * <p>The handler will be obtained by applying the servlet's HandlerMappings in order.
 	 * The HandlerAdapter will be obtained by querying the servlet's installed HandlerAdapters
 	 * to find the first that supports the handler class.

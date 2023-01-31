@@ -427,7 +427,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		}
 
 
-		// 是否需要清除缓存
+		// 是否需要清除缓存，对应 @CacheEvict
 		// 注意第二个参数是 true，表明是在执行目标方法之前执行的
 		processCacheEvicts(contexts.get(CacheEvictOperation.class), true,
 				CacheOperationExpressionEvaluator.NO_RESULT);

@@ -27,10 +27,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Servlet Filter that allows one to specify a character encoding for requests.
- * This is useful because current browsers typically do not set a character
- * encoding even if specified in the HTML page or form.
- *
+ * Servlet过滤器，允许为请求指定字符编码。这很有用，因为当前的浏览器通常不会设置字符编码，即使在HTML页面或表单中指定了字符编码
  * <p>This filter can either apply its encoding if the request does not already
  * specify an encoding, or enforce this filter's encoding in any case
  * ("forceEncoding"="true"). In the latter case, the encoding will also be
@@ -46,11 +43,21 @@ import org.springframework.util.Assert;
  */
 public class CharacterEncodingFilter extends OncePerRequestFilter {
 
+	/**
+	 * 使用的字符集
+	 * <p>在SpringBoot中是利用 {@link HttpEncodingAutoConfiguration} + {@link HttpProperties} 设置的</p>
+	 */
 	@Nullable
 	private String encoding;
 
+	/**
+	 * 是否强制请求使用配置的字符集
+	 */
 	private boolean forceRequestEncoding = false;
 
+	/**
+	 * 是否强制响应使用配置的字符集
+	 */
 	private boolean forceResponseEncoding = false;
 
 
@@ -191,9 +198,11 @@ public class CharacterEncodingFilter extends OncePerRequestFilter {
 
 		String encoding = getEncoding();
 		if (encoding != null) {
+			// 设置了要强制更改请求的字符集，请求又没有设置字符集，那就更改
 			if (isForceRequestEncoding() || request.getCharacterEncoding() == null) {
 				request.setCharacterEncoding(encoding);
 			}
+			// 更改响应的字符集
 			if (isForceResponseEncoding()) {
 				response.setCharacterEncoding(encoding);
 			}

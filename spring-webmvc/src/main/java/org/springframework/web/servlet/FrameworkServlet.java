@@ -210,7 +210,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/** Should we dispatch an HTTP TRACE request to {@link #doService}?. */
 	private boolean dispatchTraceRequest = false;
 
-	/** Whether to log potentially sensitive info (request params at DEBUG + headers at TRACE). */
+	/** 是否允许在 DEBUG 和 TRACE 级别记录(可能敏感的)请求详细信息 */
 	private boolean enableLoggingRequestDetails = false;
 
 	/** WebApplicationContext for this servlet. */

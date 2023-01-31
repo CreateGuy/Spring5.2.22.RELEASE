@@ -117,6 +117,12 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 		return declaredEventType;
 	}
 
+	/**
+	 * 返回此监听器的 {@link ResolvableType}
+	 * <p>猜测是带有 ? extends NewApplicationEvent 的{@link ResolvableType}</p>
+	 * @param listenerType
+	 * @return
+	 */
 	@Nullable
 	static ResolvableType resolveDeclaredEventType(Class<?> listenerType) {
 		ResolvableType eventType = eventTypeCache.get(listenerType);

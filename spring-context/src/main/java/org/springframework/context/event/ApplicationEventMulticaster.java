@@ -22,8 +22,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by objects that can manage a number of
- * {@link ApplicationListener} objects and publish events to them.
+ * 管理注册的所有 {@link ApplicationListener}，支持添加删除监听器和发布事件
  *
  * <p>An {@link org.springframework.context.ApplicationEventPublisher}, typically
  * a Spring {@link org.springframework.context.ApplicationContext}, can use an

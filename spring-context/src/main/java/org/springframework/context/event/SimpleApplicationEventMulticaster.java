@@ -142,6 +142,11 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		}
 	}
 
+	/**
+	 * 解析泛型
+	 * @param event
+	 * @return
+	 */
 	private ResolvableType resolveDefaultEventType(ApplicationEvent event) {
 		return ResolvableType.forInstance(event);
 	}

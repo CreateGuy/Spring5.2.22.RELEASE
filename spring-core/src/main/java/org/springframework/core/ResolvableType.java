@@ -43,7 +43,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- *
  * 是对 Java type 的封装，提供对超类型、接口和泛型参数的访问，以及最终解析为类的能力。
  * type：是指的是java提供的参数类型接口
  * ResolvableTypes可以从字段、方法参数、方法返回或类中获得
