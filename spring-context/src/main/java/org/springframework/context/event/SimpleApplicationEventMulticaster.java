@@ -29,28 +29,24 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ErrorHandler;
 
 /**
- * Simple implementation of the {@link ApplicationEventMulticaster} interface.
- *
- * <p>Multicasts all events to all registered listeners, leaving it up to
- * the listeners to ignore events that they are not interested in.
- * Listeners will usually perform corresponding {@code instanceof}
- * checks on the passed-in event object.
- *
- * <p>By default, all listeners are invoked in the calling thread.
- * This allows the danger of a rogue listener blocking the entire application,
- * but adds minimal overhead. Specify an alternative task executor to have
- * listeners executed in different threads, for example from a thread pool.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @author Stephane Nicoll
- * @see #setTaskExecutor
+ * 简单的 {@link ApplicationEventMulticaster} 的实现.
+ * <ul>
+ *     <li>所有事件多播到所有已注册的监听器，由监听器自己确定是否需要接受事件</li>
+ *     <li>监听器通常会对传入的事件对象执行相应的instanceof检查</li>
+ *     <li>通常监听器都在调度线程中执行，可以指定 Executor 来进行多线程执行</li>
+ * </ul>
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
+	/**
+	 * 可以支持多线程的
+	 */
 	@Nullable
 	private Executor taskExecutor;
 
+	/**
+	 * 当前多播程序的当前错误处理程序
+	 */
 	@Nullable
 	private ErrorHandler errorHandler;
 
@@ -133,6 +129,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
 		Executor executor = getTaskExecutor();
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			// 是否需要多线程执行
 			if (executor != null) {
 				executor.execute(() -> invokeListener(listener, event));
 			}
@@ -172,6 +169,11 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		}
 	}
 
+	/**
+	 * 推送事件给监听器
+	 * @param listener
+	 * @param event
+	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void doInvokeListener(ApplicationListener listener, ApplicationEvent event) {
 		try {
@@ -194,7 +196,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	private boolean matchesClassCastMessage(String classCastMessage, Class<?> eventClass) {
-		// On Java 8, the message starts with the class name: "java.lang.String cannot be cast..."
+		// 在Java 8上，消息以类名“Java.lang”开始。字符串不能强制转换..
 		if (classCastMessage.startsWith(eventClass.getName())) {
 			return true;
 		}

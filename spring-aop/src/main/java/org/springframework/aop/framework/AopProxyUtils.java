@@ -45,7 +45,7 @@ import org.springframework.util.ObjectUtils;
 public abstract class AopProxyUtils {
 
 	/**
-	 * Obtain the singleton target object behind the given proxy, if any.
+	 * 返回代理的对象，如果有的话
 	 * @param candidate the (potential) proxy to check
 	 * @return the singleton target object managed in a {@link SingletonTargetSource},
 	 * or {@code null} in any other case (not a proxy, not an existing singleton target)

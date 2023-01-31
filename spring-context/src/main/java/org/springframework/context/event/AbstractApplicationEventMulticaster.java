@@ -63,6 +63,9 @@ import org.springframework.util.ObjectUtils;
 public abstract class AbstractApplicationEventMulticaster
 		implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
 
+	/**
+	 * 已注册的监听器的工具类
+	 */
 	private final DefaultListenerRetriever defaultRetriever = new DefaultListenerRetriever();
 
 	/**
@@ -101,12 +104,15 @@ public abstract class AbstractApplicationEventMulticaster
 		return this.beanFactory;
 	}
 
-
+	/**
+	 * 注册监听器
+	 * <li>如果是一个代理类，被代理的类已经注册，则删除目标，然后在注册，以避免重复调用同一个侦听器</li>
+	 * @param listener the listener to add
+	 */
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		synchronized (this.defaultRetriever) {
-			// Explicitly remove target for a proxy, if registered already,
-			// in order to avoid double invocations of the same listener.
+
 			Object singletonTarget = AopProxyUtils.getSingletonTarget(listener);
 			if (singletonTarget instanceof ApplicationListener) {
 				this.defaultRetriever.applicationListeners.remove(singletonTarget);
@@ -203,7 +209,7 @@ public abstract class AbstractApplicationEventMulticaster
 			}
 			// 如果result为空，则现有检索器还没有被另一个线程完全填充。继续进行，就像当前本地尝试不可能进行缓存一样。
 		}
-		// 实际查询监听了特定事件的监听器
+		// 检索该事件和该具体数据匹配的监听器集合，并返回
 		return retrieveApplicationListeners(eventType, sourceType, newRetriever);
 	}
 
@@ -494,6 +500,10 @@ public abstract class AbstractApplicationEventMulticaster
 		 */
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
+		/**
+		 * 返回所有注册的监听器
+		 * @return
+		 */
 		public Collection<ApplicationListener<?>> getApplicationListeners() {
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
 					this.applicationListeners.size() + this.applicationListenerBeans.size());
