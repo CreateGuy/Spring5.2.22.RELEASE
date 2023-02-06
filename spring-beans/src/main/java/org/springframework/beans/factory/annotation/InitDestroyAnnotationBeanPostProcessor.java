@@ -198,7 +198,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 	/**
-	 * 在bean销毁前执行@PostConstruct方法
+	 * 在bean销毁前执行@PreDestroy方法
 	 * @param bean the bean instance to be destroyed
 	 * @param beanName the name of the bean
 	 * @throws BeansException

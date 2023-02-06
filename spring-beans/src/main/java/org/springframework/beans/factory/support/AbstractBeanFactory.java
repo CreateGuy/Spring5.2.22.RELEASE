@@ -150,16 +150,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private TypeConverter typeConverter;
 
-	/** String resolvers to apply e.g. to annotation attribute values. */
+	/**
+	 * 用于解析注解上的字符串
+	 * <li>我猜测在 {@link org.springframework.beans.factory.annotation.Value} 上会用到</li>
+	 * */
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/** 有关bean后置处理器集合. */
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
-	/** 是否开启 实例化前后的后置处理器 */
+	/** 是否有 实例化前后的后置处理器 */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
 
-	/** 是否已注册销毁bean的后置处理器*/
+	/** 是否有 注册和销毁前后的后置处理器*/
 	private volatile boolean hasDestructionAwareBeanPostProcessors;
 
 	/** Map from scope identifier String to corresponding Scope. */
@@ -513,6 +516,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 检查给定名称的bean是否与指定类型匹配
 	 * Internal extended variant of {@link #isTypeMatch(String, ResolvableType)}
 	 * to check whether the bean with the given name matches the specified type. Allow
 	 * additional constraints to be applied to ensure that beans are not created early.
@@ -529,26 +533,33 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected boolean isTypeMatch(String name, ResolvableType typeToMatch, boolean allowFactoryBeanInit)
 			throws NoSuchBeanDefinitionException {
 
+		// 返回bean名称，必要时去掉FactoryBean引用前缀
 		String beanName = transformedBeanName(name);
+		// 是否是FactoryBean名称
 		boolean isFactoryDereference = BeanFactoryUtils.isFactoryDereference(name);
 
-		// Check manually registered singletons.
+		// 返回指定bean的实例
 		Object beanInstance = getSingleton(beanName, false);
 		if (beanInstance != null && beanInstance.getClass() != NullBean.class) {
 			if (beanInstance instanceof FactoryBean) {
 				if (!isFactoryDereference) {
+					// 是一个FactoryBean，是匹配工厂生产的具体对象
 					Class<?> type = getTypeForFactoryBean((FactoryBean<?>) beanInstance);
+					// 是否有关系
 					return (type != null && typeToMatch.isAssignableFrom(type));
 				}
 				else {
+					// 是一个FactoryBean，是直接匹配这个工厂对象，而不是里面的具体的对象
 					return typeToMatch.isInstance(beanInstance);
 				}
 			}
 			else if (!isFactoryDereference) {
+				// 是否有关系
 				if (typeToMatch.isInstance(beanInstance)) {
 					// Direct match for exposed instance?
 					return true;
 				}
+				// 泛型的情况
 				else if (typeToMatch.hasGenerics() && containsBeanDefinition(beanName)) {
 					// Generics potentially only match on the target class, not on the proxy...
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
@@ -573,11 +584,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return false;
 		}
 		else if (containsSingleton(beanName) && !containsBeanDefinition(beanName)) {
-			// null instance registered
+			// 空实例注册
 			return false;
 		}
 
-		// No singleton instance found -> check bean definition.
+		// 通过父容器进行类型匹配
 		BeanFactory parentBeanFactory = getParentBeanFactory();
 		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 			// No bean definition found in this factory -> delegate to parent.
@@ -936,19 +947,25 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return result;
 	}
 
+	/**
+	 * 注册新的 {@link BeanPostProcessor}
+	 * @param beanPostProcessor the post-processor to register
+	 */
 	@Override
 	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
 		Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");
-		// Remove from old position, if any
+		// 移除旧的
 		this.beanPostProcessors.remove(beanPostProcessor);
 		// Track whether it is instantiation/destruction aware
 		if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+			// 标记有实例化前后的后置处理器
 			this.hasInstantiationAwareBeanPostProcessors = true;
 		}
 		if (beanPostProcessor instanceof DestructionAwareBeanPostProcessor) {
+			// 标记有注册和销毁前后的后置处理器
 			this.hasDestructionAwareBeanPostProcessors = true;
 		}
-		// Add to end of list
+		// 添加新的
 		this.beanPostProcessors.add(beanPostProcessor);
 	}
 
@@ -1083,6 +1100,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return getMergedLocalBeanDefinition(beanName);
 	}
 
+	/**
+	 * 是否是一个 {@link FactoryBean}
+	 * @param name the name of the bean to check
+	 * @return
+	 * @throws NoSuchBeanDefinitionException
+	 */
 	@Override
 	public boolean isFactoryBean(String name) throws NoSuchBeanDefinitionException {
 		String beanName = transformedBeanName(name);

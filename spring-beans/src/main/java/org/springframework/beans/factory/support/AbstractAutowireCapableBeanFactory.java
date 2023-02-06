@@ -458,9 +458,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
+		// 比如ApplicationListenerDetector：注册监听器
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
-			//实际上只有一个有作用
-			//ApplicationListenerDetector：注册监听器
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
 				return result;
@@ -533,6 +532,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			//
 			// 执行特定的BeanPostProcessors，有可能获得一个代理，而不是目标bean实例。
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
@@ -601,7 +601,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					//开始调用某些后置处理器对BeanDefinition进行修改
+					// 开始调用某些后置处理器对BeanDefinition进行修改
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -1124,7 +1124,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * 对合并后的BeanDefinition进行一些操作
+	 * 如果有 {@link MergedBeanDefinitionPostProcessor}，那就对 RootBeanDefinition 进行操作
 	 * @param mbd the merged bean definition for the bean
 	 * @param beanType the actual type of the managed bean instance
 	 * @param beanName the name of the bean
@@ -1134,7 +1134,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//默认就只有三个处理器会执行postProcessMergedBeanDefinition方法
 		//CommonAnnotationBeanPostProcessor：是为了查找生命周期方法和@Resource注解的信息
 		//AutowiredAnnotationBeanPostProcessor：为了查找@Autowired注解的信息
-		//ApplicationListenerDetector:是为了将监听器类型的bean，保存起来，不懂后面作何操作
+		//ApplicationListenerDetector:是为了将监听器类型的bean，保存起来，后续会注册到 ApplicationContext 中
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof MergedBeanDefinitionPostProcessor) {
 				MergedBeanDefinitionPostProcessor bdp = (MergedBeanDefinitionPostProcessor) bp;

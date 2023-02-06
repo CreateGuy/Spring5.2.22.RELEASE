@@ -31,6 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 一个后置处理器，用于将监听器注册到 {@link org.springframework.context.ApplicationContext} 中
  * {@code BeanPostProcessor} that detects beans which implement the {@code ApplicationListener}
  * interface. This catches beans that can't reliably be detected by {@code getBeanNamesForType}
  * and related operations which only work against top-level beans.
@@ -62,6 +63,12 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	}
 
 
+	/**
+	 * 如果是监听器对应的 {@link RootBeanDefinition}，那么就保存起来，后续注册Bean的时候会操作
+	 * @param beanDefinition the merged bean definition for the bean
+	 * @param beanType the actual type of the managed bean instance
+	 * @param beanName the name of the bean
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		//如果是监听器类型的bean那么就保存到对应集合中
@@ -76,19 +83,19 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	}
 
 	/**
-	 * 将
+	 * 将监听器注册到 {@link org.springframework.context.ApplicationContext} 中
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return
 	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
-		//如果bean是一个监听bean
+		// 如果bean是一个监听bean
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
-				//添加一个监听器到容器中
+				// 添加一个监听器到容器中
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
 			}
 			else if (Boolean.FALSE.equals(flag)) {
@@ -99,7 +106,7 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 							"because it does not have singleton scope. Only top-level listener beans are allowed " +
 							"to be of non-singleton scope.");
 				}
-				//具有其他作用域的bean不能可靠地处理事件
+				// 具有其他作用域的bean不能可靠地处理事件
 				this.singletonNames.remove(beanName);
 			}
 		}

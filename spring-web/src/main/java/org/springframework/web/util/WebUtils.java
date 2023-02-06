@@ -166,7 +166,8 @@ public abstract class WebUtils {
 	public static final String ERROR_EXCEPTION_ATTRIBUTE = "javax.servlet.error.exception";
 
 	/**
-	 * Standard Servlet 2.3+ spec request attribute for error page request URI.
+	 * 标准Servlet 2.3+为错误页请求URI指定请求属性
+	 * <p>在找不到对应的处理器的时候，请求Uri会变成error。那么这里就是源Uri</p>
 	 * <p>To be exposed to JSPs that are marked as error pages, when forwarding
 	 * to them directly rather than through the servlet container's error page
 	 * resolution mechanism.

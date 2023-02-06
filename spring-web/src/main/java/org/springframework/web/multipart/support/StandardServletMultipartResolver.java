@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartResolver;
 
 /**
  * 用于解析多部分普通参数和文件参数解析器
+ * <li>由 {@link MultipartAutoConfiguration} 注入到容器中</li>
  * Standard implementation of the {@link MultipartResolver} interface,
  * based on the Servlet 3.0 {@link javax.servlet.http.Part} API.
  * To be added as "multipartResolver" bean to a Spring DispatcherServlet context,
