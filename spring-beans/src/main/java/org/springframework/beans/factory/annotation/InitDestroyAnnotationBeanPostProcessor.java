@@ -110,7 +110,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 	private Class<? extends Annotation> initAnnotationType;
 
 	/**
-	 * 还没检查后的生命周期方法-@PostConstruct
+	 * 还没检查后的生命周期方法-@PreDestroy
 	 */
 	@Nullable
 	private Class<? extends Annotation> destroyAnnotationType;

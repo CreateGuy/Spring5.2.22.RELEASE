@@ -19,7 +19,7 @@ package org.springframework.aop;
 import org.aopalliance.aop.Advice;
 
 /**
- *	切面，估计类似于@Aspect注解方式的切面
+ * 切面，类似于@Aspect注解方式的切面
  * @author Rod Johnson
  * @author Juergen Hoeller
  */

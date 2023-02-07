@@ -18,7 +18,6 @@ package org.springframework.aop;
 
 /**
  * AOP 切入点
- *
  * <p>A pointcut is composed of a {@link ClassFilter} and a {@link MethodMatcher}.
  * Both these basic terms and a Pointcut itself can be combined to build up combinations
  * (e.g. through {@link org.springframework.aop.support.ComposablePointcut}).
@@ -46,7 +45,7 @@ public interface Pointcut {
 
 
 	/**
-	 * Canonical Pointcut instance that always matches.
+	 * 作为切入点，总是匹配
 	 */
 	Pointcut TRUE = TruePointcut.INSTANCE;
 

@@ -150,7 +150,7 @@ public interface ConfigurableListableBeanFactory
 
 	/**
 	 * 确保所有非懒加载的单例都被实例化，同时还要考虑
-	 * {@link org.springframework.beans.factory.FactoryBean FactoryBeans}.
+	 * {@link org.springframework.beans.factory.FactoryBean FactoryBeans} 的情况
 	 * Typically invoked at the end of factory setup, if desired.
 	 * @throws BeansException if one of the singleton beans could not be created.
 	 * Note: This may have left the factory with some beans already initialized!
