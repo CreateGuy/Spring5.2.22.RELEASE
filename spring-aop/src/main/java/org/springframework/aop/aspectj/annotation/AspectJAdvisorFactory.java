@@ -39,8 +39,7 @@ import org.springframework.lang.Nullable;
 public interface AspectJAdvisorFactory {
 
 	/**
-	 * Determine whether or not the given class is an aspect, as reported
-	 * by AspectJ's {@link org.aspectj.lang.reflect.AjTypeSystem}.
+	 * 判断给定的类是否是一个合格的 {@link org.aspectj.lang.annotation.Aspect Aspect}
 	 * <p>Will simply return {@code false} if the supposed aspect is
 	 * invalid (such as an extension of a concrete aspect class).
 	 * Will return true for some aspects that Spring AOP cannot process,
@@ -52,7 +51,7 @@ public interface AspectJAdvisorFactory {
 	boolean isAspect(Class<?> clazz);
 
 	/**
-	 * Is the given class a valid AspectJ aspect class?
+	 * 给定的类是否是有效的AspectJ类
 	 * @param aspectClass the supposed AspectJ annotation-style class to validate
 	 * @throws AopConfigException if the class is an invalid aspect
 	 * (which can never be legal)
@@ -71,7 +70,7 @@ public interface AspectJAdvisorFactory {
 	List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory);
 
 	/**
-	 * Build a Spring AOP Advisor for the given AspectJ advice method.
+	 * 通过给定的方法构建Advisor
 	 * @param candidateAdviceMethod the candidate advice method
 	 * @param aspectInstanceFactory the aspect instance factory
 	 * @param declarationOrder the declaration order within the aspect

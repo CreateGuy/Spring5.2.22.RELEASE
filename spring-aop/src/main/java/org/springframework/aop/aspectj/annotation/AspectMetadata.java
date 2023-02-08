@@ -47,9 +47,7 @@ import org.springframework.aop.support.ComposablePointcut;
 public class AspectMetadata implements Serializable {
 
 	/**
-	 * The name of this aspect as defined to Spring (the bean name) -
-	 * allows us to determine if two pieces of advice come from the
-	 * same aspect and hence their relative precedence.
+	 * 此Aspect的名称
 	 */
 	private final String aspectName;
 
@@ -74,7 +72,7 @@ public class AspectMetadata implements Serializable {
 
 
 	/**
-	 * Create a new AspectMetadata instance for the given aspect class.
+	 * 为传入的aspectClass构建元数据
 	 * @param aspectClass the aspect class
 	 * @param aspectName the name of the aspect
 	 */
@@ -94,9 +92,13 @@ public class AspectMetadata implements Serializable {
 		if (ajType == null) {
 			throw new IllegalArgumentException("Class '" + aspectClass.getName() + "' is not an @AspectJ aspect");
 		}
+
+		// 是否设置了织入顺序的注解，但是Spring的AOP不支持
 		if (ajType.getDeclarePrecedence().length > 0) {
 			throw new IllegalArgumentException("DeclarePrecedence not presently supported in Spring AOP");
 		}
+
+		// 不懂，这个也会返回传入的aspectClass
 		this.aspectClass = ajType.getJavaClass();
 		this.ajType = ajType;
 

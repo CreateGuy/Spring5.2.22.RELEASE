@@ -18,6 +18,7 @@ package org.springframework.aop.aspectj;
 
 import org.aopalliance.aop.Advice;
 
+import org.aspectj.lang.annotation.DeclareParents;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.IntroductionAdvisor;
 import org.springframework.aop.IntroductionInterceptor;
@@ -37,8 +38,14 @@ public class DeclareParentsAdvisor implements IntroductionAdvisor {
 
 	private final Advice advice;
 
+	/**
+	 * {@link DeclareParents#defaultImpl()}
+	 */
 	private final Class<?> introducedInterface;
 
+	/**
+	 * 基于 {@link DeclareParents#value()}
+	 */
 	private final ClassFilter typePatternClassFilter;
 
 

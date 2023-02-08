@@ -36,6 +36,9 @@ public abstract class AbstractExpressionPointcut implements ExpressionPointcut, 
 	@Nullable
 	private String location;
 
+	/**
+	 * 切入规则
+	 */
 	@Nullable
 	private String expression;
 

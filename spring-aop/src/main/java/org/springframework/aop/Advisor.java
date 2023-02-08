@@ -19,7 +19,7 @@ package org.springframework.aop;
 import org.aopalliance.aop.Advice;
 
 /**
- * 切面，类似于@Aspect注解方式的切面
+ * 包含Aop通知的基本接口
  * @author Rod Johnson
  * @author Juergen Hoeller
  */

@@ -103,6 +103,9 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 	private static final Log logger = LogFactory.getLog(AspectJExpressionPointcut.class);
 
+	/**
+	 * Aspect类
+	 */
 	@Nullable
 	private Class<?> pointcutDeclarationScope;
 

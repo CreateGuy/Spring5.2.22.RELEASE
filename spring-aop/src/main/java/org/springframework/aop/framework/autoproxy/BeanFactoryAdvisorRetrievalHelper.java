@@ -31,11 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Helper for retrieving standard Spring Advisors from a BeanFactory,
- * for use with auto-proxying.
- *
- * @author Juergen Hoeller
- * @since 2.0.2
+ * 从 {@link org.springframework.beans.factory.BeanFactory BeanFactory} 获得合格的 {@link Advisor}，用于自动代理。
  * @see AbstractAdvisorAutoProxyCreator
  */
 public class BeanFactoryAdvisorRetrievalHelper {
@@ -44,6 +40,9 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 	private final ConfigurableListableBeanFactory beanFactory;
 
+	/**
+	 * 容器中的 Advisor Bean
+	 */
 	@Nullable
 	private volatile String[] cachedAdvisorBeanNames;
 
@@ -59,14 +58,14 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 
 	/**
-	 * Find all eligible Advisor beans in the current bean factory,
-	 * ignoring FactoryBeans and excluding beans that are currently in creation.
+	 * 在当前 {@link org.springframework.beans.factory.BeanFactory BeanFactory}中找到所有符合条件的Advisor bean，忽略{@link org.springframework.beans.factory.BeanFactory BeanFactory}正在创建的bean
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
 	 * @see #isEligibleBean
 	 */
 	public List<Advisor> findAdvisorBeans() {
 		// Determine list of advisor bean names, if not cached already.
 		String[] advisorNames = this.cachedAdvisorBeanNames;
+		// 为空就从容器中获取 Advisor Bean
 		if (advisorNames == null) {
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the auto-proxy creator apply to them!
@@ -80,7 +79,9 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 		List<Advisor> advisors = new ArrayList<>();
 		for (String name : advisorNames) {
+			/// 检查Advisor是否合格
 			if (isEligibleBean(name)) {
+				// 是否正在创建
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Skipping currently created advisor '" + name + "'");
@@ -88,6 +89,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 				}
 				else {
 					try {
+						// 加入集合中
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
 					catch (BeanCreationException ex) {
