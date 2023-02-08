@@ -739,10 +739,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Implementation of AOP Alliance MethodInvocation used by this AOP proxy.
+	 * AOP的代理，是对真实处理方法的执行的描述
 	 */
 	private static class CglibMethodInvocation extends ReflectiveMethodInvocation {
 
+		/**
+		 * 代理方法
+		 */
 		@Nullable
 		private final MethodProxy methodProxy;
 
@@ -752,7 +755,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 			super(proxy, target, method, arguments, targetClass, interceptorsAndDynamicMethodMatchers);
 
-			// Only use method proxy for public methods not derived from java.lang.Object
+			// 仅对是Public的方法，并且不是Object的Equals、HashCode、ToString方法，那么就使用代理
 			this.methodProxy = (isMethodProxyCompatible(method) ? methodProxy : null);
 		}
 
@@ -799,7 +802,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 			return super.invokeJoinpoint();
 		}
 
+		/**
+		 * 是否需要代理
+		 * @param method
+		 * @return
+		 */
 		static boolean isMethodProxyCompatible(Method method) {
+			// 当是Public的方法，并且不是由Object的Equals、HashCode、ToString方法，那么就使用代理
 			return (Modifier.isPublic(method.getModifiers()) &&
 					method.getDeclaringClass() != Object.class && !AopUtils.isEqualsMethod(method) &&
 					!AopUtils.isHashCodeMethod(method) && !AopUtils.isToStringMethod(method));

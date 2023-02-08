@@ -25,10 +25,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.AfterAdvice;
 
 /**
- * Spring AOP advice wrapping an AspectJ after advice method.
- *
- * @author Rod Johnson
- * @since 2.0
+ * 在方法执行后需要执行的 {@link org.aspectj.lang.reflect.Advice}
  */
 @SuppressWarnings("serial")
 public class AspectJAfterAdvice extends AbstractAspectJAdvice
@@ -47,6 +44,7 @@ public class AspectJAfterAdvice extends AbstractAspectJAdvice
 			return mi.proceed();
 		}
 		finally {
+			// 执行Advice方法
 			invokeAdviceMethod(getJoinPointMatch(), null, null);
 		}
 	}

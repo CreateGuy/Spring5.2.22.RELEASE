@@ -21,10 +21,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.MethodMatcher;
 
 /**
- * Internal framework class, combining a MethodInterceptor instance
- * with a MethodMatcher for use as an element in the advisor chain.
- *
- * @author Rod Johnson
+ * 内部框架类，将 {@link MethodInterceptor} 和 {@link MethodMatcher}结合起来
+ * <li>当代理在执行拦截器之前，会通过 {@link MethodMatcher} 再次进行匹配</li>
  */
 class InterceptorAndDynamicMethodMatcher {
 

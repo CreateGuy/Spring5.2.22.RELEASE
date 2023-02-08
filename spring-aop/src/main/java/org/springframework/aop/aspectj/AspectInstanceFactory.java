@@ -34,7 +34,8 @@ import org.springframework.lang.Nullable;
 public interface AspectInstanceFactory extends Ordered {
 
 	/**
-	 * Create an instance of this factory's aspect.
+	 * 返回这个工厂保存的实例
+	 * <li>一般情况下都是被代理的对象</li>
 	 * @return the aspect instance (never {@code null})
 	 */
 	Object getAspectInstance();

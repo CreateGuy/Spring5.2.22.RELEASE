@@ -23,8 +23,8 @@ import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.lang.Nullable;
 
 /**
- * Spring AOP advice that wraps an AspectJ before method.
- *
+ * 在方法执行前需要执行的 {@link org.aspectj.lang.reflect.Advice}
+ * <li>例如使用 {@link org.aspectj.lang.annotation.Before @Before}</li>
  * @author Rod Johnson
  * @author Adrian Colyer
  * @since 2.0

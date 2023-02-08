@@ -27,10 +27,8 @@ import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.PriorityOrdered;
 
 /**
- * Interceptor that exposes the current {@link org.aopalliance.intercept.MethodInvocation}
- * as a thread-local object. We occasionally need to do this; for example, when a pointcut
- * (e.g. an AspectJ expression pointcut) needs to know the full invocation context.
- *
+ * 将当前 {@link MethodInvocation} 利用 {@link ThreadLocal}公开
+ * <li>例如，一个AspectJ表达式切入点，需要知道完整的调用上下文</li>
  * <p>Don't use this interceptor unless this is really necessary. Target objects should
  * not normally know about Spring AOP, as this creates a dependency on Spring API.
  * Target objects should be plain POJOs as far as possible.
@@ -57,12 +55,15 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 		}
 	};
 
+	/**
+	 * 暴露 {@link MethodInvocation} 的
+	 */
 	private static final ThreadLocal<MethodInvocation> invocation =
 			new NamedThreadLocal<>("Current AOP method invocation");
 
 
 	/**
-	 * Return the AOP Alliance MethodInvocation object associated with the current invocation.
+	 * 返回管理的 {@link MethodInvocation}
 	 * @return the invocation object associated with the current invocation
 	 * @throws IllegalStateException if there is no AOP invocation in progress,
 	 * or if the ExposeInvocationInterceptor was not added to this interceptor chain
@@ -82,11 +83,17 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 
 
 	/**
-	 * Ensures that only the canonical instance can be created.
+	 * 确保只能创建规范实例
 	 */
 	private ExposeInvocationInterceptor() {
 	}
 
+	/**
+	 * 将 {@link MethodInvocation} 暴露到 {@link ThreadLocal} 中
+	 * @param mi
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		MethodInvocation oldInvocation = invocation.get();
@@ -99,6 +106,10 @@ public final class ExposeInvocationInterceptor implements MethodInterceptor, Pri
 		}
 	}
 
+	/**
+	 * 将此拦截器放在最前面
+	 * @return
+	 */
 	@Override
 	public int getOrder() {
 		return PriorityOrdered.HIGHEST_PRECEDENCE + 1;

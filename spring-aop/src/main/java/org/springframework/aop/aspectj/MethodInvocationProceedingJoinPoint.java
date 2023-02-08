@@ -19,6 +19,7 @@ package org.springframework.aop.aspectj;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -55,10 +56,17 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 
 	private final ProxyMethodInvocation methodInvocation;
 
+	/**
+	 * 真实处理方法的参数值列表
+	 * <li>采用懒加载</li>
+	 */
 	@Nullable
 	private Object[] args;
 
-	/** Lazily initialized signature object. */
+	/**
+	 * 是获取真实的处理方法的信息的工具类
+	 * <li>采用懒加载</li>
+	 */
 	@Nullable
 	private Signature signature;
 
@@ -83,14 +91,26 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * 执行真实的处理方法
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	public Object proceed() throws Throwable {
+		// 这个是带有参数的
 		return this.methodInvocation.invocableClone().proceed();
 	}
 
+	/**
+	 * 使用传入的参数列表，执行真实的处理方法
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	public Object proceed(Object[] arguments) throws Throwable {
 		Assert.notNull(arguments, "Argument array passed to proceed cannot be null");
+		// 参数个数不匹配，直接抛出异常
 		if (arguments.length != this.methodInvocation.getArguments().length) {
 			throw new IllegalArgumentException("Expecting " +
 					this.methodInvocation.getArguments().length + " arguments to proceed, " +
@@ -101,7 +121,7 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 	}
 
 	/**
-	 * Returns the Spring AOP proxy. Cannot be {@code null}.
+	 * 返回代理对象
 	 */
 	@Override
 	public Object getThis() {
@@ -109,7 +129,7 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 	}
 
 	/**
-	 * Returns the Spring AOP target. May be {@code null} if there is no target.
+	 * 返回被代理对象
 	 */
 	@Override
 	@Nullable
@@ -117,6 +137,10 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 		return this.methodInvocation.getThis();
 	}
 
+	/**
+	 * 通过 {@link MethodInvocation} 获得真实处理方法参数列表值
+	 * @return
+	 */
 	@Override
 	public Object[] getArgs() {
 		if (this.args == null) {
@@ -174,7 +198,8 @@ public class MethodInvocationProceedingJoinPoint implements ProceedingJoinPoint,
 
 
 	/**
-	 * Lazily initialized MethodSignature.
+	 * 是方法签名的工具类
+	 * <p>获取方法的信息，主要就是利用 {@link MethodInvocation}</p>
 	 */
 	private class MethodSignatureImpl implements MethodSignature {
 

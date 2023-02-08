@@ -46,12 +46,12 @@ public interface AspectJPrecedenceInformation extends Ordered {
 	int getDeclarationOrder();
 
 	/**
-	 * Return whether this is a before advice.
+	 * 是否是一个前 {@link org.aspectj.lang.reflect.Advice}
 	 */
 	boolean isBeforeAdvice();
 
 	/**
-	 * Return whether this is an after advice.
+	 * 是否是一个后 {@link org.aspectj.lang.reflect.Advice}
 	 */
 	boolean isAfterAdvice();
 

@@ -211,9 +211,7 @@ public abstract class AopProxyUtils {
 
 
 	/**
-	 * Adapt the given arguments to the target signature in the given method,
-	 * if necessary: in particular, if a given vararg argument array does not
-	 * match the array type of the declared vararg parameter in the method.
+	 * 当给定入参与方法定义的入参不匹配的时候，将给定的参数调整为给定方法中的目标签名
 	 * @param method the target method
 	 * @param arguments the given arguments
 	 * @return a cloned argument array, or the original if no adaptation is needed
@@ -223,13 +221,17 @@ public abstract class AopProxyUtils {
 		if (ObjectUtils.isEmpty(arguments)) {
 			return new Object[0];
 		}
+		// 有可变参数的情况
+		// 可变参数是在最后的
 		if (method.isVarArgs()) {
 			if (method.getParameterCount() == arguments.length) {
 				Class<?>[] paramTypes = method.getParameterTypes();
 				int varargIndex = paramTypes.length - 1;
 				Class<?> varargType = paramTypes[varargIndex];
+				// 如果最后一个是数组
 				if (varargType.isArray()) {
 					Object varargArray = arguments[varargIndex];
+					// 转换为新的参数列表
 					if (varargArray instanceof Object[] && !varargType.isInstance(varargArray)) {
 						Object[] newArguments = new Object[arguments.length];
 						System.arraycopy(arguments, 0, newArguments, 0, varargIndex);

@@ -36,13 +36,14 @@ import org.springframework.lang.Nullable;
 public interface ProxyMethodInvocation extends MethodInvocation {
 
 	/**
-	 * Return the proxy that this method invocation was made through.
+	 * 返回代理对象
 	 * @return the original proxy object
 	 */
 	Object getProxy();
 
 	/**
-	 * Create a clone of this object. If cloning is done before {@code proceed()}
+	 * 创建当前对象的副本
+	 * If cloning is done before {@code proceed()}
 	 * is invoked on this object, {@code proceed()} can be invoked once per clone
 	 * to invoke the joinpoint (and the rest of the advice chain) more than once.
 	 * @return an invocable clone of this invocation.
@@ -51,7 +52,7 @@ public interface ProxyMethodInvocation extends MethodInvocation {
 	MethodInvocation invocableClone();
 
 	/**
-	 * Create a clone of this object. If cloning is done before {@code proceed()}
+	 * 创建当前对象的副本(带参数的) If cloning is done before {@code proceed()}
 	 * is invoked on this object, {@code proceed()} can be invoked once per clone
 	 * to invoke the joinpoint (and the rest of the advice chain) more than once.
 	 * @param arguments the arguments that the cloned invocation is supposed to use,
@@ -62,14 +63,13 @@ public interface ProxyMethodInvocation extends MethodInvocation {
 	MethodInvocation invocableClone(Object... arguments);
 
 	/**
-	 * Set the arguments to be used on subsequent invocations in the any advice
-	 * in this chain.
+	 * 设置后续要使用的参数
 	 * @param arguments the argument array
 	 */
 	void setArguments(Object... arguments);
 
 	/**
-	 * Add the specified user attribute with the given value to this invocation.
+	 * 将指定值的指定用户属性添加到此调用
 	 * <p>Such attributes are not used within the AOP framework itself. They are
 	 * just kept as part of the invocation object, for use in special interceptors.
 	 * @param key the name of the attribute
@@ -78,7 +78,7 @@ public interface ProxyMethodInvocation extends MethodInvocation {
 	void setUserAttribute(String key, @Nullable Object value);
 
 	/**
-	 * Return the value of the specified user attribute.
+	 * 返回保存的属性
 	 * @param key the name of the attribute
 	 * @return the value of the attribute, or {@code null} if not set
 	 * @see #setUserAttribute
