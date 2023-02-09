@@ -89,11 +89,15 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	}
 
 
+	/**
+	 * 从容器中查找 {@link Advisor}，并返回
+	 * @return
+	 */
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
-		// 在BeanFactory中查找Advisor类型的Bean
+		// 在BeanFactory中直接查找Advisor类型的Bean
 		List<Advisor> advisors = super.findCandidateAdvisors();
-		// Build Advisors for all AspectJ aspects in the bean factory.
+		// 从容器中获取带有 @Aspect 的类，然后构建并获取这些类的 Advisor
 		if (this.aspectJAdvisorsBuilder != null) {
 			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		}

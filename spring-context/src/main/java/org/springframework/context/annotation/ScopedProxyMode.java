@@ -17,8 +17,7 @@
 package org.springframework.context.annotation;
 
 /**
- * 多例时候如果创建对象
- *
+ * 多例的时候是否应该使用代理
  * <p>For a more complete discussion of exactly what a scoped proxy is, see the
  * section of the Spring reference documentation entitled '<em>Scoped beans as
  * dependencies</em>'.

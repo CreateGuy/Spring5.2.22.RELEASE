@@ -94,39 +94,38 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 
 
 	/**
-	 * Check the interfaces on the given bean class and apply them to the {@link ProxyFactory},
-	 * if appropriate.
-	 * <p>Calls {@link #isConfigurationCallbackInterface} and {@link #isInternalLanguageInterface}
-	 * to filter for reasonable proxy interfaces, falling back to a target-class proxy otherwise.
+	 * 确定代理的方式
 	 * @param beanClass the class of the bean
 	 * @param proxyFactory the ProxyFactory for the bean
 	 */
 	protected void evaluateProxyInterfaces(Class<?> beanClass, ProxyFactory proxyFactory) {
+		// 返回要类实现的接口，包括父类
 		Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, getProxyClassLoader());
 		boolean hasReasonableProxyInterface = false;
 		for (Class<?> ifc : targetInterfaces) {
+			// 此接口是容器内部回调接口或者是代理的内部接口，不能算合理的接口，也就不能使用JDK代理
 			if (!isConfigurationCallbackInterface(ifc) && !isInternalLanguageInterface(ifc) &&
 					ifc.getMethods().length > 0) {
 				hasReasonableProxyInterface = true;
 				break;
 			}
 		}
+
+		// 使用JDK代理
 		if (hasReasonableProxyInterface) {
-			// Must allow for introductions; can't just set interfaces to the target's interfaces only.
+			// 将合理的接口保存起来
 			for (Class<?> ifc : targetInterfaces) {
 				proxyFactory.addInterface(ifc);
 			}
 		}
 		else {
+			// 使用Cglib代理
 			proxyFactory.setProxyTargetClass(true);
 		}
 	}
 
 	/**
-	 * Determine whether the given interface is just a container callback and
-	 * therefore not to be considered as a reasonable proxy interface.
-	 * <p>If no reasonable proxy interface is found for a given bean, it will get
-	 * proxied with its full target class, assuming that as the user's intention.
+	 * 确定给定的接口是否只是一个容器回调，因此不能算合理的代理接口
 	 * @param ifc the interface to check
 	 * @return whether the given interface is just a container callback
 	 */
@@ -136,8 +135,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 	}
 
 	/**
-	 * Determine whether the given interface is a well-known internal language interface
-	 * and therefore not to be considered as a reasonable proxy interface.
+	 * 代理的内部接口不能算合理的需要JDK实现的接口
 	 * <p>If no reasonable proxy interface is found for a given bean, it will get
 	 * proxied with its full target class, assuming that as the user's intention.
 	 * @param ifc the interface to check

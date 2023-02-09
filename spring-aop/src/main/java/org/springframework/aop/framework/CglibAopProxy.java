@@ -101,7 +101,9 @@ class CglibAopProxy implements AopProxy, Serializable {
 	private static final Map<Class<?>, Boolean> validatedClasses = new WeakHashMap<>();
 
 
-	/** The configuration used to configure this proxy. */
+	/**
+	 * 此代理对象的配置，一般情况下都是{@link ProxyFactory}，里面就包含了拦截器
+	 * */
 	protected final AdvisedSupport advised;
 
 	@Nullable
@@ -163,10 +165,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 		}
 
 		try {
+			// 获得被代理对象
 			Class<?> rootClass = this.advised.getTargetClass();
 			Assert.state(rootClass != null, "Target class must be available for creating a CGLIB proxy");
 
 			Class<?> proxySuperClass = rootClass;
+
+			// 如果被代理对象本身就是一个代理对象
 			if (rootClass.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
 				proxySuperClass = rootClass.getSuperclass();
 				Class<?>[] additionalInterfaces = rootClass.getInterfaces();
@@ -175,7 +180,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				}
 			}
 
-			// Validate the class, writing log messages as necessary.
+			// 检查类中的方法，打印日志
 			validateClassIfNecessary(proxySuperClass, classLoader);
 
 			// Configure CGLIB Enhancer...
@@ -233,8 +238,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 	}
 
 	/**
-	 * Checks to see whether the supplied {@code Class} has already been validated and
-	 * validates it if not.
+	 * 检查类中的方法，打印日志
 	 */
 	private void validateClassIfNecessary(Class<?> proxySuperClass, @Nullable ClassLoader proxyClassLoader) {
 		if (logger.isInfoEnabled()) {
@@ -249,16 +253,19 @@ class CglibAopProxy implements AopProxy, Serializable {
 	}
 
 	/**
-	 * Checks for final methods on the given {@code Class}, as well as package-visible
-	 * methods across ClassLoaders, and writes warnings to the log for each one found.
+	 * 检查类中的方法，打印日志
 	 */
 	private void doValidateClass(Class<?> proxySuperClass, @Nullable ClassLoader proxyClassLoader, Set<Class<?>> ifcs) {
 		if (proxySuperClass != Object.class) {
 			Method[] methods = proxySuperClass.getDeclaredMethods();
 			for (Method method : methods) {
+				// 获得方法的修饰符
 				int mod = method.getModifiers();
+				// 不是静态和私有方法
 				if (!Modifier.isStatic(mod) && !Modifier.isPrivate(mod)) {
+					// 是Final
 					if (Modifier.isFinal(mod)) {
+						// 检查传入的方法是否是给定接口中的方法的实现
 						if (logger.isInfoEnabled() && implementsInterface(method, ifcs)) {
 							logger.info("Unable to proxy interface-implementing method [" + method + "] because " +
 									"it is marked as final: Consider using interface-based JDK proxies instead!");
@@ -277,6 +284,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 					}
 				}
 			}
+			// 递归检查父类
 			doValidateClass(proxySuperClass.getSuperclass(), proxyClassLoader, ifcs);
 		}
 	}
@@ -364,7 +372,10 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Check whether the given method is declared on any of the given interfaces.
+	 * 检查传入的方法是否是给定接口中的方法的实现
+	 * @param method
+	 * @param ifcs 接口
+	 * @return
 	 */
 	private static boolean implementsInterface(Method method, Set<Class<?>> ifcs) {
 		for (Class<?> ifc : ifcs) {
@@ -560,10 +571,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Dispatcher for any methods declared on the Advised class.
+	 * 调度器：用于通知类上声明的任何方法
 	 */
 	private static class AdvisedDispatcher implements Dispatcher, Serializable {
 
+		/**
+		 * 一般情况是{@link ProxyFactory}
+		 */
 		private final AdvisedSupport advised;
 
 		public AdvisedDispatcher(AdvisedSupport advised) {

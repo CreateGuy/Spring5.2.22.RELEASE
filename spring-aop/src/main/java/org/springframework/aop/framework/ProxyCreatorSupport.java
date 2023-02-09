@@ -22,11 +22,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * Base class for proxy factories.
- * Provides convenient access to a configurable AopProxyFactory.
- *
- * @author Juergen Hoeller
- * @since 2.0.3
+ * 代理工厂的基类
  * @see #createAopProxy()
  */
 @SuppressWarnings("serial")
@@ -34,9 +30,14 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 
 	private AopProxyFactory aopProxyFactory;
 
+	/**
+	 *
+	 */
 	private final List<AdvisedSupportListener> listeners = new LinkedList<>();
 
-	/** Set to true when the first AOP proxy has been created. */
+	/**
+	 * 此代理工厂是否已经创建了代理对象
+	 * */
 	private boolean active = false;
 
 
@@ -99,6 +100,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	 * create an AOP proxy with {@code this} as an argument.
 	 */
 	protected final synchronized AopProxy createAopProxy() {
+		// 如果是此代理工厂第一次创建对象，先发布一个事件
 		if (!this.active) {
 			activate();
 		}
@@ -106,7 +108,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	}
 
 	/**
-	 * Activate this proxy configuration.
+	 * 发布创建Advice事件
 	 * @see AdvisedSupportListener#activated
 	 */
 	private void activate() {
@@ -117,7 +119,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	}
 
 	/**
-	 * Propagate advice change event to all AdvisedSupportListeners.
+	 * 发布改变Advice事件
 	 * @see AdvisedSupportListener#adviceChanged
 	 */
 	@Override
@@ -133,7 +135,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	}
 
 	/**
-	 * Subclasses can call this to check whether any AOP proxies have been created yet.
+	 * 子类可以调用它来检查是否已经创建了任何代理对象
 	 */
 	protected final synchronized boolean isActive() {
 		return this.active;

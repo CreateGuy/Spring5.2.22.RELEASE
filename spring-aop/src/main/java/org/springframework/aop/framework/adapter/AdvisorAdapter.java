@@ -48,8 +48,7 @@ public interface AdvisorAdapter {
 	boolean supportsAdvice(Advice advice);
 
 	/**
-	 * Return an AOP Alliance MethodInterceptor exposing the behavior of
-	 * the given advice to an interception-based AOP framework.
+	 * 将传入的Advisor进行适配为{@link MethodInterceptor}
 	 * <p>Don't worry about any Pointcut contained in the Advisor;
 	 * the AOP framework will take care of checking the pointcut.
 	 * @param advisor the Advisor. The supportsAdvice() method must have

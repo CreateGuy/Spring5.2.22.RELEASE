@@ -72,12 +72,10 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	private static final Comparator<Method> METHOD_COMPARATOR;
 
+	/**
+	 * 初始化比较器，规定Advice方法的执行顺序
+	 */
 	static {
-		// Note: although @After is ordered before @AfterReturning and @AfterThrowing,
-		// an @After advice method will actually be invoked after @AfterReturning and
-		// @AfterThrowing methods due to the fact that AspectJAfterAdvice.invoke(MethodInvocation)
-		// invokes proceed() in a `try` block and only invokes the @After advice method
-		// in a corresponding `finally` block.
 		Comparator<Method> adviceKindComparator = new ConvertingComparator<>(
 				new InstanceComparator<>(
 						Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class),
@@ -115,6 +113,12 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 	}
 
 
+	/**
+	 * 根据传入工厂中的Bean构建 {@link Advisor}
+	 * @param aspectInstanceFactory the aspect instance factory
+	 * (not the aspect instance itself in order to avoid eager instantiation)
+	 * @return
+	 */
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
 		// 获得Aspect Bean的Class对象
@@ -180,6 +184,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			}
 		}, ReflectionUtils.USER_DECLARED_METHODS);
 		if (methods.size() > 1) {
+			// 根据Advice方法标注的注解，进行排序
 			methods.sort(METHOD_COMPARATOR);
 		}
 		return methods;

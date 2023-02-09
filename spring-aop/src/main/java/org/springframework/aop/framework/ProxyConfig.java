@@ -33,15 +33,30 @@ public class ProxyConfig implements Serializable {
 	/** use serialVersionUID from Spring 1.2 for interoperability. */
 	private static final long serialVersionUID = -8409359707199703185L;
 
-
+	/**
+	 * <ul>
+	 *     <li>是否直接代理目标类(Cglib)，而不是仅仅代理特定的接口(JDK)</li>
+	 *     <li>如果目标类是一个接口，则将为给定的接口创建JDK代理。如果目标类是任何其他类，则将为给定类创建CGLIB代理</li>
+	 * </ul>
+	 */
 	private boolean proxyTargetClass = false;
 
+	/**
+	 * 代理是否应该主动去优化
+	 * <li>其实就是使用Cglib，估计是认为Cglib更加好</li>
+	 */
 	private boolean optimize = false;
 
 	boolean opaque = false;
 
+	/**
+	 * 设置代理对象是否应该保存在{@link AopContext}(ThreadLocal)中
+	 */
 	boolean exposeProxy = false;
 
+	/**
+	 * 返回配置是否被冻结，并且不能修改任何Advice
+	 */
 	private boolean frozen = false;
 
 
@@ -148,7 +163,7 @@ public class ProxyConfig implements Serializable {
 
 
 	/**
-	 * Copy configuration from the other config object.
+	 * 从另一个{@link ProxyConfig}对象中复制属性
 	 * @param other object to copy configuration from
 	 */
 	public void copyFrom(ProxyConfig other) {

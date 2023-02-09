@@ -89,7 +89,7 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
-	 * Determine the complete set of interfaces to proxy for the given AOP configuration.
+	 * 确定为给定的AOP配置代理的完整接口集
 	 * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
 	 * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
 	 * {@link org.springframework.aop.SpringProxy} marker interface.

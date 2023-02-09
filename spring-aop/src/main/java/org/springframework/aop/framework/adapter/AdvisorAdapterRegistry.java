@@ -31,8 +31,8 @@ import org.springframework.aop.Advisor;
 public interface AdvisorAdapterRegistry {
 
 	/**
-	 * Return an {@link Advisor} wrapping the given advice.
-	 * <p>Should by default at least support
+	 * 返回包装后的 {@link Advisor}
+	 * <p>默认支持包装一下的接口
 	 * {@link org.aopalliance.intercept.MethodInterceptor},
 	 * {@link org.springframework.aop.MethodBeforeAdvice},
 	 * {@link org.springframework.aop.AfterReturningAdvice},
@@ -46,8 +46,7 @@ public interface AdvisorAdapterRegistry {
 	Advisor wrap(Object advice) throws UnknownAdviceTypeException;
 
 	/**
-	 * Return an array of AOP Alliance MethodInterceptors to allow use of the
-	 * given Advisor in an interception-based framework.
+	 * 通过传入的Advisor包装为{@link MethodInterceptor}
 	 * <p>Don't worry about the pointcut associated with the {@link Advisor}, if it is
 	 * a {@link org.springframework.aop.PointcutAdvisor}: just return an interceptor.
 	 * @param advisor the Advisor to find an interceptor for

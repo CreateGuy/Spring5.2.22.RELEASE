@@ -26,7 +26,7 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.lang.Nullable;
 
 /**
- * 支持 {@link org.springframework.core.Ordered} 和 {@link Order @Order} 和 {@link javax.annotation.Priority @Priority} 的排序
+ * 支持 {@link org.springframework.core.Ordered Ordered} 和 {@link Order @Order} 和 {@link javax.annotation.Priority @Priority} 的排序
  * <p>with an order value provided by an {@code Ordered} instance overriding a statically defined annotation value (if any).</p>
  *
  * <p>Consult the Javadoc for {@link OrderComparator} for details on the

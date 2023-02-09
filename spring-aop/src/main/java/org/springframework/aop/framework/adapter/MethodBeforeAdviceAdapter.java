@@ -25,9 +25,8 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.MethodBeforeAdvice;
 
 /**
- * Adapter to enable {@link org.springframework.aop.MethodBeforeAdvice}
- * to be used in the Spring AOP framework.
- *
+ * 支持适配 {@link org.springframework.aop.MethodBeforeAdvice}，在Spring AOP框架中使用
+ * <li>貌似是因为最后在{@link org.springframework.aop.framework.CglibAopProxy CglibAopProxy}中最后执行的拦截器是{@link MethodInterceptor}</li>
  * @author Rod Johnson
  * @author Juergen Hoeller
  */

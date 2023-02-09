@@ -23,11 +23,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Implementation of the {@link org.springframework.aop.TargetSource} interface
- * that holds a given object. This is the default implementation of the TargetSource
- * interface, as used by the Spring AOP framework. There is usually no need to
- * create objects of this class in application code.
- *
+ * 包含被代理对象的的 {@link TargetSource} 的实现。这是TargetSource接口的默认实现，由Spring AOP框架使用。通常不需要在应用程序代码中创建该类的对象。
  * <p>This class is serializable. However, the actual serializability of a
  * SingletonTargetSource will depend on whether the target is serializable.
  *
@@ -41,7 +37,9 @@ public class SingletonTargetSource implements TargetSource, Serializable {
 	private static final long serialVersionUID = 9031246629662423738L;
 
 
-	/** Target cached and invoked using reflection. */
+	/**
+	 * 被代理的类，也是最后使用反射调用的目标
+	 * */
 	private final Object target;
 
 

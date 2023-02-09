@@ -702,8 +702,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return all interfaces that the given class implements as an array,
-	 * including ones implemented by superclasses.
+	 * 返回要类实现的接口，包括父类
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyze for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in
@@ -726,7 +725,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * 返回传入的Class能够加载 继承的父类和实现的接口 的集合
+	 * 返回传入的Class能够加载 继承的父类和实现接口 的集合
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
 	 * @param clazz the class to analyze for interfaces
 	 * @return all interfaces that the given object implements as a Set

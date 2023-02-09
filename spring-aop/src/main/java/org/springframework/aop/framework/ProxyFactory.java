@@ -23,14 +23,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Factory for AOP proxies for programmatic use, rather than via declarative
- * setup in a bean factory. This class provides a simple way of obtaining
- * and configuring AOP proxy instances in custom user code.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @author Rob Harrop
- * @since 14.03.2003
+ * 面向AOP代理的工厂，用于编程使用，而真正创建代理对象的工厂，创建对象是靠内部维护的{@link AopProxyFactory}
  */
 @SuppressWarnings("serial")
 public class ProxyFactory extends ProxyCreatorSupport {

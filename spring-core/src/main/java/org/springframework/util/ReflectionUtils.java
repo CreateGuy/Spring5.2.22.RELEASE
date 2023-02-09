@@ -374,8 +374,7 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
-	 * Get all declared methods on the leaf class and all superclasses.
-	 * Leaf class methods are included first.
+	 * 获得传入类和父类的所有声明方法
 	 * @param leafClass the class to introspect
 	 * @throws IllegalStateException if introspection fails
 	 */

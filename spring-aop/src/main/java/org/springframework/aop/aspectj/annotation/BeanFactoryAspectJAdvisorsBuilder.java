@@ -31,11 +31,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Helper for retrieving @AspectJ beans from a BeanFactory and building
- * Spring Advisors based on them, for use with auto-proxying.
- *
- * @author Juergen Hoeller
- * @since 2.0.2
+ * 负责从容器中获取带有 {@link org.aspectj.lang.annotation.Aspect @Aspect} 的类，然后构建并返回这些类的 {@link Advisor}
  * @see AnnotationAwareAspectJAutoProxyCreator
  */
 public class BeanFactoryAspectJAdvisorsBuilder {
@@ -50,8 +46,17 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	@Nullable
 	private volatile List<String> aspectBeanNames;
 
+	/**
+	 * Aspect类和其构建的Advisor
+	 * <li>是单例的情况</li>
+	 */
 	private final Map<String, List<Advisor>> advisorsCache = new ConcurrentHashMap<>();
 
+
+	/**
+	 * Aspect类和其 {@link org.springframework.aop.aspectj.AspectInstanceFactory AspectInstanceFactory}
+	 * <li>是单非单例的情况</li>
+	 */
 	private final Map<String, MetadataAwareAspectInstanceFactory> aspectFactoryCache = new ConcurrentHashMap<>();
 
 
@@ -77,9 +82,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 
 
 	/**
-	 * Look for AspectJ-annotated aspect beans in the current bean factory,
-	 * and return to a list of Spring AOP Advisors representing them.
-	 * <p>Creates a Spring Advisor for each AspectJ advice method.
+	 * 从容器中获取带有 {@link org.aspectj.lang.annotation.Aspect @Aspect} 的类，然后构建并返回这些类的 {@link Advisor}
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
 	 * @see #isEligibleBean
 	 */
@@ -111,11 +114,13 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						if (this.advisorFactory.isAspect(beanType)) {
 							aspectNames.add(beanName);
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
-							// 单例的情况?
+							// 单例的情况?不懂
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+								// 基于AspectInstanceFactory中的beanName构建Advisor集合
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+								// Bean实例是单例的情况
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
 								}
@@ -146,13 +151,17 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 		if (aspectNames.isEmpty()) {
 			return Collections.emptyList();
 		}
+
+		// 手机Aspect中的Advisor
 		List<Advisor> advisors = new ArrayList<>();
 		for (String aspectName : aspectNames) {
 			List<Advisor> cachedAdvisors = this.advisorsCache.get(aspectName);
+			// 单例是直接获取
 			if (cachedAdvisors != null) {
 				advisors.addAll(cachedAdvisors);
 			}
 			else {
+				// 非单例，每次都从工厂中重新获取
 				MetadataAwareAspectInstanceFactory factory = this.aspectFactoryCache.get(aspectName);
 				advisors.addAll(this.advisorFactory.getAdvisors(factory));
 			}

@@ -17,8 +17,7 @@
 package org.springframework.aop.framework;
 
 /**
- * Interface to be implemented by factories that are able to create
- * AOP proxies based on {@link AdvisedSupport} configuration objects.
+ * 基于{@link AdvisedSupport}创建代理对象的接口
  *
  * <p>Proxies should observe the following contract:
  * <ul>

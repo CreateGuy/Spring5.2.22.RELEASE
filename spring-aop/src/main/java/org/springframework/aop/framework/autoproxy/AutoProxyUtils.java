@@ -34,9 +34,8 @@ import org.springframework.util.StringUtils;
 public abstract class AutoProxyUtils {
 
 	/**
-	 * Bean definition attribute that may indicate whether a given bean is supposed
-	 * to be proxied with its target class (in case of it getting proxied in the first
-	 * place). The value is {@code Boolean.TRUE} or {@code Boolean.FALSE}.
+	 * Bean定义属性，该属性可以指示Bean是否应该被其目标类代理(以防它首先被代理)
+	 * <li>比如说使用了 {@link org.springframework.beans.factory.config.Scope @Scope} 注解并且设置了Cglib这里就是True</li>
 	 * <p>Proxy factories can set this attribute if they built a target class proxy
 	 * for a specific bean, and want to enforce that bean can always be cast
 	 * to its target class (even if AOP advices get applied through auto-proxying).
@@ -46,9 +45,8 @@ public abstract class AutoProxyUtils {
 			Conventions.getQualifiedAttributeName(AutoProxyUtils.class, "preserveTargetClass");
 
 	/**
-	 * Bean definition attribute that indicates the original target class of an
-	 * auto-proxied bean, e.g. to be used for the introspection of annotations
-	 * on the target class behind an interface-based proxy.
+	 * Bean定义属性，表示代理后的Bean的原始目标类
+	 * <li>例如，用于在基于接口的代理后对目标类上的注释进行内省</li>
 	 * @since 4.2.3
 	 * @see #determineTargetClass
 	 */
@@ -57,10 +55,7 @@ public abstract class AutoProxyUtils {
 
 
 	/**
-	 * Determine whether the given bean should be proxied with its target
-	 * class rather than its interfaces. Checks the
-	 * {@link #PRESERVE_TARGET_CLASS_ATTRIBUTE "preserveTargetClass" attribute}
-	 * of the corresponding bean definition.
+	 * 检查是否应该使用Cglib
 	 * @param beanFactory the containing ConfigurableListableBeanFactory
 	 * @param beanName the name of the bean
 	 * @return whether the given bean should be proxied with its target class
@@ -102,7 +97,8 @@ public abstract class AutoProxyUtils {
 	}
 
 	/**
-	 * Expose the given target class for the specified bean, if possible.
+	 * 暴露Bean的原始类的Class对象
+	 * <li>比如说到这来就说明要创建代理对象了，那么最后容器中存放的也是代理对象，所以我猜测这里就是为了让容器知道这个Bean实际的Class对象是什么</li>
 	 * @param beanFactory the containing ConfigurableListableBeanFactory
 	 * @param beanName the name of the bean
 	 * @param targetClass the corresponding target class

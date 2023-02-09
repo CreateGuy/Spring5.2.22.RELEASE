@@ -177,6 +177,7 @@ public abstract class AopUtils {
 	}
 
 	/**
+	 * 如果传入的方法可能是来自接口，那么就找到具体的实现方法(猜测)
 	 * Given a method, which may come from an interface, and a target class used
 	 * in the current AOP invocation, find the corresponding target method if there
 	 * is one. E.g. the method may be {@code IFoo.bar()} and the target class
@@ -223,13 +224,14 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
+		// 判断此切入点表达式是否能够匹配的类
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
 
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
+		// 是否是匹配任何方法的 MethodMatcher
 		if (methodMatcher == MethodMatcher.TRUE) {
-			// No need to iterate the methods if we're matching any method anyway...
 			return true;
 		}
 
@@ -239,14 +241,19 @@ public abstract class AopUtils {
 		}
 
 		Set<Class<?>> classes = new LinkedHashSet<>();
+		// 如果是代理类又要被代理的情况
 		if (!Proxy.isProxyClass(targetClass)) {
+			// 添加其原始类
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		// 添加目标类继承的父类和实现接口的集合
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
 		for (Class<?> clazz : classes) {
+			// 获得类和父类的所有声明方法
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 			for (Method method : methods) {
+				// 只要此类的任意方法匹配都可以
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
 						methodMatcher.matches(method, targetClass)) {
@@ -259,9 +266,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Can the given advisor apply at all on the given class?
-	 * This is an important test as it can be used to optimize
-	 * out a advisor for a class.
+	 * 判断给给定的Advisor是否能够匹配传入的类
 	 * @param advisor the advisor to check
 	 * @param targetClass class we're testing
 	 * @return whether the pointcut can apply on any method
@@ -271,7 +276,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Can the given advisor apply at all on the given class?
+	 * 判断给给定的Advisor是否能够匹配传入的类
 	 * <p>This is an important test as it can be used to optimize out a advisor for a class.
 	 * This version also takes into account introductions (for IntroductionAwareMethodMatchers).
 	 * @param advisor the advisor to check
@@ -295,8 +300,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Determine the sublist of the {@code candidateAdvisors} list
-	 * that is applicable to the given class.
+	 * 根据传入的 {@code candidateAdvisors} 和 {@code clazz}，然后返回匹配的 {@link Advisor}
 	 * @param candidateAdvisors the Advisors to evaluate
 	 * @param clazz the target class
 	 * @return sublist of Advisors that can apply to an object of the given class
@@ -315,7 +319,7 @@ public abstract class AopUtils {
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
 			if (candidate instanceof IntroductionAdvisor) {
-				// already processed
+				// 已经处理过的
 				continue;
 			}
 			if (canApply(candidate, clazz, hasIntroductions)) {

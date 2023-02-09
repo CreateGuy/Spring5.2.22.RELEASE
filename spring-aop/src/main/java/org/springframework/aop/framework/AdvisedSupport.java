@@ -70,8 +70,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	 */
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
 
-
-	/** Package-protected to allow direct access for efficiency. */
+	/**
+	 * 包保护，允许直接访问被代理类，增加效率
+	 * */
 	TargetSource targetSource = EMPTY_TARGET_SOURCE;
 
 	/** 是否已经为特定的目标类过滤了 {@link Advisor} */
@@ -80,24 +81,23 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	/** The AdvisorChainFactory to use. */
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
-	/** Cache with Method as key and advisor chain List as value. */
+	/**
+	 * 以方法为键，以Advice集合为值的缓存
+	 * */
 	private transient Map<MethodCacheKey, List<Object>> methodCache;
 
 	/**
-	 * Interfaces to be implemented by the proxy. Held in List to keep the order
-	 * of registration, to create JDK proxy with specified order of interfaces.
+	 * 被代理类实现的接口，保持注册顺序
 	 */
 	private List<Class<?>> interfaces = new ArrayList<>();
 
 	/**
-	 * List of Advisors. If an Advice is added, it will be wrapped
-	 * in an Advisor before being added to this List.
+	 * 最后确定符合条件的Advisor
 	 */
 	private List<Advisor> advisors = new ArrayList<>();
 
 	/**
-	 * Array updated on changes to the advisors list, which is easier
-	 * to manipulate internally.
+	 * 数组保持最新的Advice列表的变化，这更容易在内部操作
 	 */
 	private Advisor[] advisorArray = new Advisor[0];
 
@@ -201,7 +201,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Add a new proxied interface.
+	 * 添加一个新的接口
 	 * @param intf the additional interface to proxy
 	 */
 	public void addInterface(Class<?> intf) {
@@ -292,7 +292,9 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			}
 		}
 
+		// 使数组与列表保持最新
 		updateAdvisorArray();
+		// 清空缓存
 		adviceChanged();
 	}
 
@@ -324,10 +326,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Add all of the given advisors to this proxy configuration.
+	 * 将所有给定Advice添加到此代理配置中
 	 * @param advisors the advisors to register
 	 */
 	public void addAdvisors(Collection<Advisor> advisors) {
+		// 是否允许配置
 		if (isFrozen()) {
 			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
 		}
@@ -339,7 +342,10 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 				Assert.notNull(advisor, "Advisor must not be null");
 				this.advisors.add(advisor);
 			}
+
+			// 使数组与列表保持最新
 			updateAdvisorArray();
+			// 清空缓存
 			adviceChanged();
 		}
 	}
@@ -368,7 +374,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Bring the array up to date with the list.
+	 * 使数组与列表保持最新
 	 */
 	protected final void updateAdvisorArray() {
 		this.advisorArray = this.advisors.toArray(new Advisor[0]);
@@ -487,7 +493,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
-	 * Invoked when advice has changed.
+	 * 清空缓存
 	 */
 	protected void adviceChanged() {
 		this.methodCache.clear();

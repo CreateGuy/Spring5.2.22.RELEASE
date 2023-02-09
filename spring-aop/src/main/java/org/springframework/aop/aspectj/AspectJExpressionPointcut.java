@@ -87,6 +87,9 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 	private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<>();
 
+	/**
+	 * 切入点表达式支持的格式
+	 */
 	static {
 		SUPPORTED_PRIMITIVES.add(PointcutPrimitive.EXECUTION);
 		SUPPORTED_PRIMITIVES.add(PointcutPrimitive.ARGS);
@@ -189,8 +192,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 
 	/**
-	 * Check whether this pointcut is ready to match,
-	 * lazily building the underlying AspectJ pointcut expression.
+	 * 返回切入点表达式
 	 */
 	private PointcutExpression obtainPointcutExpression() {
 		if (getExpression() == null) {
@@ -218,7 +220,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 	}
 
 	/**
-	 * Build the underlying AspectJ pointcut expression.
+	 * 构建底层的切入点表达式
 	 */
 	private PointcutExpression buildPointcutExpression(@Nullable ClassLoader classLoader) {
 		PointcutParser parser = initializePointcutParser(classLoader);
@@ -270,11 +272,18 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 		return obtainPointcutExpression();
 	}
 
+	/**
+	 * 判断此切入点表达式是否能够匹配的类
+	 * @param targetClass
+	 * @return
+	 */
 	@Override
 	public boolean matches(Class<?> targetClass) {
+		// 获得切入点表达式
 		PointcutExpression pointcutExpression = obtainPointcutExpression();
 		try {
 			try {
+				// 确定此切入点表达式是否能够匹配这个类
 				return pointcutExpression.couldMatchJoinPointsInType(targetClass);
 			}
 			catch (ReflectionWorldException ex) {
@@ -292,14 +301,22 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 		return false;
 	}
 
+	/**
+	 * 判断此 {@link org.springframework.aop.Pointcut Pointcut} 是否支持此方法
+	 * @param method the candidate method
+	 * @param targetClass the target class
+	 * @param hasIntroductions {@code true} if the object on whose behalf we are
+	 * asking is the subject on one or more introductions; {@code false} otherwise
+	 * @return
+	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass, boolean hasIntroductions) {
+		// 检查切入点表达式
 		obtainPointcutExpression();
+		// 方法匹配
 		ShadowMatch shadowMatch = getTargetShadowMatch(method, targetClass);
 
-		// Special handling for this, target, @this, @target, @annotation
-		// in Spring - we can optimize since we know we have exactly this class,
-		// and there will never be matching subclass at runtime.
+		// 对this、target、@this、@target、@annotation的特殊处理在Spring中——我们可以优化，因为我们知道我们确切地拥有这个类，并且在运行时永远不会有匹配的子类
 		if (shadowMatch.alwaysMatches()) {
 			return true;
 		}
@@ -429,7 +446,10 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 	}
 
 	private ShadowMatch getTargetShadowMatch(Method method, Class<?> targetClass) {
+		// 如果传入的方法可能是来自接口，那么就找到具体的实现方法(猜测)
 		Method targetMethod = AopUtils.getMostSpecificMethod(method, targetClass);
+
+		// 不懂接口的
 		if (targetMethod.getDeclaringClass().isInterface()) {
 			// Try to build the most specific interface possible for inherited methods to be
 			// considered for sub-interface matches as well, in particular for proxy classes.
@@ -450,6 +470,12 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 		return getShadowMatch(targetMethod, method);
 	}
 
+	/**
+	 *
+	 * @param targetMethod
+	 * @param originalMethod
+	 * @return
+	 */
 	private ShadowMatch getShadowMatch(Method targetMethod, Method originalMethod) {
 		// Avoid lock contention for known Methods through concurrent access...
 		ShadowMatch shadowMatch = this.shadowMatchCache.get(targetMethod);
@@ -462,6 +488,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 					Method methodToMatch = targetMethod;
 					try {
 						try {
+							// 匹配方法
 							shadowMatch = obtainPointcutExpression().matchesMethodExecution(methodToMatch);
 						}
 						catch (ReflectionWorldException ex) {
