@@ -293,6 +293,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		// Parameters used for optimization choices...
 		boolean exposeProxy = this.advised.isExposeProxy();
 		boolean isFrozen = this.advised.isFrozen();
+		// 是否每次getTarget()的调用都返回相同的对象
 		boolean isStatic = this.advised.getTargetSource().isStatic();
 
 		// Choose an "aop" interceptor (used for AOP calls).
@@ -301,12 +302,15 @@ class CglibAopProxy implements AopProxy, Serializable {
 		// Choose a "straight to target" interceptor. (used for calls that are
 		// unadvised but can return this). May be required to expose the proxy.
 		Callback targetInterceptor;
+		// 是否在AopContext中暴露代理对象
 		if (exposeProxy) {
+			// 是否一直都是调用当前被代理对象，还是说会有变动
 			targetInterceptor = (isStatic ?
 					new StaticUnadvisedExposedInterceptor(this.advised.getTargetSource().getTarget()) :
 					new DynamicUnadvisedExposedInterceptor(this.advised.getTargetSource()));
 		}
 		else {
+			// 是否一直都是调用当前被代理对象，还是说会有变动
 			targetInterceptor = (isStatic ?
 					new StaticUnadvisedInterceptor(this.advised.getTargetSource().getTarget()) :
 					new DynamicUnadvisedInterceptor(this.advised.getTargetSource()));
@@ -435,13 +439,14 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Method interceptor used for static targets with no advice chain. The call
-	 * is passed directly back to the target. Used when the proxy needs to be
-	 * exposed and it can't be determined that the method won't return
+	 * 方法拦截器用于没有通知链的静态目标。调用被直接传递回目标。当需要公开代理且无法确定该方法不会返回时使用
 	 * {@code this}.
 	 */
 	private static class StaticUnadvisedInterceptor implements MethodInterceptor, Serializable {
 
+		/**
+		 * 被代理类
+		 */
 		@Nullable
 		private final Object target;
 
@@ -555,6 +560,9 @@ class CglibAopProxy implements AopProxy, Serializable {
 	 */
 	private static class StaticDispatcher implements Dispatcher, Serializable {
 
+		/**
+		 * 被代理对象
+		 */
 		@Nullable
 		private final Object target;
 
@@ -678,11 +686,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * General purpose AOP callback. Used when the target is dynamic or when the
-	 * proxy is not frozen.
+	 * 通用的AOP回调，当目标是动态的或者代理没有冻结时使用
 	 */
 	private static class DynamicAdvisedInterceptor implements MethodInterceptor, Serializable {
 
+		/**
+		 * 默认是{@link ProxyFactory}，也就是保存Advice的地方
+		 */
 		private final AdvisedSupport advised;
 
 		public DynamicAdvisedInterceptor(AdvisedSupport advised) {

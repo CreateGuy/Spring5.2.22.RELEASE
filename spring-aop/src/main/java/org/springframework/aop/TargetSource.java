@@ -47,7 +47,7 @@ public interface TargetSource extends TargetClassAware {
 	Class<?> getTargetClass();
 
 	/**
-	 * Will all calls to {@link #getTarget()} return the same object?
+	 * 是否所有对getTarget()的调用都返回相同的对象
 	 * <p>In that case, there will be no need to invoke {@link #releaseTarget(Object)},
 	 * and the AOP framework can cache the return value of {@link #getTarget()}.
 	 * @return {@code true} if the target is immutable
@@ -56,8 +56,7 @@ public interface TargetSource extends TargetClassAware {
 	boolean isStatic();
 
 	/**
-	 * Return a target instance. Invoked immediately before the
-	 * AOP framework calls the "target" of an AOP method invocation.
+	 * 返回被代理对象
 	 * @return the target object which contains the joinpoint,
 	 * or {@code null} if there is no actual target instance
 	 * @throws Exception if the target object can't be resolved

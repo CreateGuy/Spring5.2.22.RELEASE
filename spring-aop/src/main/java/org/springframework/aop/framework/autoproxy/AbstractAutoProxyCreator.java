@@ -151,7 +151,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	/**
 	 * 需要代理的对象
 	 * key：是bean最有效的一个缓存键
-	 * value：代理类的Class
+	 * value：代理类的Class, 类似于：HelloController$$EnhancerBySpringCGLIB$$cbd61fc
 	 */
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
 

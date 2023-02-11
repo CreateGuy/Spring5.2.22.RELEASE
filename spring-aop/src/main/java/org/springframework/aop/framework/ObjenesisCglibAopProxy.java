@@ -59,6 +59,7 @@ class ObjenesisCglibAopProxy extends CglibAopProxy {
 
 		if (objenesis.isWorthTrying()) {
 			try {
+				// 创建代理对象
 				proxyInstance = objenesis.newInstance(proxyClass, enhancer.getUseCache());
 			}
 			catch (Throwable ex) {
@@ -68,7 +69,7 @@ class ObjenesisCglibAopProxy extends CglibAopProxy {
 		}
 
 		if (proxyInstance == null) {
-			// Regular instantiation via default constructor...
+			// 通过默认构造函数进行常规实例化
 			try {
 				Constructor<?> ctor = (this.constructorArgs != null ?
 						proxyClass.getDeclaredConstructor(this.constructorArgTypes) :

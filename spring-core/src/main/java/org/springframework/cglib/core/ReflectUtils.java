@@ -637,15 +637,22 @@ public class ReflectUtils {
 		};
 	}
 
-	// used by MethodInterceptorGenerated generated code
+	/**
+	 * 找到方法描述对应的方法
+	 * @param namesAndDescriptors：["equals", "(Ljava/lang/Obj...", "toString", "()Ljava/lang/St...", "hashCode", +3 more]
+	 * @param methods
+	 * @return
+	 */
 	public static Method[] findMethods(String[] namesAndDescriptors, Method[] methods) {
 		Map map = new HashMap();
 		for (int i = 0; i < methods.length; i++) {
 			Method method = methods[i];
+			// 方法名称 + 方法描述((Ljava/lang/Object;)Z) + 方法
 			map.put(method.getName() + Type.getMethodDescriptor(method), method);
 		}
 		Method[] result = new Method[namesAndDescriptors.length / 2];
 		for (int i = 0; i < result.length; i++) {
+			// 用传入的方法和方法描述符获得对应的方法
 			result[i] = (Method) map.get(namesAndDescriptors[i * 2] + namesAndDescriptors[i * 2 + 1]);
 			if (result[i] == null) {
 				// TODO: error?
