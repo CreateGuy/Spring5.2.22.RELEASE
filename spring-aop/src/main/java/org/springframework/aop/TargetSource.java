@@ -48,10 +48,7 @@ public interface TargetSource extends TargetClassAware {
 
 	/**
 	 * 是否所有对getTarget()的调用都返回相同的对象
-	 * <p>In that case, there will be no need to invoke {@link #releaseTarget(Object)},
-	 * and the AOP framework can cache the return value of {@link #getTarget()}.
-	 * @return {@code true} if the target is immutable
-	 * @see #getTarget
+	 * <li>比如说在执行完拦截器之后，有可能更改了被代理对象的某些属性，就会根据此方法判断是否需要更新</li>
 	 */
 	boolean isStatic();
 
@@ -65,7 +62,7 @@ public interface TargetSource extends TargetClassAware {
 	Object getTarget() throws Exception;
 
 	/**
-	 * Release the given target object obtained from the
+	 * 释放原先的代理对象，保存新的代理对象
 	 * {@link #getTarget()} method, if any.
 	 * @param target object obtained from a call to {@link #getTarget()}
 	 * @throws Exception if the object can't be released

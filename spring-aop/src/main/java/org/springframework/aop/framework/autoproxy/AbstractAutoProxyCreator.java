@@ -52,9 +52,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
- * that wraps each eligible bean with an AOP proxy, delegating to specified interceptors
- * before invoking the bean itself.
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor} 的实现，主要是为了创建代理对象
  *
  * <p>This class distinguishes between "common" interceptors: shared for all proxies it
  * creates, and "specific" interceptors: unique per bean instance. There need not be any
@@ -130,6 +128,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 */
 	private boolean applyCommonInterceptorsFirst = true;
 
+	/**
+	 * 为Bean设置TargetSourceCreator
+	 * <li>就代表某个Bean需要代理</li>
+	 */
 	@Nullable
 	private TargetSourceCreator[] customTargetSourceCreators;
 
@@ -256,6 +258,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return null;
 	}
 
+	/**
+	 * 获得对象的一个引用
+	 * <li>到这就说明出现了循环依赖问题，那么就看是否需要创建代理对象</li>
+	 * @param bean the raw bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object getEarlyBeanReference(Object bean, String beanName) {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
@@ -263,6 +272,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
+	/**
+	 * 在实例化前就创建代理对象
+	 * @param beanClass the class of the bean to be instantiated
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
@@ -271,15 +286,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			//判断类是否是一个不需要被代理的类(基础类)
+			// 判断类是否是一个不需要被代理的类(基础类)
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
 			}
 		}
 
-		// 获取封装当前bean的TargetSource对象，如果不存在，则直接退出当前方法，否则从TargetSource
-		// 中获取当前bean对象，并且判断是否需要将切面逻辑应用在当前bean上。
+		// 获取封装当前bean的TargetSource对象
 		TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
 		//不为空就说明通过某个配置文件设置的代理对象了
 		if (targetSource != null) {
@@ -315,9 +329,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Create a proxy with the configured interceptors if the bean is
-	 * identified as one to proxy by the subclass.
-	 * @see #getAdvicesAndAdvisorsForBean
+	 * 根据Advice和Advisor确定是否需要创建代理对象
 	 */
 	@Override
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
@@ -421,14 +433,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	}
 
 	/**
-	 * Create a target source for bean instances. Uses any TargetSourceCreators if set.
-	 * Returns {@code null} if no custom TargetSource should be used.
-	 * <p>This implementation uses the "customTargetSourceCreators" property.
-	 * Subclasses can override this method to use a different mechanism.
-	 * @param beanClass the class of the bean to create a TargetSource for
-	 * @param beanName the name of the bean
-	 * @return a TargetSource for this bean
-	 * @see #setCustomTargetSourceCreators
+	 * 返回Class对应的{@link TargetSource}
+	 * <li>返回的{@link TargetSource}不为空就代表需要创建代理对象</li>
+	 * @param beanClass
+	 * @param beanName
+	 * @return
 	 */
 	@Nullable
 	protected TargetSource getCustomTargetSource(Class<?> beanClass, String beanName) {

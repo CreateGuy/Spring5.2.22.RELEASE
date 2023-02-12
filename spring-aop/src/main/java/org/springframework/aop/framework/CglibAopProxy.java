@@ -84,7 +84,9 @@ import org.springframework.util.ReflectionUtils;
 @SuppressWarnings("serial")
 class CglibAopProxy implements AopProxy, Serializable {
 
-	// Constants for CGLIB callback array indices
+	/**
+	 * Cglib回调数组下标的常量
+	 */
 	private static final int AOP_PROXY = 0;
 	private static final int INVOKE_TARGET = 1;
 	private static final int NO_OVERRIDE = 2;
@@ -192,6 +194,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 					enhancer.setUseCache(false);
 				}
 			}
+			// 设置相关属性
 			enhancer.setSuperclass(proxySuperClass);
 			enhancer.setInterfaces(AopProxyUtils.completeProxiedInterfaces(this.advised));
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
@@ -202,12 +205,12 @@ class CglibAopProxy implements AopProxy, Serializable {
 			for (int x = 0; x < types.length; x++) {
 				types[x] = callbacks[x].getClass();
 			}
-			// fixedInterceptorMap only populated at this point, after getCallbacks call above
+			// 重点：设置Callback也就是MethodInterceptor
 			enhancer.setCallbackFilter(new ProxyCallbackFilter(
 					this.advised.getConfigurationOnlyCopy(), this.fixedInterceptorMap, this.fixedInterceptorOffset));
 			enhancer.setCallbackTypes(types);
 
-			// Generate the proxy class and create a proxy instance.
+			// 生成代理类并创建代理对象
 			return createProxyClassAndInstance(enhancer, callbacks);
 		}
 		catch (CodeGenerationException | IllegalArgumentException ex) {
@@ -221,6 +224,12 @@ class CglibAopProxy implements AopProxy, Serializable {
 		}
 	}
 
+	/**
+	 * 生成代理类并创建代理对象
+	 * @param enhancer
+	 * @param callbacks
+	 * @return
+	 */
 	protected Object createProxyClassAndInstance(Enhancer enhancer, Callback[] callbacks) {
 		enhancer.setInterceptDuringConstruction(false);
 		enhancer.setCallbacks(callbacks);
@@ -391,8 +400,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 	}
 
 	/**
-	 * Invoke the given method with a CGLIB MethodProxy if possible, falling back
-	 * to a plain reflection invocation in case of a fast-class generation failure.
+	 * 执行真实方法
 	 */
 	@Nullable
 	private static Object invokeMethod(@Nullable Object target, Method method, Object[] args, MethodProxy methodProxy)
@@ -407,14 +415,18 @@ class CglibAopProxy implements AopProxy, Serializable {
 	}
 
 	/**
-	 * Process a return value. Wraps a return of {@code this} if necessary to be the
-	 * {@code proxy} and also verifies that {@code null} is not returned as a primitive.
+	 * 处理拦截器链的返回值
+	 * @param proxy 代理对象
+	 * @param target 被代理对象
+	 * @param method
+	 * @param returnValue 返回值
+	 * @return
 	 */
 	@Nullable
 	private static Object processReturnType(
 			Object proxy, @Nullable Object target, Method method, @Nullable Object returnValue) {
 
-		// Massage return value if necessary
+		// 如果返回值是this的情况，那么就返回代理对象本身
 		if (returnValue != null && returnValue == target &&
 				!RawTargetAccess.class.isAssignableFrom(method.getDeclaringClass())) {
 			// Special case: it returned "this". Note that we can't help
@@ -422,6 +434,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			returnValue = proxy;
 		}
 		Class<?> returnType = method.getReturnType();
+		// 不能返回Void
 		if (returnValue == null && returnType != Void.TYPE && returnType.isPrimitive()) {
 			throw new AopInvocationException(
 					"Null return value from advice does not match primitive return type for: " + method);
@@ -439,8 +452,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * 方法拦截器用于没有通知链的静态目标。调用被直接传递回目标。当需要公开代理且无法确定该方法不会返回时使用
-	 * {@code this}.
+	 * 静态执行被代理类的方法
 	 */
 	private static class StaticUnadvisedInterceptor implements MethodInterceptor, Serializable {
 
@@ -464,8 +476,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Method interceptor used for static targets with no advice chain, when the
-	 * proxy is to be exposed.
+	 * 静态执行被代理类的方法，但此之前将被代理对象暴露在AopContext中
 	 */
 	private static class StaticUnadvisedExposedInterceptor implements MethodInterceptor, Serializable {
 
@@ -493,12 +504,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Interceptor used to invoke a dynamic target without creating a method
-	 * invocation or evaluating an advice chain. (We know there was no advice
-	 * for this method.)
+	 * 动态执行被代理类的方法
 	 */
 	private static class DynamicUnadvisedInterceptor implements MethodInterceptor, Serializable {
 
+		/**
+		 * 表示被代理类的TargetSource
+		 */
 		private final TargetSource targetSource;
 
 		public DynamicUnadvisedInterceptor(TargetSource targetSource) {
@@ -508,6 +520,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		@Override
 		@Nullable
 		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+			// 可能此方法返回的被代理类不一样
 			Object target = this.targetSource.getTarget();
 			try {
 				Object retVal = invokeMethod(target, method, args, methodProxy);
@@ -523,7 +536,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * Interceptor for unadvised dynamic targets when the proxy needs exposing.
+	 * 动态执行被代理类的方法，但此之前将被代理对象暴露在AopContext中
 	 */
 	private static class DynamicUnadvisedExposedInterceptor implements MethodInterceptor, Serializable {
 
@@ -705,20 +718,24 @@ class CglibAopProxy implements AopProxy, Serializable {
 			Object oldProxy = null;
 			boolean setProxyContext = false;
 			Object target = null;
+			// 过得被代理类对应的TargetSource
 			TargetSource targetSource = this.advised.getTargetSource();
 			try {
+				// 是否需要在AopContext中暴露代理对象
 				if (this.advised.exposeProxy) {
 					// Make invocation available if necessary.
 					oldProxy = AopContext.setCurrentProxy(proxy);
 					setProxyContext = true;
 				}
-				// Get as late as possible to minimize the time we "own" the target, in case it comes from a pool...
+				// 获得被代理对象
 				target = targetSource.getTarget();
 				Class<?> targetClass = (target != null ? target.getClass() : null);
+				// 根据传入的方法和被代理类，返回匹配的MethodInterceptor
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 				Object retVal;
 				// Check whether we only have one InvokerInterceptor: that is,
 				// no real advice, but just reflective invocation of the target.
+				// 执行真实方法
 				if (chain.isEmpty() && CglibMethodInvocation.isMethodProxyCompatible(method)) {
 					// We can skip creating a MethodInvocation: just invoke the target directly.
 					// Note that the final invoker must be an InvokerInterceptor, so we know
@@ -728,18 +745,20 @@ class CglibAopProxy implements AopProxy, Serializable {
 					retVal = invokeMethod(target, method, argsToUse, methodProxy);
 				}
 				else {
-					// We need to create a method invocation...
+					// 执行拦截器
 					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
 				}
+				// 处理拦截器链的返回值
 				retVal = processReturnType(proxy, target, method, retVal);
 				return retVal;
 			}
 			finally {
+				// 如果可变的，那么就更新被代理对象
 				if (target != null && !targetSource.isStatic()) {
 					targetSource.releaseTarget(target);
 				}
+				// 恢复旧代理
 				if (setProxyContext) {
-					// Restore old proxy.
 					AopContext.setCurrentProxy(oldProxy);
 				}
 			}

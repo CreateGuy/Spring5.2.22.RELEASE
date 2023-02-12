@@ -47,6 +47,14 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {
 
+	/**
+	 * 根据传入的方法和被代理类，返回匹配的 {@link org.aopalliance.intercept.MethodInterceptor}
+	 * @param config the AOP configuration in the form of an Advised object
+	 * @param method the proxied method
+	 * @param targetClass the target class (may be {@code null} to indicate a proxy without
+	 * target object, in which case the method's declaring class is the next best option)
+	 * @return
+	 */
 	@Override
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
 			Advised config, Method method, @Nullable Class<?> targetClass) {
@@ -70,6 +78,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					boolean match;
 					if (mm instanceof IntroductionAwareMethodMatcher) {
 						if (hasIntroductions == null) {
+							// 确定Advisor是否包含匹配传入的类
 							hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
 						}
 						match = ((IntroductionAwareMethodMatcher) mm).matches(method, actualClass, hasIntroductions);
@@ -111,7 +120,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 	}
 
 	/**
-	 * Determine whether the Advisors contain matching introductions.
+	 * 确定Advisor是否包含匹配传入的类
 	 */
 	private static boolean hasMatchingIntroductions(Advisor[] advisors, Class<?> actualClass) {
 		for (Advisor advisor : advisors) {
