@@ -1,4 +1,4 @@
-package com.lzx.demo.AOP;
+package com.lzx.demo.AOP.Cglib;
 
 class AA {
 	public Integer bb() {

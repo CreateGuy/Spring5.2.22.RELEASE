@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package com.lzx.demo.AOP;
+package com.lzx.demo.AOP.Cglib;
 
 import java.lang.reflect.InvocationTargetException;
 import org.lzx.springBootDemo.controller.AA..EnhancerByCGLIB..aa19a509;
@@ -12,7 +12,7 @@ import org.springframework.cglib.proxy.Callback;
 import org.springframework.cglib.reflect.FastClass;
 
 /**
- * 被代理类的FastClass
+ * 被代理类对应的FastClass
  */
 public class AA$$EnhancerByCGLIB$$aa19a509$$FastClassByCGLIB$$34887017 extends FastClass {
     public AA$$EnhancerByCGLIB$$aa19a509$$FastClassByCGLIB$$34887017(Class var1) {

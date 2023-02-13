@@ -483,7 +483,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.copyFrom(this);
 
-		// 一般情况下都是直接代理类的，而不是仅仅代理某个方法
+		// 默认是使用Cglib
 		if (proxyFactory.isProxyTargetClass()) {
 			// JDK代理目标的显式处理，翻译是这样翻译的，但是JDK代理不是看是否有实现接口吗，为什么要判断是否是代理类？
 			if (Proxy.isProxyClass(beanClass)) {

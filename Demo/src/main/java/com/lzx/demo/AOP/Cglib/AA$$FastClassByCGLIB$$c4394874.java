@@ -3,14 +3,14 @@
 // (powered by FernFlower decompiler)
 //
 
-package com.lzx.demo.AOP;
+package com.lzx.demo.AOP.Cglib;
 
 import java.lang.reflect.InvocationTargetException;
 import org.springframework.cglib.core.Signature;
 import org.springframework.cglib.reflect.FastClass;
 
 /**
- * 被代理类的FastClass
+ * 被代理类对应的FastClass
  */
 public class AA$$FastClassByCGLIB$$c4394874 extends FastClass {
     public AA$$FastClassByCGLIB$$c4394874(Class var1) {

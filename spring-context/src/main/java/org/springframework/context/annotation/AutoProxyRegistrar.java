@@ -27,12 +27,8 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * Registers an auto proxy creator against the current {@link BeanDefinitionRegistry}
- * as appropriate based on an {@code @Enable*} annotation having {@code mode} and
- * {@code proxyTargetClass} attributes set to the correct values.
- *
- * @author Chris Beams
- * @since 3.1
+ * 注册{@link org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator InfrastructureAdvisorAutoProxyCreator}，然后设置其属性
+ * @see org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
  * @see org.springframework.cache.annotation.EnableCaching
  * @see org.springframework.transaction.annotation.EnableTransactionManagement
  */
@@ -41,36 +37,29 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 	private final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * Register, escalate, and configure the standard auto proxy creator (APC) against the
-	 * given registry. Works by finding the nearest annotation declared on the importing
-	 * {@code @Configuration} class that has both {@code mode} and {@code proxyTargetClass}
-	 * attributes. If {@code mode} is set to {@code PROXY}, the APC is registered; if
-	 * {@code proxyTargetClass} is set to {@code true}, then the APC is forced to use
-	 * subclass (CGLIB) proxying.
-	 * <p>Several {@code @Enable*} annotations expose both {@code mode} and
-	 * {@code proxyTargetClass} attributes. It is important to note that most of these
-	 * capabilities end up sharing a {@linkplain AopConfigUtils#AUTO_PROXY_CREATOR_BEAN_NAME
-	 * single APC}. For this reason, this implementation doesn't "care" exactly which
-	 * annotation it finds -- as long as it exposes the right {@code mode} and
-	 * {@code proxyTargetClass} attributes, the APC can be registered and configured all
-	 * the same.
+	 * 注册InfrastructureAdvisorAutoProxyCreator，然后设置其属性
 	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 		boolean candidateFound = false;
+		// 获取导入类上的注解
 		Set<String> annTypes = importingClassMetadata.getAnnotationTypes();
 		for (String annType : annTypes) {
+			// 获得指定注解
 			AnnotationAttributes candidate = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);
 			if (candidate == null) {
 				continue;
 			}
 			Object mode = candidate.get("mode");
 			Object proxyTargetClass = candidate.get("proxyTargetClass");
+			// 如果设置了AdviceMode和ProxyTargetClass
 			if (mode != null && proxyTargetClass != null && AdviceMode.class == mode.getClass() &&
 					Boolean.class == proxyTargetClass.getClass()) {
 				candidateFound = true;
+				// 注册自动代理创建器
 				if (mode == AdviceMode.PROXY) {
 					AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);
+					// 是否强制使用Cglib
 					if ((Boolean) proxyTargetClass) {
 						AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 						return;

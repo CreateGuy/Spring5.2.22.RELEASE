@@ -35,8 +35,8 @@ public class ProxyConfig implements Serializable {
 
 	/**
 	 * <ul>
-	 *     <li>是否直接代理目标类(Cglib)，而不是仅仅代理特定的接口(JDK)</li>
-	 *     <li>如果目标类是一个接口，则将为给定的接口创建JDK代理。如果目标类是任何其他类，则将为给定类创建CGLIB代理</li>
+	 *     <li>True：直接使用Cglib代理目标类</li>
+	 *     <li>False：如果目标类有或者就是是一个接口，使用JDK，否则使用Cglib</li>
 	 * </ul>
 	 */
 	private boolean proxyTargetClass = false;

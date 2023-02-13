@@ -25,9 +25,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Programmatic means of constructing
- * {@link org.springframework.beans.factory.config.BeanDefinition BeanDefinitions}
- * using the builder pattern. Intended primarily for use when implementing Spring 2.0
+ * 基于建造者模式创建，{@link org.springframework.beans.factory.config.BeanDefinition BeanDefinitions}，主要用于实现
  * {@link org.springframework.beans.factory.xml.NamespaceHandler NamespaceHandlers}.
  *
  * @author Rod Johnson
@@ -98,7 +96,7 @@ public final class BeanDefinitionBuilder {
 	}
 
 	/**
-	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 * 创建一个新的 {@link BeanDefinitionBuilder} 用于构建 {@link RootBeanDefinition}
 	 * @param beanClass the {@code Class} of the bean that the definition is being created for
 	 */
 	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass) {
@@ -192,8 +190,7 @@ public final class BeanDefinitionBuilder {
 	}
 
 	/**
-	 * Add an indexed constructor arg value. The current index is tracked internally
-	 * and all additions are at the present point.
+	 * 添加Bean实例化需要执行的构造方法的入参
 	 */
 	public BeanDefinitionBuilder addConstructorArgValue(@Nullable Object value) {
 		this.beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(
@@ -202,7 +199,8 @@ public final class BeanDefinitionBuilder {
 	}
 
 	/**
-	 * Add a reference to a named bean as a constructor arg.
+	 * 添加Bean实例化需要执行的构造方法的入参
+	 * <li>这里是指的是这个参数必须是什么类型的</li>
 	 * @see #addConstructorArgValue(Object)
 	 */
 	public BeanDefinitionBuilder addConstructorArgReference(String beanName) {

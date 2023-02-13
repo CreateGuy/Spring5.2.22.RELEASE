@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package com.lzx.demo.AOP;
+package com.lzx.demo.AOP.Cglib;
 
 import java.lang.reflect.Method;
 import org.springframework.cglib.core.ReflectUtils;
@@ -13,6 +13,9 @@ import org.springframework.cglib.proxy.Factory;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 
+/**
+ * 代理对象
+ */
 public class AA$$EnhancerByCGLIB$$aa19a509 extends AA implements Factory {
 	/**
 	 * 标识拦截器是否已经绑定

@@ -123,15 +123,12 @@ import java.lang.annotation.Target;
 public @interface EnableAspectJAutoProxy {
 
 	/**
-	 * 是否一直使用Cglib，而不是根据被代理对象确定代理方式
+	 * 是否直接使用Cglib，而不是根据被代理对象确定代理方式
 	 */
 	boolean proxyTargetClass() default false;
 
 	/**
-	 * Indicate that the proxy should be exposed by the AOP framework as a {@code ThreadLocal}
-	 * for retrieval via the {@link org.springframework.aop.framework.AopContext} class.
-	 * Off by default, i.e. no guarantees that {@code AopContext} access will work.
-	 * @since 4.3.1
+	 * 代理类是否需要暴露在{@link org.springframework.aop.framework.AopContext AopContext} 中
 	 */
 	boolean exposeProxy() default false;
 

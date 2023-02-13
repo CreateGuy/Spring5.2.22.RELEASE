@@ -21,11 +21,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.lang.Nullable;
 
 /**
- * Auto-proxy creator that considers infrastructure Advisor beans only,
- * ignoring any application-defined Advisors.
- *
- * @author Juergen Hoeller
- * @since 2.0.7
+ * 自动代理创建器，只考虑容器中的Advisor bean，忽略未注册到容器的Advisor
  */
 @SuppressWarnings("serial")
 public class InfrastructureAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator {

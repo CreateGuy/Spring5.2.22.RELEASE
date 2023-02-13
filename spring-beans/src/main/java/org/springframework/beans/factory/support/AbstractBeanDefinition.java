@@ -135,7 +135,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public static final String INFER_METHOD = "(inferred)";
 
-
 	//注册此bean的类
 	@Nullable
 	private volatile Object beanClass;
