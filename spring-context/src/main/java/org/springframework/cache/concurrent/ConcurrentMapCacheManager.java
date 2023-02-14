@@ -48,10 +48,21 @@ import org.springframework.lang.Nullable;
  */
 public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderAware {
 
+	/**
+	 * 保存数据的地方
+	 * <li>这里的键相当于文件夹名，{@link Cache} 是文件夹，数据是在文件夹中保存的</li>
+	 */
 	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>(16);
 
+	/**
+	 * 是否是动态的缓存空间
+	 * <li>动态是指当发现某个键的值没有的时候，是否动态创建一个新的 {@link ConcurrentMapCache}</li>
+	 */
 	private boolean dynamic = true;
 
+	/**
+	 * 是否允许将缓存中所有值都设置为空值，没有删除映射关系
+	 */
 	private boolean allowNullValues = true;
 
 	private boolean storeByValue = false;
@@ -184,7 +195,7 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 	}
 
 	/**
-	 * Create a new ConcurrentMapCache instance for the specified cache name.
+	 * 为指定的缓存名创建一个新的 {@link ConcurrentMapCache}
 	 * @param name the name of the cache
 	 * @return the ConcurrentMapCache (or a decorator thereof)
 	 */

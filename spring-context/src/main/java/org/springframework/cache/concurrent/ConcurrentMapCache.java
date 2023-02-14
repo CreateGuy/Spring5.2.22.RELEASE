@@ -46,8 +46,14 @@ import org.springframework.util.Assert;
  */
 public class ConcurrentMapCache extends AbstractValueAdaptingCache {
 
+	/**
+	 * 此缓存文件夹的名称
+	 */
 	private final String name;
 
+	/**
+	 * 真正缓存名称和缓存值的映射关系
+	 */
 	private final ConcurrentMap<Object, Object> store;
 
 	@Nullable
@@ -188,6 +194,7 @@ public class ConcurrentMapCache extends AbstractValueAdaptingCache {
 		Object storeValue = super.toStoreValue(userValue);
 		if (this.serialization != null) {
 			try {
+				// 将值序列化转换为字节数组
 				return this.serialization.serializeToByteArray(storeValue);
 			}
 			catch (Throwable ex) {

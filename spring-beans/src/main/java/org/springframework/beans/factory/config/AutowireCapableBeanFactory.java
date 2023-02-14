@@ -252,8 +252,9 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	void applyBeanPropertyValues(Object existingBean, String beanName) throws BeansException;
 
 	/**
-	 * Initialize the given raw bean, applying factory callbacks
-	 * such as {@code setBeanName} and {@code setBeanFactory},
+	 * 初始化Bean
+	 * <li>像SpringSecurity的 {@link AutowireBeanFactoryObjectPostProcessor} 就会操作</li>
+	 * ,applying factory callbacks such as {@code setBeanName} and {@code setBeanFactory},
 	 * also applying all bean post processors (including ones which
 	 * might wrap the given raw bean).
 	 * <p>Note that no bean definition of the given name has to exist

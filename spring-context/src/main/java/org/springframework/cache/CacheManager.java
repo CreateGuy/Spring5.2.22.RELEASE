@@ -21,12 +21,8 @@ import java.util.Collection;
 import org.springframework.lang.Nullable;
 
 /**
- * Spring's central cache manager SPI.
- *
- * <p>Allows for retrieving named {@link Cache} regions.
- *
- * @author Costin Leau
- * @author Sam Brannen
+ * 缓存管理器：读取缓存
+ * <li>注意：这里的缓存是指的是包含某种缓存的文件夹，所以说要更新和删除缓存是在这里的 {@link Cache} 中去操作的</li>
  * @since 3.1
  */
 public interface CacheManager {
@@ -43,7 +39,7 @@ public interface CacheManager {
 	Cache getCache(String name);
 
 	/**
-	 * Get a collection of the cache names known by this manager.
+	 * 获得该缓存管理器已知的缓存名称的集合
 	 * @return the names of all caches known by the cache manager
 	 */
 	Collection<String> getCacheNames();

@@ -45,7 +45,7 @@ public interface Serializer<T> {
 	void serialize(T object, OutputStream outputStream) throws IOException;
 
 	/**
-	 * Turn an object of type T into a serialized byte array.
+	 * 将类型为T的对象序列化转换为字节数组
 	 * @param object the object to serialize
 	 * @return the resulting byte array
 	 * @throws IOException in case of serialization failure

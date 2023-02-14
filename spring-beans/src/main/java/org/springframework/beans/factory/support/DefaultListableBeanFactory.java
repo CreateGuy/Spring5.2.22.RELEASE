@@ -915,6 +915,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		// 如果是单例，并且实现了 SmartInitializingSingleton，执行其后置方法
+		// 比如说 GlobalMethodSecurityConfiguration 就会初始化角色继承器，认证管理器
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {

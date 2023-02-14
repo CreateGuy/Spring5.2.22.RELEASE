@@ -21,8 +21,8 @@ import java.util.concurrent.Callable;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface that defines common cache operations.
- *
+ * 缓存文件夹：定义缓存文件夹的各种操作
+ * <p>
  * <b>Note:</b> Due to the generic use of caching, it is recommended that
  * implementations allow storage of <tt>null</tt> values (for example to
  * cache methods that return {@code null}).
@@ -35,12 +35,12 @@ import org.springframework.lang.Nullable;
 public interface Cache {
 
 	/**
-	 * Return the cache name.
+	 * 返回此缓存文件夹类型
 	 */
 	String getName();
 
 	/**
-	 * Return the underlying native cache provider.
+	 * 返回此缓存文件夹中保存的所有数据
 	 */
 	Object getNativeCache();
 
@@ -61,8 +61,7 @@ public interface Cache {
 	ValueWrapper get(Object key);
 
 	/**
-	 * Return the value to which this cache maps the specified key,
-	 * generically specifying a type that return value will be cast to.
+	 * 获得缓存文件夹中的某条数据(记录)，并转为指定类型
 	 * <p>Note: This variant of {@code get} does not allow for differentiating
 	 * between a cached {@code null} value and no cache entry found at all.
 	 * Use the standard {@link #get(Object)} variant for that purpose instead.
@@ -101,7 +100,7 @@ public interface Cache {
 	<T> T get(Object key, Callable<T> valueLoader);
 
 	/**
-	 * Associate the specified value with the specified key in this cache.
+	 * 将指定键和指定缓存值像关联
 	 * <p>If the cache previously contained a mapping for this key, the old
 	 * value is replaced by the specified value.
 	 * <p>Actual registration may be performed in an asynchronous or deferred
@@ -151,7 +150,7 @@ public interface Cache {
 	}
 
 	/**
-	 * Evict the mapping for this key from this cache if it is present.
+	 * 删除键对应的缓存记录
 	 * <p>Actual eviction may be performed in an asynchronous or deferred
 	 * fashion, with subsequent lookups possibly still seeing the entry.
 	 * This may for example be the case with transactional cache decorators.
@@ -183,7 +182,8 @@ public interface Cache {
 	}
 
 	/**
-	 * Clear the cache through removing all mappings.
+	 * 移除所有映射管理来清除缓存
+	 * <li>相当于键对应的值为空了，但是键还是在</li>
 	 * <p>Actual clearing may be performed in an asynchronous or deferred
 	 * fashion, with subsequent lookups possibly still seeing the entries.
 	 * This may for example be the case with transactional cache decorators.
