@@ -25,18 +25,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Convenient base class for {@link ImportSelector} implementations that select imports
- * based on an {@link AdviceMode} value from an annotation (such as the {@code @Enable*}
- * annotations).
- *
- * @author Chris Beams
+ * 根据导入类上的指定注解中的 AdviceMode 属性，返回要导入容器的Bean的名称
+ * <li>比如 {@link org.springframework.cache.annotation.EnableCaching @EnableCaching}, {@link org.springframework.scheduling.annotation.EnableAsync @EnableAsync}</li>
  * @since 3.1
  * @param <A> annotation containing {@linkplain #getAdviceModeAttributeName() AdviceMode attribute}
  */
 public abstract class AdviceModeImportSelector<A extends Annotation> implements ImportSelector {
 
 	/**
-	 * The default advice mode attribute name.
+	 * 默认的 {@link AdviceMode} 名称
 	 */
 	public static final String DEFAULT_ADVICE_MODE_ATTRIBUTE_NAME = "mode";
 
@@ -51,22 +48,15 @@ public abstract class AdviceModeImportSelector<A extends Annotation> implements 
 	}
 
 	/**
-	 * This implementation resolves the type of annotation from generic metadata and
-	 * validates that (a) the annotation is in fact present on the importing
-	 * {@code @Configuration} class and (b) that the given annotation has an
-	 * {@linkplain #getAdviceModeAttributeName() advice mode attribute} of type
-	 * {@link AdviceMode}.
-	 * <p>The {@link #selectImports(AdviceMode)} method is then invoked, allowing the
-	 * concrete implementation to choose imports in a safe and convenient fashion.
-	 * @throws IllegalArgumentException if expected annotation {@code A} is not present
-	 * on the importing {@code @Configuration} class or if {@link #selectImports(AdviceMode)}
-	 * returns {@code null}
+	 * 根据导入类上的指定注解中的 {@link AdviceMode} 属性，返回要导入容器的Bean的名称
 	 */
 	@Override
 	public final String[] selectImports(AnnotationMetadata importingClassMetadata) {
+		// 拿到泛型，比如说CachingConfigurationSelector里面的EnableCaching
 		Class<?> annType = GenericTypeResolver.resolveTypeArgument(getClass(), AdviceModeImportSelector.class);
 		Assert.state(annType != null, "Unresolvable type argument for AdviceModeImportSelector");
 
+		// 拿到在导入类上指定注解的属性
 		AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);
 		if (attributes == null) {
 			throw new IllegalArgumentException(String.format(
@@ -74,6 +64,7 @@ public abstract class AdviceModeImportSelector<A extends Annotation> implements 
 					annType.getSimpleName(), importingClassMetadata.getClassName()));
 		}
 
+		// 拿到AOP方式
 		AdviceMode adviceMode = attributes.getEnum(getAdviceModeAttributeName());
 		String[] imports = selectImports(adviceMode);
 		if (imports == null) {
@@ -83,7 +74,7 @@ public abstract class AdviceModeImportSelector<A extends Annotation> implements 
 	}
 
 	/**
-	 * Determine which classes should be imported based on the given {@code AdviceMode}.
+	 * 根据 {@link org.springframework.cache.annotation.EnableCaching EnableCaching#mode()} 设置的AOP模式，确定要导入的类
 	 * <p>Returning {@code null} from this method indicates that the {@code AdviceMode}
 	 * could not be handled or was unknown and that an {@code IllegalArgumentException}
 	 * should be thrown.

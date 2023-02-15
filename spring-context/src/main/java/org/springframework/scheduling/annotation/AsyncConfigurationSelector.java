@@ -21,12 +21,7 @@ import org.springframework.context.annotation.AdviceModeImportSelector;
 import org.springframework.lang.Nullable;
 
 /**
- * Selects which implementation of {@link AbstractAsyncConfiguration} should
- * be used based on the value of {@link EnableAsync#mode} on the importing
- * {@code @Configuration} class.
- *
- * @author Chris Beams
- * @author Juergen Hoeller
+ * 根据 {@link EnableAsync#mode()} 的值确定要注册哪一个异步任务配置类
  * @since 3.1
  * @see EnableAsync
  * @see ProxyAsyncConfiguration

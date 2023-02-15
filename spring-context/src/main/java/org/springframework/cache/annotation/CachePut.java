@@ -26,7 +26,8 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation indicating that a method (or all methods on a class) triggers a
+ * 是做删除缓存的
+ * <p>Annotation indicating that a method (or all methods on a class) triggers a
  * {@link org.springframework.cache.Cache#put(Object, Object) cache put} operation.
  *
  * <p>In contrast to the {@link Cacheable @Cacheable} annotation, this annotation

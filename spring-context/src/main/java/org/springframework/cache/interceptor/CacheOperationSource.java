@@ -22,19 +22,13 @@ import java.util.Collection;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface used by {@link CacheInterceptor}. Implementations know how to source
- * cache operation attributes, whether from configuration, metadata attributes at
- * source level, or elsewhere.
- *
- * @author Costin Leau
- * @author Juergen Hoeller
+ * 保存 {@link CacheOperation} 的地方
  * @since 3.1
  */
 public interface CacheOperationSource {
 
 	/**
-	 * Determine whether the given class is a candidate for cache operations
-	 * in the metadata format of this {@code CacheOperationSource}.
+	 * 是否是一个需要利用缓存机制的类
 	 * <p>If this method returns {@code false}, the methods on the given class
 	 * will not get traversed for {@link #getCacheOperations} introspection.
 	 * Returning {@code false} is therefore an optimization for non-affected
@@ -51,8 +45,7 @@ public interface CacheOperationSource {
 	}
 
 	/**
-	 * Return the collection of cache operations for this method,
-	 * or {@code null} if the method contains no <em>cacheable</em> annotations.
+	 * 返回方法对应的 {@link CacheOperation}
 	 * @param method the method to introspect
 	 * @param targetClass the target class (may be {@code null}, in which case
 	 * the declaring class of the method must be used)

@@ -17,9 +17,7 @@
 package org.springframework.core;
 
 /**
- * {@code Ordered} is an interface that can be implemented by objects that
- * should be <em>orderable</em>, for example in a {@code Collection}.
- *
+ * 是一个可以由对象实现的接口，表明该对象应该是可排序的，例如在Collection中
  * <p>The actual {@link #getOrder() order} can be interpreted as prioritization,
  * with the first object (with the lowest order value) having the highest
  * priority.
@@ -43,13 +41,13 @@ package org.springframework.core;
 public interface Ordered {
 
 	/**
-	 * Useful constant for the highest precedence value.
+	 * 用于最高优先级值的有用常量
 	 * @see java.lang.Integer#MIN_VALUE
 	 */
 	int HIGHEST_PRECEDENCE = Integer.MIN_VALUE;
 
 	/**
-	 * Useful constant for the lowest precedence value.
+	 * 用于最低优先级值的有用常量
 	 * @see java.lang.Integer#MAX_VALUE
 	 */
 	int LOWEST_PRECEDENCE = Integer.MAX_VALUE;

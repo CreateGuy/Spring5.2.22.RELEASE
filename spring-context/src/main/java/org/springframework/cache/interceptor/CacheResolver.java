@@ -27,7 +27,7 @@ import org.springframework.cache.Cache;
 public interface CacheResolver {
 
 	/**
-	 * 返回所有的缓存地址，比如说 RedsCache
+	 * 返回缓存文件夹的所有记录(文件)
 	 * @param context the context of the particular invocation
 	 * @return the cache(s) to use (never {@code null})
 	 * @throws IllegalStateException if cache resolution failed

@@ -163,39 +163,20 @@ import org.springframework.core.Ordered;
 public @interface EnableAsync {
 
 	/**
-	 * Indicate the 'async' annotation type to be detected at either class
-	 * or method level.
-	 * <p>By default, both Spring's @{@link Async} annotation and the EJB 3.1
-	 * {@code @javax.ejb.Asynchronous} annotation will be detected.
-	 * <p>This attribute exists so that developers can provide their own
-	 * custom annotation type to indicate that a method (or all methods of
-	 * a given class) should be invoked asynchronously.
+	 * 在类或方法级上检测的Async注解类型
+	 * <li>默认情况下会检查 @{@link Async @Async} 和 {@link javax.ejb.Asynchronous @Asynchronous}</li>
+	 * <li>此属性的存在使开发人员可以提供他们自己的自定义注解，以指示应该异步调用某个方法(或给定类的所有方法)</li>
 	 */
 	Class<? extends Annotation> annotation() default Annotation.class;
 
 	/**
-	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
-	 * to standard Java interface-based proxies.
-	 * <p><strong>Applicable only if the {@link #mode} is set to {@link AdviceMode#PROXY}</strong>.
-	 * <p>The default is {@code false}.
-	 * <p>Note that setting this attribute to {@code true} will affect <em>all</em>
-	 * Spring-managed beans requiring proxying, not just those marked with {@code @Async}.
-	 * For example, other beans marked with Spring's {@code @Transactional} annotation
-	 * will be upgraded to subclass proxying at the same time. This approach has no
-	 * negative impact in practice unless one is explicitly expecting one type of proxy
-	 * vs. another &mdash; for example, in tests.
+	 * 是否直接使用Cglib，而不是根据被代理对象确定代理方式
+	 * @return
 	 */
 	boolean proxyTargetClass() default false;
 
 	/**
-	 * Indicate how async advice should be applied.
-	 * <p><b>The default is {@link AdviceMode#PROXY}.</b>
-	 * Please note that proxy mode allows for interception of calls through the proxy
-	 * only. Local calls within the same class cannot get intercepted that way; an
-	 * {@link Async} annotation on such a method within a local call will be ignored
-	 * since Spring's interceptor does not even kick in for such a runtime scenario.
-	 * For a more advanced mode of interception, consider switching this to
-	 * {@link AdviceMode#ASPECTJ}.
+	 * 默认使用Spring自带的AOP功能
 	 */
 	AdviceMode mode() default AdviceMode.PROXY;
 

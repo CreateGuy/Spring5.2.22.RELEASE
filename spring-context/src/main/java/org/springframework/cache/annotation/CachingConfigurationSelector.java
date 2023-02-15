@@ -40,6 +40,9 @@ import org.springframework.util.StringUtils;
  */
 public class CachingConfigurationSelector extends AdviceModeImportSelector<EnableCaching> {
 
+	/**
+	 * JCache的匹配类
+	 */
 	private static final String PROXY_JCACHE_CONFIGURATION_CLASS =
 			"org.springframework.cache.jcache.config.ProxyJCacheConfiguration";
 
@@ -62,9 +65,7 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 
 
 	/**
-	 * Returns {@link ProxyCachingConfiguration} or {@code AspectJCachingConfiguration}
-	 * for {@code PROXY} and {@code ASPECTJ} values of {@link EnableCaching#mode()},
-	 * respectively. Potentially includes corresponding JCache configuration as well.
+	 * 根据 {@link EnableCaching#mode()} 设置的AOP模式，确定要导入的类
 	 */
 	@Override
 	public String[] selectImports(AdviceMode adviceMode) {
@@ -79,8 +80,7 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	}
 
 	/**
-	 * Return the imports to use if the {@link AdviceMode} is set to {@link AdviceMode#PROXY}.
-	 * <p>Take care of adding the necessary JSR-107 import if it is available.
+	 * 返回使用 {@link AdviceMode#PROXY} 所需类
 	 */
 	private String[] getProxyImports() {
 		List<String> result = new ArrayList<>(3);
@@ -93,8 +93,7 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	}
 
 	/**
-	 * Return the imports to use if the {@link AdviceMode} is set to {@link AdviceMode#ASPECTJ}.
-	 * <p>Take care of adding the necessary JSR-107 import if it is available.
+	 * 返回使用 {@link AdviceMode#ASPECTJ} 所需类
 	 */
 	private String[] getAspectJImports() {
 		List<String> result = new ArrayList<>(2);

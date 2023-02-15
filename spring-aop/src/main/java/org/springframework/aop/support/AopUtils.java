@@ -177,7 +177,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * 如果传入的方法可能是来自接口，那么就找到具体的实现方法(猜测)
+	 * 如果传入的方法可能是来自接口，那么就找到具体的实现方法
 	 * Given a method, which may come from an interface, and a target class used
 	 * in the current AOP invocation, find the corresponding target method if there
 	 * is one. E.g. the method may be {@code IFoo.bar()} and the target class

@@ -27,12 +27,7 @@ import org.springframework.scheduling.config.TaskManagementConfigUtils;
 import org.springframework.util.Assert;
 
 /**
- * {@code @Configuration} class that registers the Spring infrastructure beans necessary
- * to enable proxy-based asynchronous method execution.
- *
- * @author Chris Beams
- * @author Stephane Nicoll
- * @author Juergen Hoeller
+ * 异步任务配置类
  * @since 3.1
  * @see EnableAsync
  * @see AsyncConfigurationSelector
@@ -41,6 +36,10 @@ import org.springframework.util.Assert;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class ProxyAsyncConfiguration extends AbstractAsyncConfiguration {
 
+	/**
+	 * 注入 {@link AsyncAnnotationBeanPostProcessor}
+	 * @return
+	 */
 	@Bean(name = TaskManagementConfigUtils.ASYNC_ANNOTATION_PROCESSOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public AsyncAnnotationBeanPostProcessor asyncAdvisor() {

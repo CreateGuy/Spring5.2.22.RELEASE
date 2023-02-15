@@ -27,11 +27,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * A Pointcut that matches if the underlying {@link CacheOperationSource}
- * has an attribute for a given method.
- *
- * @author Costin Leau
- * @author Juergen Hoeller
+ * 如果有方法对应的 {@link CacheOperation}，那就匹配成功
  * @since 3.1
  */
 @SuppressWarnings("serial")
@@ -42,6 +38,12 @@ abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut 
 	}
 
 
+	/**
+	 * 如果有方法对应的 {@link CacheOperation}，那就匹配成功
+	 * @param method the candidate method
+	 * @param targetClass the target class
+	 * @return
+	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
 		CacheOperationSource cas = getCacheOperationSource();
@@ -80,13 +82,13 @@ abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut 
 
 
 	/**
-	 * {@link ClassFilter} that delegates to {@link CacheOperationSource#isCandidateClass}
-	 * for filtering classes whose methods are not worth searching to begin with.
+	 * 服务于缓存的 {@link ClassFilter}
 	 */
 	private class CacheOperationSourceClassFilter implements ClassFilter {
 
 		@Override
 		public boolean matches(Class<?> clazz) {
+			// 缓存管理器不能是需要缓存的类
 			if (CacheManager.class.isAssignableFrom(clazz)) {
 				return false;
 			}

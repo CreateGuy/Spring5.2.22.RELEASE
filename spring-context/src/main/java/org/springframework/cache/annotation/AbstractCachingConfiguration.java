@@ -32,34 +32,48 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Abstract base {@code @Configuration} class providing common structure
- * for enabling Spring's annotation-driven cache management capability.
- *
- * @author Chris Beams
- * @author Stephane Nicoll
- * @author Juergen Hoeller
+ * 缓存配置类的基类
  * @since 3.1
  * @see EnableCaching
  */
 @Configuration
 public abstract class AbstractCachingConfiguration implements ImportAware {
 
+	/**
+	 * 导入类上有关 {@link EnableCaching @EnableCaching} 的属性
+	 */
 	@Nullable
 	protected AnnotationAttributes enableCaching;
 
+	/**
+	 * 缓存管理器
+	 */
 	@Nullable
 	protected Supplier<CacheManager> cacheManager;
 
+	/**
+	 * 缓存解析器：感觉只会在JCache中使用
+	 */
 	@Nullable
 	protected Supplier<CacheResolver> cacheResolver;
 
+	/**
+	 * 缓存键生成器
+	 */
 	@Nullable
 	protected Supplier<KeyGenerator> keyGenerator;
 
+	/**
+	 * 缓存操作错误处理器
+	 */
 	@Nullable
 	protected Supplier<CacheErrorHandler> errorHandler;
 
 
+	/**
+	 * 将导入类上有关 {@link EnableCaching @EnableCaching} 的属性保存起来
+	 * @param importMetadata
+	 */
 	@Override
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
 		this.enableCaching = AnnotationAttributes.fromMap(
@@ -70,6 +84,10 @@ public abstract class AbstractCachingConfiguration implements ImportAware {
 		}
 	}
 
+	/**
+	 * 通过 {@link CachingConfigurer} 来配置缓存的相关属性
+	 * @param configurers
+	 */
 	@Autowired(required = false)
 	void setConfigurers(Collection<CachingConfigurer> configurers) {
 		if (CollectionUtils.isEmpty(configurers)) {
@@ -82,11 +100,12 @@ public abstract class AbstractCachingConfiguration implements ImportAware {
 					"implemented only once or not at all.");
 		}
 		CachingConfigurer configurer = configurers.iterator().next();
+		// 使用容器中的CachingConfigurer来配置缓存的属性
 		useCachingConfigurer(configurer);
 	}
 
 	/**
-	 * Extract the configuration from the nominated {@link CachingConfigurer}.
+	 * 从 {@link CachingConfigurer} 中提取缓存属性
 	 */
 	protected void useCachingConfigurer(CachingConfigurer config) {
 		this.cacheManager = config::cacheManager;

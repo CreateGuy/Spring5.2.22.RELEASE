@@ -92,6 +92,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 	private final CacheOperationExpressionEvaluator evaluator = new CacheOperationExpressionEvaluator();
 
+	/**
+	 * 保存 {@link CacheOperation} 的地方
+	 */
 	@Nullable
 	private CacheOperationSource cacheOperationSource;
 
@@ -103,6 +106,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	@Nullable
 	private BeanFactory beanFactory;
 
+	/**
+	 * 是否初始化完毕
+	 */
 	private boolean initialized = false;
 
 
@@ -353,7 +359,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	}
 
 	/**
-	 *
+	 * 执行拦截器
 	 * @param invoker 具体执行的方法
 	 * @param target 目标对象，比如说Controller
 	 * @param method 目标方法
@@ -382,7 +388,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 	/**
 	 * 直接调用目标方法
-	 * If an exception occurs it will be wrapped in a
+	 * <p>If an exception occurs it will be wrapped in a
 	 * {@link CacheOperationInvoker.ThrowableWrapper}: the exception can be handled
 	 * or modified but it <em>must</em> be wrapped in a
 	 * {@link CacheOperationInvoker.ThrowableWrapper} as well.
@@ -408,7 +414,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			if (isConditionPassing(context, CacheOperationExpressionEvaluator.NO_RESULT)) {
 				// 计算缓存操作的key
 				Object key = generateKey(context, CacheOperationExpressionEvaluator.NO_RESULT);
-				// 拿到第一个缓存地址
+				// 拿到第一个缓存文件夹
 				Cache cache = context.getCaches().iterator().next();
 				try {
 					// 开始加锁获取返回值，然后包装
@@ -731,11 +737,14 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		}
 
 		private boolean determineSyncFlag(Method method) {
+			// 是获得CacheableOperation，也就是@Cacheable的信息
 			List<CacheOperationContext> cacheOperationContexts = this.contexts.get(CacheableOperation.class);
 			if (cacheOperationContexts == null) {  // no @Cacheable operation at all
 				return false;
 			}
 			boolean syncEnabled = false;
+
+			// 其实就是看CacheableOperation对应的那一个@Cacheable是否设置了同步标记
 			for (CacheOperationContext cacheOperationContext : cacheOperationContexts) {
 				if (((CacheableOperation) cacheOperationContext.getOperation()).isSync()) {
 					syncEnabled = true;
@@ -743,10 +752,12 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 				}
 			}
 			if (syncEnabled) {
+				// 开启了同步，不能设置多个缓存注解
 				if (this.contexts.size() > 1) {
 					throw new IllegalStateException(
 							"@Cacheable(sync=true) cannot be combined with other cache operations on '" + method + "'");
 				}
+				// 开启了同步，不能设置多个@Cacheabel
 				if (cacheOperationContexts.size() > 1) {
 					throw new IllegalStateException(
 							"Only one @Cacheable(sync=true) entry is allowed on '" + method + "'");
@@ -826,7 +837,8 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		private final Object target;
 
 		/**
-		 * 缓存地址，比如说 RedisCache
+		 * 缓存文件夹，可以设置多个
+		 * <li>可以理解为可以在磁盘的多个文件夹下都存放数据</li>
 		 */
 		private final Collection<? extends Cache> caches;
 
@@ -845,7 +857,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			this.metadata = metadata;
 			this.args = extractArgs(metadata.method, args);
 			this.target = target;
-			// 调用缓存解析器获取缓存地址
+			// 调用缓存解析器获取缓存文件夹的所有记录(文件)
 			this.caches = CacheAspectSupport.this.getCaches(this, metadata.cacheResolver);
 			// 设置缓存名称
 			this.cacheNames = createCacheNames(this.caches);

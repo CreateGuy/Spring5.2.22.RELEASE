@@ -24,7 +24,8 @@ import java.lang.annotation.Target;
 
 /**
  * 提供了一种在类级别上共享通用缓存相关设置的机制。
- *
+ * <li>在 {@link org.springframework.cache.annotation.SpringCacheAnnotationParser.DefaultCacheConfig DefaultCacheConfig} 中会操作</li>
+ * <li>只有在那三个缓存注解没有配置下面这四个属性的时候才会生效</li>
  * <p>When this annotation is present on a given class, it provides a set
  * of default settings for any cache operation defined in that class.
  *

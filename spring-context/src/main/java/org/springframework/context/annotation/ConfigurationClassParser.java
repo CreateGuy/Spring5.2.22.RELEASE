@@ -696,11 +696,12 @@ class ConfigurationClassParser {
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
-						//候选类不是ImportSelector或ImportBeanDefinitionRegistrar那就当成@Configuration类处理
-						//如果是成@Configuration类就有可能出现循环导入，就放入下面的importStack的imports中
+						// 候选类不是ImportSelector或ImportBeanDefinitionRegistrar那就当成@Configuration类处理
+						// 如果是@Configuration类就有可能出现循环导入，就放入下面的importStack的imports中
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
 						//处理此配置类
+						// 注意：如果是一个类A导入了B，B又导入了C，这个时候还是会记录是A导入了C，是在上面执行processImports方法的时候，传入的是最开始的类
 						processConfigurationClass(candidate.asConfigClass(configClass), exclusionFilter);
 					}
 				}
@@ -821,8 +822,7 @@ class ConfigurationClassParser {
 
 
 	/**
-	 * 这个类本身就是一个双端队列
-	 * 内部花有一个imports是用来保存有导入关系的
+	 * 这个类本身就是一个双端队列，内部花有一个imports是用来保存导入关系的
 	 */
 	@SuppressWarnings("serial")
 	private static class ImportStack extends ArrayDeque<ConfigurationClass> implements ImportRegistry {

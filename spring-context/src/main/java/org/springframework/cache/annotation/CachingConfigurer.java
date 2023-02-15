@@ -23,21 +23,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface to be implemented by @{@link org.springframework.context.annotation.Configuration
- * Configuration} classes annotated with @{@link EnableCaching} that wish or need to
- * specify explicitly how caches are resolved and how keys are generated for annotation-driven
- * cache management. Consider extending {@link CachingConfigurerSupport}, which provides a
- * stub implementation of all interface methods.
- *
- * <p>See @{@link EnableCaching} for general examples and context; see
- * {@link #cacheManager()}, {@link #cacheResolver()} and {@link #keyGenerator()}
- * for detailed instructions.
- *
- * @author Chris Beams
- * @author Stephane Nicoll
- * @since 3.1
- * @see EnableCaching
- * @see CachingConfigurerSupport
+ * 在 {@link AbstractCachingConfiguration} 中会有一个 {@link org.springframework.beans.factory.annotation.Autowired @Autowired} 的方法，入参是就当前类，然后就可以通过当前类操作缓存的相关属性了
  */
 public interface CachingConfigurer {
 

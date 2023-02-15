@@ -30,24 +30,28 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Abstract base {@code Configuration} class providing common structure for enabling
- * Spring's asynchronous method execution capability.
- *
- * @author Chris Beams
- * @author Juergen Hoeller
- * @author Stephane Nicoll
+ * 异步任务配置类的基类
  * @since 3.1
  * @see EnableAsync
  */
 @Configuration
 public abstract class AbstractAsyncConfiguration implements ImportAware {
 
+	/**
+	 * 导入类上 {@link EnableAsync @EnableAsync} 的属性
+	 */
 	@Nullable
 	protected AnnotationAttributes enableAsync;
 
+	/**
+	 * 异步任务线程池
+	 */
 	@Nullable
 	protected Supplier<Executor> executor;
 
+	/**
+	 * 异常处理器
+	 */
 	@Nullable
 	protected Supplier<AsyncUncaughtExceptionHandler> exceptionHandler;
 
@@ -63,7 +67,7 @@ public abstract class AbstractAsyncConfiguration implements ImportAware {
 	}
 
 	/**
-	 * Collect any {@link AsyncConfigurer} beans through autowiring.
+	 * 通过自动装配收集任何 {@link AsyncConfigurer} bean，然后配置异步的属性
 	 */
 	@Autowired(required = false)
 	void setConfigurers(Collection<AsyncConfigurer> configurers) {

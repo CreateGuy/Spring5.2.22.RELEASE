@@ -19,8 +19,7 @@ package org.springframework.aop.interceptor;
 import java.lang.reflect.Method;
 
 /**
- * A strategy for handling uncaught exceptions thrown from asynchronous methods.
- *
+ * 处理异步方法抛出的未捕获异常的策略
  * <p>An asynchronous method usually returns a {@link java.util.concurrent.Future}
  * instance that gives access to the underlying exception. When the method does
  * not provide that return type, this handler can be used to manage such

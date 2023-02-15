@@ -77,12 +77,21 @@ public class AsyncAnnotationBeanPostProcessor extends AbstractBeanFactoryAwareAd
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 线程池
+	 */
 	@Nullable
 	private Supplier<Executor> executor;
 
+	/**
+	 * 异步方法抛出的未捕获异常的策略
+	 */
 	@Nullable
 	private Supplier<AsyncUncaughtExceptionHandler> exceptionHandler;
 
+	/**
+	 * 扫描的异步任务注解类型
+	 */
 	@Nullable
 	private Class<? extends Annotation> asyncAnnotationType;
 
@@ -142,6 +151,10 @@ public class AsyncAnnotationBeanPostProcessor extends AbstractBeanFactoryAwareAd
 	}
 
 
+	/**
+	 * 注册 {@link org.springframework.aop.Advisor Advisor}
+	 * @param beanFactory
+	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		super.setBeanFactory(beanFactory);

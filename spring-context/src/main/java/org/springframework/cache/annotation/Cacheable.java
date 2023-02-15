@@ -27,9 +27,7 @@ import java.util.concurrent.Callable;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation indicating that the result of invoking a method (or all methods
- * in a class) can be cached.
- *
+ * 是做查询和保存操作的
  * <p>Each time an advised method is invoked, caching behavior will be applied,
  * checking whether the method has been already invoked for the given arguments.
  * A sensible default simply uses the method parameters to compute the key, but
@@ -59,12 +57,8 @@ import org.springframework.core.annotation.AliasFor;
 public @interface Cacheable {
 
 	/**
-	 * 缓存的名称
-	 * <ul>
-	 *     <li>
-	 *         比如说要记录对账单日志，value 是 statementsLog，而 key 是 123，那么就表示记录一条对账单号是123的日志
-	 *     </li>
-	 * </ul>
+	 * 缓存文件夹的名称
+	 * <li>比如说要记录对账单日志：value是statementLog, key是对账单id，value是statement这个实例/li>
 	 */
 	@AliasFor("cacheNames")
 	String[] value() default {};
@@ -81,13 +75,13 @@ public @interface Cacheable {
 	String[] cacheNames() default {};
 
 	/**
-	 * 缓存的键，上面的value有介绍
+	 * 缓存的键，可以理解为一个文件名称
 	 * @return
 	 */
 	String key() default "";
 
 	/**
-	 * 键生成器，通常是 key 未指定时
+	 * 键生成器，通常是 key 未指定时才会用的
 	 * @return
 	 */
 	String keyGenerator() default "";

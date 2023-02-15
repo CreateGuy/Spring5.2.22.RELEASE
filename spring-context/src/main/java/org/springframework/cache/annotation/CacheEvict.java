@@ -26,7 +26,8 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation indicating that a method (or all methods on a class) triggers a
+ * 和 {@link Cacheable @Cacheable}差不多，是做更新的
+ * <p>Annotation indicating that a method (or all methods on a class) triggers a
  * {@link org.springframework.cache.Cache#evict(Object) cache evict} operation.
  *
  * <p>This annotation may be used as a <em>meta-annotation</em> to create custom

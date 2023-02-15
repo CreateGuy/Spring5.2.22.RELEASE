@@ -23,14 +23,8 @@ import org.springframework.cache.interceptor.CacheOperation;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for parsing known caching annotation types.
- * {@link AnnotationCacheOperationSource} delegates to such parsers
- * for supporting specific annotation types such as Spring's own
- * {@link Cacheable}, {@link CachePut} and{@link CacheEvict}.
- *
- * @author Costin Leau
- * @author Stephane Nicoll
- * @author Juergen Hoeller
+ * 缓存相关注解的解析器
+ * <li>{@link Cacheable} 和 {@link CachePut} 和 {@link CacheEvict} 和 {@link Caching}</li>
  * @since 3.1
  * @see AnnotationCacheOperationSource
  * @see SpringCacheAnnotationParser
@@ -38,8 +32,8 @@ import org.springframework.lang.Nullable;
 public interface CacheAnnotationParser {
 
 	/**
-	 * Determine whether the given class is a candidate for cache operations
-	 * in the annotation format of this {@code CacheAnnotationParser}.
+	 * 判断给定的类是否是标注了指定注解的的候选类(在类型、方法或字段上去判断)
+	 * <li>比如说会在 {@link org.springframework.aop.ClassFilter ClassFilter} 中调用</li>
 	 * <p>If this method returns {@code false}, the methods on the given class
 	 * will not get traversed for {@code #parseCacheAnnotations} introspection.
 	 * Returning {@code false} is therefore an optimization for non-affected
@@ -68,8 +62,7 @@ public interface CacheAnnotationParser {
 	Collection<CacheOperation> parseCacheAnnotations(Class<?> type);
 
 	/**
-	 * Parse the cache definition for the given method,
-	 * based on an annotation type understood by this parser.
+	 * 解析方法上的特定注解然后转换为 {@link CacheOperation} 并返回
 	 * <p>This essentially parses a known cache annotation into Spring's metadata
 	 * attribute class. Returns {@code null} if the method is not cacheable.
 	 * @param method the annotated method

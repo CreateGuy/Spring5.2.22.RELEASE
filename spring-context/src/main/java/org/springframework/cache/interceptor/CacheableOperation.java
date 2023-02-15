@@ -57,7 +57,7 @@ public class CacheableOperation extends CacheOperation {
 
 
 	/**
-	 * A builder that can be used to create a {@link CacheableOperation}.
+	 * 创建 {@link CacheableOperation} 的基类
 	 * @since 4.3
 	 */
 	public static class Builder extends CacheOperation.Builder {

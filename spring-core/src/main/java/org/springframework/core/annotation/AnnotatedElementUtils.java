@@ -367,12 +367,7 @@ public abstract class AnnotatedElementUtils {
 	}
 
 	/**
-	 * Get <strong>all</strong> annotations of the specified {@code annotationTypes}
-	 * within the annotation hierarchy <em>above</em> the supplied {@code element};
-	 * and for each annotation found, merge that annotation's attributes with
-	 * <em>matching</em> attributes from annotations in lower levels of the
-	 * annotation hierarchy and synthesize the results back into an annotation
-	 * of the corresponding {@code annotationType}.
+	 * 提取给定元素上的指定注解，对于找到的多个相同注解，将注解与更低一级的注解进行合并，然后返回
 	 * <p>{@link AliasFor @AliasFor} semantics are fully supported, both within a
 	 * single annotation and within annotation hierarchies.
 	 * <p>This method follows <em>get semantics</em> as described in the
@@ -661,12 +656,7 @@ public abstract class AnnotatedElementUtils {
 	}
 
 	/**
-	 * Find <strong>all</strong> annotations of the specified {@code annotationTypes}
-	 * within the annotation hierarchy <em>above</em> the supplied {@code element};
-	 * and for each annotation found, merge that annotation's attributes with
-	 * <em>matching</em> attributes from annotations in lower levels of the
-	 * annotation hierarchy and synthesize the results back into an annotation
-	 * of the corresponding {@code annotationType}.
+	 * 和 {@link AnnotatedElementUtils#getAllMergedAnnotations(AnnotatedElement, Set)}} 很像，只是多了一个排序规则
 	 * <p>{@link AliasFor @AliasFor} semantics are fully supported, both within a
 	 * single annotation and within annotation hierarchies.
 	 * <p>This method follows <em>find semantics</em> as described in the

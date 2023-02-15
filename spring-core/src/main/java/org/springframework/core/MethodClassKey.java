@@ -22,11 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
- * A common key class for a method against a specific target class,
- * including {@link #toString()} representation and {@link Comparable}
- * support (as suggested for custom {@code HashMap} keys as of Java 8).
- *
- * @author Juergen Hoeller
+ * 可唯一确定类和方法的
  * @since 4.3
  */
 public final class MethodClassKey implements Comparable<MethodClassKey> {

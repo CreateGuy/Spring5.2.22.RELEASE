@@ -67,15 +67,14 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * Cache of CacheOperations, keyed by method on a specific target class.
-	 * <p>As this base class is not marked Serializable, the cache will be recreated
-	 * after serialization - provided that the concrete subclass is Serializable.
+	 * 指定对象和对应的 {@link CacheOperation} 的映射关系
+	 * <li>比如说 {@link MethodClassKey} 和对应的 {@link CacheOperation}</li>
 	 */
 	private final Map<Object, Collection<CacheOperation>> attributeCache = new ConcurrentHashMap<>(1024);
 
 
 	/**
-	 * Determine the caching attribute for this method invocation.
+	 * 返回此方法对的 {@link CacheOperation}
 	 * <p>Defaults to the class's caching attribute if no method attribute is found.
 	 * @param method the method for the current invocation (never {@code null})
 	 * @param targetClass the target class for this invocation (may be {@code null})
@@ -92,10 +91,12 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		Object cacheKey = getCacheKey(method, targetClass);
 		Collection<CacheOperation> cached = this.attributeCache.get(cacheKey);
 
+		// 先从缓存中获取
 		if (cached != null) {
 			return (cached != NULL_CACHING_ATTRIBUTE ? cached : null);
 		}
 		else {
+			// 从方法和类上获取CacheOperation
 			Collection<CacheOperation> cacheOps = computeCacheOperations(method, targetClass);
 			if (cacheOps != null) {
 				if (logger.isTraceEnabled()) {
@@ -122,29 +123,35 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		return new MethodClassKey(method, targetClass);
 	}
 
+	/**
+	 * 从方法和类上获取 {@link CacheOperation}
+	 * @param method
+	 * @param targetClass
+	 * @return
+	 */
 	@Nullable
 	private Collection<CacheOperation> computeCacheOperations(Method method, @Nullable Class<?> targetClass) {
-		// Don't allow no-public methods as required.
+		// 是否不缓存非Public的方法
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
 
-		// The method may be on an interface, but we need attributes from the target class.
-		// If the target class is null, the method will be unchanged.
+		// 如果传入的方法可能是来自接口，那么就找到具体的实现方法
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
-		// First try is the method in the target class.
+		// 首先：获取给定方法对应的CacheOperation
 		Collection<CacheOperation> opDef = findCacheOperations(specificMethod);
 		if (opDef != null) {
 			return opDef;
 		}
 
-		// Second try is the caching operation on the target class.
+		// 第二次：获取给定类对应的CacheOperation
 		opDef = findCacheOperations(specificMethod.getDeclaringClass());
 		if (opDef != null && ClassUtils.isUserLevelMethod(method)) {
 			return opDef;
 		}
 
+		// 如果是在子类上没有找到，那就去更高一级的方法和类去查找
 		if (specificMethod != method) {
 			// Fallback is to look at the original method.
 			opDef = findCacheOperations(method);
@@ -163,8 +170,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 
 
 	/**
-	 * Subclasses need to implement this to return the caching attribute for the
-	 * given class, if any.
+	 * 子类需要实现此方法，以返回给定类对应的 {@link CacheOperation}
 	 * @param clazz the class to retrieve the attribute for
 	 * @return all caching attribute associated with this class, or {@code null} if none
 	 */
@@ -172,8 +178,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	protected abstract Collection<CacheOperation> findCacheOperations(Class<?> clazz);
 
 	/**
-	 * Subclasses need to implement this to return the caching attribute for the
-	 * given method, if any.
+	 * 子类需要实现此方法，以返回给定方法对应的 {@link CacheOperation}
 	 * @param method the method to retrieve the attribute for
 	 * @return all caching attribute associated with this method, or {@code null} if none
 	 */

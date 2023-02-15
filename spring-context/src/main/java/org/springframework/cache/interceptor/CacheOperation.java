@@ -153,11 +153,14 @@ public abstract class CacheOperation implements BasicOperation {
 
 
 	/**
-	 * Base class for builders that can be used to create a {@link CacheOperation}.
+	 * 创建 {@link CacheOperation} 的基类
 	 * @since 4.3
 	 */
 	public abstract static class Builder {
 
+		/**
+		 * 要使用缓存机制的类的名称
+		 */
 		private String name = "";
 
 		private Set<String> cacheNames = Collections.emptySet();

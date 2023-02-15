@@ -77,14 +77,21 @@ public abstract class AbstractCacheResolver implements CacheResolver, Initializi
 		Assert.notNull(this.cacheManager, "CacheManager is required");
 	}
 
-
+	/**
+	 * 返回缓存文件夹的所有记录(文件)
+	 * @param context the context of the particular invocation
+	 * @return
+	 */
 	@Override
 	public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
+		// 获得缓存文件夹名称
 		Collection<String> cacheNames = getCacheNames(context);
 		if (cacheNames == null) {
 			return Collections.emptyList();
 		}
 		Collection<Cache> result = new ArrayList<>(cacheNames.size());
+		// 拿到缓存文件夹中的文件
+		// Cache可以理解为一个文件
 		for (String cacheName : cacheNames) {
 			Cache cache = getCacheManager().getCache(cacheName);
 			if (cache == null) {
@@ -97,7 +104,7 @@ public abstract class AbstractCacheResolver implements CacheResolver, Initializi
 	}
 
 	/**
-	 * Provide the name of the cache(s) to resolve against the current cache manager.
+	 * 返回缓存文件夹名称
 	 * <p>It is acceptable to return {@code null} to indicate that no cache could
 	 * be resolved for this invocation.
 	 * @param context the context of the particular invocation

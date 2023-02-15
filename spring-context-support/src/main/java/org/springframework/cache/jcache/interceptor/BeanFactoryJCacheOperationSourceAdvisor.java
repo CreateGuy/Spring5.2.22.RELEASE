@@ -22,10 +22,7 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.lang.Nullable;
 
 /**
- * Advisor driven by a {@link JCacheOperationSource}, used to include a
- * cache advice bean for methods that are cacheable.
- *
- * @author Stephane Nicoll
+ * 是JCache的Advisor，是支持另外一套缓存注解的
  * @since 4.1
  */
 @SuppressWarnings("serial")

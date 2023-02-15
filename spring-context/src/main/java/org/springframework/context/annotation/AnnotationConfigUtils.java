@@ -300,7 +300,8 @@ public abstract class AnnotationConfigUtils {
 	}
 
 	/**
-	 * 查看注解元数据是否有某些注解的属性
+	 * 返回注解元数据中包含指定注解的属性
+	 * <li>就是返回这个注解的所有属性</li>
 	 * @param metadata
 	 * @param annotationClass
 	 * @return
