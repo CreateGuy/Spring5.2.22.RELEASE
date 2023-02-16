@@ -38,10 +38,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.function.SingletonSupplier;
 
 /**
- * Advisor that activates asynchronous method execution through the {@link Async}
- * annotation. This annotation can be used at the method and type level in
- * implementation classes as well as in service interfaces.
- *
+ * 异步任务对应的 {@link org.springframework.aop.Advisor Advisor}
  * <p>This advisor detects the EJB 3.1 {@code javax.ejb.Asynchronous}
  * annotation as well, treating it exactly like Spring's own {@code Async}.
  * Furthermore, a custom async annotation type may get specified through the
@@ -96,15 +93,20 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 			@Nullable Supplier<Executor> executor, @Nullable Supplier<AsyncUncaughtExceptionHandler> exceptionHandler) {
 
 		Set<Class<? extends Annotation>> asyncAnnotationTypes = new LinkedHashSet<>(2);
+		// 首先异步注解支持@Async
 		asyncAnnotationTypes.add(Async.class);
 		try {
+			// 能找到这个注解，那么就再多支持一个
 			asyncAnnotationTypes.add((Class<? extends Annotation>)
 					ClassUtils.forName("javax.ejb.Asynchronous", AsyncAnnotationAdvisor.class.getClassLoader()));
 		}
 		catch (ClassNotFoundException ex) {
-			// If EJB 3.1 API not present, simply ignore.
+			// EJB 3.1 API不存在，直接忽略
 		}
+
+		// 创建对应的拦截器
 		this.advice = buildAdvice(executor, exceptionHandler);
+		// 创建异步任务方法的切入点
 		this.pointcut = buildPointcut(asyncAnnotationTypes);
 	}
 
@@ -147,6 +149,12 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 
+	/**
+	 * 创建异步任务的通知(拦截器)
+	 * @param executor
+	 * @param exceptionHandler
+	 * @return
+	 */
 	protected Advice buildAdvice(
 			@Nullable Supplier<Executor> executor, @Nullable Supplier<AsyncUncaughtExceptionHandler> exceptionHandler) {
 
@@ -156,14 +164,14 @@ public class AsyncAnnotationAdvisor extends AbstractPointcutAdvisor implements B
 	}
 
 	/**
-	 * Calculate a pointcut for the given async annotation types, if any.
-	 * @param asyncAnnotationTypes the async annotation types to introspect
-	 * @return the applicable Pointcut object, or {@code null} if none
+	 * 创建异步任务方法的切入点
 	 */
 	protected Pointcut buildPointcut(Set<Class<? extends Annotation>> asyncAnnotationTypes) {
 		ComposablePointcut result = null;
 		for (Class<? extends Annotation> asyncAnnotationType : asyncAnnotationTypes) {
+			// 检查类上的
 			Pointcut cpc = new AnnotationMatchingPointcut(asyncAnnotationType, true);
+			// 检查方法上的
 			Pointcut mpc = new AnnotationMatchingPointcut(null, asyncAnnotationType, true);
 			if (result == null) {
 				result = new ComposablePointcut(cpc);

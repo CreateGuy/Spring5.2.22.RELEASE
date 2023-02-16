@@ -38,7 +38,7 @@ import org.springframework.lang.Nullable;
  * @since 3.1
  */
 @SuppressWarnings("serial")
-public class CacheInterceptor extends CacheAspectSupport implements MethodInterceptor, Serializable {
+	public class CacheInterceptor extends CacheAspectSupport implements MethodInterceptor, Serializable {
 
 	@Override
 	@Nullable

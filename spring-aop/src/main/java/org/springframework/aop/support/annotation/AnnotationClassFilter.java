@@ -24,17 +24,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple ClassFilter that looks for a specific Java 5 annotation
- * being present on a class.
- *
- * @author Juergen Hoeller
- * @since 2.0
+ * 通过检查是否有特定注解的返回匹配结果的 {@link ClassFilter}
  * @see AnnotationMatchingPointcut
  */
 public class AnnotationClassFilter implements ClassFilter {
 
+	/**
+	 * 当前 {@link ClassFilter} 支持的注解
+	 */
 	private final Class<? extends Annotation> annotationType;
 
+	/**
+	 * 是否检查父类
+	 */
 	private final boolean checkInherited;
 
 

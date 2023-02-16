@@ -34,6 +34,10 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSupport implements BeanPostProcessor {
 
+	/**
+	 * 注册的Advisor
+	 * <li>比如说是 {@link AsyncAnnotationAdvisor}</li>
+	 */
 	@Nullable
 	protected Advisor advisor;
 
@@ -72,6 +76,8 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 			return bean;
 		}
 
+		// 如果Bean本身就已经是Advised
+		// 如果已经被代理也是Advised，AOP的InfrastructureAdvisorAutoProxyCreator的顺序一般情况下比当前对象高
 		if (bean instanceof Advised) {
 			Advised advised = (Advised) bean;
 			if (!advised.isFrozen() && isEligible(AopUtils.getTargetClass(bean))) {
@@ -86,6 +92,7 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 			}
 		}
 
+		// 是否需要代理
 		if (isEligible(bean, beanName)) {
 			ProxyFactory proxyFactory = prepareProxyFactory(bean, beanName);
 			if (!proxyFactory.isProxyTargetClass()) {
@@ -119,8 +126,7 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 	}
 
 	/**
-	 * Check whether the given class is eligible for advising with this
-	 * post-processor's {@link Advisor}.
+	 * 检查给定的类是否有资格使用这个后置处理器的 {@link Advisor}
 	 * <p>Implements caching of {@code canApply} results per bean target class.
 	 * @param targetClass the class to check against
 	 * @see AopUtils#canApply(Advisor, Class)

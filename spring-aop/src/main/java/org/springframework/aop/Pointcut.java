@@ -43,7 +43,6 @@ public interface Pointcut {
 	 */
 	MethodMatcher getMethodMatcher();
 
-
 	/**
 	 * 作为切入点，总是匹配
 	 */

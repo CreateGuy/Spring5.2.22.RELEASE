@@ -19,26 +19,20 @@ package org.springframework.transaction.annotation;
 import org.springframework.transaction.TransactionDefinition;
 
 /**
- * Enumeration that represents transaction propagation behaviors for use
- * with the {@link Transactional} annotation, corresponding to the
- * {@link TransactionDefinition} interface.
- *
- * @author Colin Sampaleanu
- * @author Juergen Hoeller
- * @since 1.2
+ * 事务传播类型
  */
 public enum Propagation {
 
 	/**
-	 * Support a current transaction, create a new one if none exists.
-	 * Analogous to EJB transaction attribute of the same name.
-	 * <p>This is the default setting of a transaction annotation.
+	 * 支持当前事务，如果不存在则创建一个新事务。类似于同名的EJB事务属性
+	 * <li>也就是进入一个新方法，如果原方法有事务就共用，否则就创建新事务</li>
+	 * <li>这是默认的事务传播的默认设置</li>
 	 */
 	REQUIRED(TransactionDefinition.PROPAGATION_REQUIRED),
 
 	/**
-	 * Support a current transaction, execute non-transactionally if none exists.
-	 * Analogous to EJB transaction attribute of the same name.
+	 * 支持当前事务，如果不存在则以非事务方式执行。类似于同名的EJB事务属性
+	 * <li>也就是进入一个新方法，如果原方法有事务就共用，否则就不使用事务</li>
 	 * <p>Note: For transaction managers with transaction synchronization,
 	 * {@code SUPPORTS} is slightly different from no transaction at all,
 	 * as it defines a transaction scope that synchronization will apply for.
@@ -50,14 +44,13 @@ public enum Propagation {
 	SUPPORTS(TransactionDefinition.PROPAGATION_SUPPORTS),
 
 	/**
-	 * Support a current transaction, throw an exception if none exists.
-	 * Analogous to EJB transaction attribute of the same name.
+	 * 支持当前事务，如果不存在则抛出异常。类似于同名的EJB事务属性
+	 * <li>也就是进入一个新方法，如果原方法有事务就共用，否则就直接抛出异常</li>
 	 */
 	MANDATORY(TransactionDefinition.PROPAGATION_MANDATORY),
 
 	/**
-	 * Create a new transaction, and suspend the current transaction if one exists.
-	 * Analogous to the EJB transaction attribute of the same name.
+	 * 创建一个新事务，如果存在当前事务，则挂起当前事务。类似于同名的EJB事务属性
 	 * <p><b>NOTE:</b> Actual transaction suspension will not work out-of-the-box
 	 * on all transaction managers. This in particular applies to
 	 * {@link org.springframework.transaction.jta.JtaTransactionManager},

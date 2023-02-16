@@ -27,8 +27,7 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.transaction.TransactionDefinition;
 
 /**
- * Describes a transaction attribute on an individual method or on a class.
- *
+ * 描述单个方法或类上的事务属性
  * <p>When this annotation is declared at the class level, it applies as a default
  * to all methods of the declaring class and its subclasses. Note that it does not
  * apply to ancestor classes up the class hierarchy; inherited methods need to be
@@ -96,8 +95,7 @@ public @interface Transactional {
 	String transactionManager() default "";
 
 	/**
-	 * The transaction propagation type.
-	 * <p>Defaults to {@link Propagation#REQUIRED}.
+	 * 事务传播类型
 	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getPropagationBehavior()
 	 */
 	Propagation propagation() default Propagation.REQUIRED;

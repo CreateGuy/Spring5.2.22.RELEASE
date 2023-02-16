@@ -100,10 +100,14 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 	@Override
 	@Nullable
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
+		// 获得代理类
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
+		// 方法可能来自接口或者类，返回具体的目标方法
 		Method specificMethod = ClassUtils.getMostSpecificMethod(invocation.getMethod(), targetClass);
+		// 由于方法可能是桥接方法，那么就找到真实方法
 		final Method userDeclaredMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
+		// 根据给定的方法返回对应的线程池
 		AsyncTaskExecutor executor = determineAsyncExecutor(userDeclaredMethod);
 		if (executor == null) {
 			throw new IllegalStateException(
@@ -112,30 +116,29 @@ public class AsyncExecutionInterceptor extends AsyncExecutionAspectSupport imple
 
 		Callable<Object> task = () -> {
 			try {
+				// 执行后续的拦截器或者真实方法
 				Object result = invocation.proceed();
 				if (result instanceof Future) {
 					return ((Future<?>) result).get();
 				}
 			}
 			catch (ExecutionException ex) {
+				// 处理执行异步任务抛出的异常
 				handleError(ex.getCause(), userDeclaredMethod, invocation.getArguments());
 			}
 			catch (Throwable ex) {
+				// 处理执行异步任务抛出的错误
 				handleError(ex, userDeclaredMethod, invocation.getArguments());
 			}
 			return null;
 		};
 
+		// 使用委托的线程池来执行任务
 		return doSubmit(task, executor, invocation.getMethod().getReturnType());
 	}
 
 	/**
-	 * This implementation is a no-op for compatibility in Spring 3.1.2.
-	 * Subclasses may override to provide support for extracting qualifier information,
-	 * e.g. via an annotation on the given method.
-	 * @return always {@code null}
-	 * @since 3.1.2
-	 * @see #determineAsyncExecutor(Method)
+	 * 通过方法获得设置的线程池名称
 	 */
 	@Override
 	@Nullable

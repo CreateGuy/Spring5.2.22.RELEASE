@@ -65,21 +65,11 @@ public class AnnotationAsyncExecutionInterceptor extends AsyncExecutionIntercept
 
 
 	/**
-	 * Return the qualifier or bean name of the executor to be used when executing the
-	 * given method, specified via {@link Async#value} at the method or declaring
-	 * class level. If {@code @Async} is specified at both the method and class level, the
-	 * method's {@code #value} takes precedence (even if empty string, indicating that
-	 * the default executor should be used preferentially).
-	 * @param method the method to inspect for executor qualifier metadata
-	 * @return the qualifier if specified, otherwise empty string indicating that the
-	 * {@linkplain #setExecutor(Executor) default executor} should be used
-	 * @see #determineAsyncExecutor(Method)
+	 * 通过方法上的注解或者方法声明类上的 {@link Async @Async} 获得设置的线程池名称
 	 */
 	@Override
 	@Nullable
 	protected String getExecutorQualifier(Method method) {
-		// Maintainer's note: changes made here should also be made in
-		// AnnotationAsyncExecutionAspect#getExecutorQualifier
 		Async async = AnnotatedElementUtils.findMergedAnnotation(method, Async.class);
 		if (async == null) {
 			async = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Async.class);
