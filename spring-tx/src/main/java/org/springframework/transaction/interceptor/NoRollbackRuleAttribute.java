@@ -17,11 +17,7 @@
 package org.springframework.transaction.interceptor;
 
 /**
- * Tag subclass of {@link RollbackRuleAttribute} that has the opposite behavior
- * to the {@code RollbackRuleAttribute} superclass.
- *
- * @author Rod Johnson
- * @since 09.04.2003
+ * 与 {@link RollbackRuleAttribute} 的作用相反，指示不需要回滚的异常
  */
 @SuppressWarnings("serial")
 public class NoRollbackRuleAttribute extends RollbackRuleAttribute {

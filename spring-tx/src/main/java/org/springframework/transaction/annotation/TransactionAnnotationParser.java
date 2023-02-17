@@ -22,8 +22,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
- * Strategy interface for parsing known transaction annotation types.
- * {@link AnnotationTransactionAttributeSource} delegates to such
+ * 用于解析已知的事务注解类型的策略接口
+ * <p>{@link AnnotationTransactionAttributeSource} delegates to such
  * parsers for supporting specific annotation types such as Spring's own
  * {@link Transactional}, JTA 1.2's {@link javax.transaction.Transactional}
  * or EJB3's {@link javax.ejb.TransactionAttribute}.
@@ -38,8 +38,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public interface TransactionAnnotationParser {
 
 	/**
-	 * Determine whether the given class is a candidate for transaction attributes
-	 * in the annotation format of this {@code TransactionAnnotationParser}.
+	 * 确定给定的类是否是带有事务注解格式的候选类
 	 * <p>If this method returns {@code false}, the methods on the given class
 	 * will not get traversed for {@code #parseTransactionAnnotation} introspection.
 	 * Returning {@code false} is therefore an optimization for non-affected
@@ -56,8 +55,7 @@ public interface TransactionAnnotationParser {
 	}
 
 	/**
-	 * Parse the transaction attribute for the given method or class,
-	 * based on an annotation type understood by this parser.
+	 * 返回指定元素上带有的事务注解的信息
 	 * <p>This essentially parses a known transaction annotation into Spring's metadata
 	 * attribute class. Returns {@code null} if the method/class is not transactional.
 	 * @param element the annotated method or class

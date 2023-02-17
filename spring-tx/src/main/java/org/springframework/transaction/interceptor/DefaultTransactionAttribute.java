@@ -31,9 +31,15 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public class DefaultTransactionAttribute extends DefaultTransactionDefinition implements TransactionAttribute {
 
+	/**
+	 * 默认就是 {@link org.springframework.transaction.annotation.Transactional @Transactional} 中设置的事务管理器
+	 */
 	@Nullable
 	private String qualifier;
 
+	/**
+	 * 此事务属性对应方法的限定名
+	 */
 	@Nullable
 	private String descriptor;
 

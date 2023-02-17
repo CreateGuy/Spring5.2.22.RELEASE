@@ -101,7 +101,7 @@ public interface PlatformTransactionManager extends TransactionManager {
 	void commit(TransactionStatus status) throws TransactionException;
 
 	/**
-	 * Perform a rollback of the given transaction.
+	 * 执行给定事务的回滚
 	 * <p>If the transaction wasn't a new one, just set it rollback-only for proper
 	 * participation in the surrounding transaction. If a previous transaction
 	 * has been suspended to be able to create a new one, resume the previous

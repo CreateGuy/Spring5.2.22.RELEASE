@@ -96,7 +96,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Determine the target class of the given bean instance which might be an AOP proxy.
+	 * 确定给定bean实例的目标类，它可能是一个AOP代理
 	 * <p>Returns the target class for an AOP proxy or the plain class otherwise.
 	 * @param candidate the instance to check (might be an AOP proxy)
 	 * @return the target class (or the plain class of the given object as fallback;
@@ -178,7 +178,7 @@ public abstract class AopUtils {
 
 	/**
 	 * 如果传入的方法可能是来自接口，那么就找到具体的实现方法
-	 * Given a method, which may come from an interface, and a target class used
+	 * <p>Given a method, which may come from an interface, and a target class used
 	 * in the current AOP invocation, find the corresponding target method if there
 	 * is one. E.g. the method may be {@code IFoo.bar()} and the target class
 	 * may be {@code DefaultFoo}. In this case, the method may be
@@ -213,7 +213,7 @@ public abstract class AopUtils {
 	}
 
 	/**
-	 * Can the given pointcut apply at all on the given class?
+	 * 给定的切入点是否适用于给定的类
 	 * <p>This is an important test as it can be used to optimize
 	 * out a pointcut for a class.
 	 * @param pc the static or dynamic pointcut to check

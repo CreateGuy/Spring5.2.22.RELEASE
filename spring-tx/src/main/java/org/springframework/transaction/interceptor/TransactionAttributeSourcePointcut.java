@@ -40,7 +40,12 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 		setClassFilter(new TransactionAttributeSourceClassFilter());
 	}
 
-
+	/**
+	 * 静态的方式对方法进行匹配
+	 * @param method the candidate method
+	 * @param targetClass the target class
+	 * @return
+	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
 		TransactionAttributeSource tas = getTransactionAttributeSource();
@@ -79,13 +84,13 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 
 
 	/**
-	 * {@link ClassFilter} that delegates to {@link TransactionAttributeSource#isCandidateClass}
-	 * for filtering classes whose methods are not worth searching to begin with.
+	 * 用于检查指定类是否需要事务的 {@link ClassFilter}
 	 */
 	private class TransactionAttributeSourceClassFilter implements ClassFilter {
 
 		@Override
 		public boolean matches(Class<?> clazz) {
+			// 指定的类不允许使用事务
 			if (TransactionalProxy.class.isAssignableFrom(clazz) ||
 					TransactionManager.class.isAssignableFrom(clazz) ||
 					PersistenceExceptionTranslator.class.isAssignableFrom(clazz)) {

@@ -22,15 +22,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Rule determining whether or not a given exception (and any subclasses)
- * should cause a rollback.
- *
- * <p>Multiple such rules can be applied to determine whether a transaction
- * should commit or rollback after an exception has been thrown.
- *
- * @author Rod Johnson
- * @since 09.04.2003
- * @see NoRollbackRuleAttribute
+ * 确定给定异常(及其任何子类)是否应该导致回滚。可以应用多个这样的规则来确定抛出异常后事务是应该提交还是回滚
  */
 @SuppressWarnings("serial")
 public class RollbackRuleAttribute implements Serializable{
@@ -44,7 +36,8 @@ public class RollbackRuleAttribute implements Serializable{
 
 
 	/**
-	 * Could hold exception, resolving class name but would always require FQN.
+	 * 表示如果抛出指定异常需要回滚的
+	 * <p>Could hold exception, resolving class name but would always require FQN.
 	 * This way does multiple string comparisons, but how often do we decide
 	 * whether to roll back a transaction following an exception?
 	 */

@@ -101,7 +101,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
-		// 获取Advisor：1、从容器中查找Advisor，2、查找@Aspect的类型然后构建Advisor
+		// 获取能够匹配Advisor：1、从容器中查找Advisor，2、查找@Aspect的类型然后构建Advisor
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		// 根据候选Advisor和beanClass，然后返回匹配的Advisor
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);

@@ -527,10 +527,7 @@ public abstract class AnnotatedElementUtils {
 	}
 
 	/**
-	 * Find the first annotation of the specified {@code annotationType} within
-	 * the annotation hierarchy <em>above</em> the supplied {@code element} and
-	 * merge that annotation's attributes with <em>matching</em> attributes from
-	 * annotations in lower levels of the annotation hierarchy.
+	 * 在元素的注解层次结构中找到指定的注解的第一个注解，并将注解的属性与结构中同类的较低级别注解的匹配属性合并
 	 * <p>Attributes from lower levels in the annotation hierarchy override
 	 * attributes of the same name from higher levels, and
 	 * {@link AliasFor @AliasFor} semantics are fully supported, both

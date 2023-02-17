@@ -95,14 +95,14 @@ public @interface Transactional {
 	String transactionManager() default "";
 
 	/**
-	 * 事务传播类型
+	 * 事务传播级别
 	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getPropagationBehavior()
 	 */
 	Propagation propagation() default Propagation.REQUIRED;
 
 	/**
-	 * The transaction isolation level.
-	 * <p>Defaults to {@link Isolation#DEFAULT}.
+	 * 事务隔离级别
+	 * <li>默认值是{@link Isolation#DEFAULT}</li>
 	 * <p>Exclusively designed for use with {@link Propagation#REQUIRED} or
 	 * {@link Propagation#REQUIRES_NEW} since it only applies to newly started
 	 * transactions. Consider switching the "validateExistingTransactions" flag to
@@ -115,7 +115,7 @@ public @interface Transactional {
 	Isolation isolation() default Isolation.DEFAULT;
 
 	/**
-	 * The timeout for this transaction (in seconds).
+	 * 此事务的超时时间(以秒为单位)
 	 * <p>Defaults to the default timeout of the underlying transaction system.
 	 * <p>Exclusively designed for use with {@link Propagation#REQUIRED} or
 	 * {@link Propagation#REQUIRES_NEW} since it only applies to newly started
@@ -125,9 +125,7 @@ public @interface Transactional {
 	int timeout() default TransactionDefinition.TIMEOUT_DEFAULT;
 
 	/**
-	 * A boolean flag that can be set to {@code true} if the transaction is
-	 * effectively read-only, allowing for corresponding optimizations at runtime.
-	 * <p>Defaults to {@code false}.
+	 * 如果事务实际上是只读的，则可以将其设置为true，从而允许在运行时进行相应的优化。
 	 * <p>This just serves as a hint for the actual transaction subsystem;
 	 * it will <i>not necessarily</i> cause failure of write access attempts.
 	 * A transaction manager which cannot interpret the read-only hint will
@@ -139,9 +137,7 @@ public @interface Transactional {
 	boolean readOnly() default false;
 
 	/**
-	 * Defines zero (0) or more exception {@link Class classes}, which must be
-	 * subclasses of {@link Throwable}, indicating which exception types must cause
-	 * a transaction rollback.
+	 * 指示哪些异常类型必须导致事务回滚
 	 * <p>By default, a transaction will be rolling back on {@link RuntimeException}
 	 * and {@link Error} but not on checked exceptions (business exceptions). See
 	 * {@link org.springframework.transaction.interceptor.DefaultTransactionAttribute#rollbackOn(Throwable)}
@@ -155,9 +151,7 @@ public @interface Transactional {
 	Class<? extends Throwable>[] rollbackFor() default {};
 
 	/**
-	 * Defines zero (0) or more exception names (for exceptions which must be a
-	 * subclass of {@link Throwable}), indicating which exception types must cause
-	 * a transaction rollback.
+	 * 指示哪些异常类型必须导致事务回滚
 	 * <p>This can be a substring of a fully qualified class name, with no wildcard
 	 * support at present. For example, a value of {@code "ServletException"} would
 	 * match {@code javax.servlet.ServletException} and its subclasses.
@@ -175,9 +169,7 @@ public @interface Transactional {
 	String[] rollbackForClassName() default {};
 
 	/**
-	 * Defines zero (0) or more exception {@link Class Classes}, which must be
-	 * subclasses of {@link Throwable}, indicating which exception types must
-	 * <b>not</b> cause a transaction rollback.
+	 * 指示哪些异常类型必须不能导致事务回滚
 	 * <p>This is the preferred way to construct a rollback rule (in contrast
 	 * to {@link #noRollbackForClassName}), matching the exception class and
 	 * its subclasses.
@@ -188,9 +180,7 @@ public @interface Transactional {
 	Class<? extends Throwable>[] noRollbackFor() default {};
 
 	/**
-	 * Defines zero (0) or more exception names (for exceptions which must be a
-	 * subclass of {@link Throwable}) indicating which exception types must <b>not</b>
-	 * cause a transaction rollback.
+	 * 指示哪些异常类型必须不能导致事务回滚
 	 * <p>See the description of {@link #rollbackForClassName} for further
 	 * information on how the specified names are treated.
 	 * <p>Similar to {@link org.springframework.transaction.interceptor.NoRollbackRuleAttribute#NoRollbackRuleAttribute(String exceptionName)}.

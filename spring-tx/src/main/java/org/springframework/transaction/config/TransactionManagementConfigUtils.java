@@ -26,7 +26,7 @@ package org.springframework.transaction.config;
 public abstract class TransactionManagementConfigUtils {
 
 	/**
-	 * The bean name of the internally managed transaction advisor (used when mode == PROXY).
+	 * 检查需要需要事务的Bean的Advisor的名称(当mode == PROXY时使用)
 	 */
 	public static final String TRANSACTION_ADVISOR_BEAN_NAME =
 			"org.springframework.transaction.config.internalTransactionAdvisor";

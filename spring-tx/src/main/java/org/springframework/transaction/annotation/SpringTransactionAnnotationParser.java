@@ -31,19 +31,28 @@ import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
- * Strategy implementation for parsing Spring's {@link Transactional} annotation.
- *
- * @author Juergen Hoeller
- * @since 2.5
+ * 解析 {@link Transactional @Transactional} 策略
+ * <li>我感觉和ClassFilter和MethodMatch效果差不多，只是在上面有嵌套了一层</li>
  */
 @SuppressWarnings("serial")
 public class SpringTransactionAnnotationParser implements TransactionAnnotationParser, Serializable {
 
+	/**
+	 * 确定给定的类是否是带有 {@link Transactional @Transactional}的候选类
+	 * <li>实际上就是在Advisor->ClassFilter中调用的</li>
+	 * @param targetClass the class to introspect
+	 * @return
+	 */
 	@Override
 	public boolean isCandidateClass(Class<?> targetClass) {
 		return AnnotationUtils.isCandidateClass(targetClass, Transactional.class);
 	}
 
+	/**
+	 * 返回指定元素上带有的 {@link Transactional @Transactional} 信息
+	 * @param element the annotated method or class
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public TransactionAttribute parseTransactionAnnotation(AnnotatedElement element) {

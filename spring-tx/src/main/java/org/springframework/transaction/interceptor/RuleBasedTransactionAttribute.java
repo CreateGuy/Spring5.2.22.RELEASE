@@ -42,16 +42,24 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute implements Serializable {
 
-	/** Prefix for rollback-on-exception rules in description strings. */
+	/**
+	 * 需要回滚的异常的分隔符
+	 */
 	public static final String PREFIX_ROLLBACK_RULE = "-";
 
-	/** Prefix for commit-on-exception rules in description strings. */
+	/**
+	 * 不需要回滚的异常的分隔符
+	 */
 	public static final String PREFIX_COMMIT_RULE = "+";
 
 
 	/** Static for optimal serializability. */
 	private static final Log logger = LogFactory.getLog(RuleBasedTransactionAttribute.class);
 
+	/**
+	 * 需要回滚或者不需要回滚的异常信息
+	 * <li>分别对应 {@link RollbackRuleAttribute} 和 {@link NoRollbackRuleAttribute}</li>
+	 */
 	@Nullable
 	private List<RollbackRuleAttribute> rollbackRules;
 
