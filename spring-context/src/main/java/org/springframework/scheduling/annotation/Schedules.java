@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Container annotation that aggregates several {@link Scheduled} annotations.
+ * 聚合多个 {@link Scheduled @Scheduled} 的容器注解
  *
  * <p>Can be used natively, declaring several nested {@link Scheduled} annotations.
  * Can also be used in conjunction with Java 8's support for repeatable annotations,

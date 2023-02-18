@@ -19,12 +19,7 @@ package org.springframework.scheduling.config;
 import org.springframework.scheduling.support.CronTrigger;
 
 /**
- * {@link TriggerTask} implementation defining a {@code Runnable} to be executed according
- * to a {@linkplain org.springframework.scheduling.support.CronSequenceGenerator standard
- * cron expression}.
- *
- * @author Chris Beams
- * @since 3.2
+ * 一个基于Cron表达式的任务
  * @see org.springframework.scheduling.annotation.Scheduled#cron()
  * @see ScheduledTaskRegistrar#addCronTask(CronTask)
  */

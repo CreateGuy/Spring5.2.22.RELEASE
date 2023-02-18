@@ -25,7 +25,7 @@ package org.springframework.scheduling.config;
 public abstract class TaskManagementConfigUtils {
 
 	/**
-	 * The bean name of the internally managed Scheduled annotation processor.
+	 * 内部管理的 {@link org.springframework.scheduling.annotation.Scheduled @Scheduled} 注解处理器的bean名称
 	 */
 	public static final String SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME =
 			"org.springframework.context.annotation.internalScheduledAnnotationProcessor";

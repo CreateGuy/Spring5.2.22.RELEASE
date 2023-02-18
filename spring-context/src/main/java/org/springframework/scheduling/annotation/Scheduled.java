@@ -68,7 +68,8 @@ public @interface Scheduled {
 
 
 	/**
-	 * A cron-like expression, extending the usual UN*X definition to include triggers
+	 * 触发调度任务的表达式
+	 * <p>A cron-like expression, extending the usual UN*X definition to include triggers
 	 * on the second, minute, hour, day of month, month, and day of week.
 	 * <p>For example, {@code "0 * * * * MON-FRI"} means once per minute on weekdays
 	 * (at the top of the minute - the 0th second).
@@ -90,62 +91,40 @@ public @interface Scheduled {
 	String cron() default "";
 
 	/**
-	 * A time zone for which the cron expression will be resolved. By default, this
-	 * attribute is the empty String (i.e. the server's local time zone will be used).
-	 * @return a zone id accepted by {@link java.util.TimeZone#getTimeZone(String)},
-	 * or an empty String to indicate the server's default time zone
-	 * @since 4.0
+	 * {@link #cron()} 表达式会基于该时区解析
+	 * <li>默认是一个空字符串，即取服务器所在地的时区。比如我们一般使用的时区Asia/Shanghai</li>
 	 * @see org.springframework.scheduling.support.CronTrigger#CronTrigger(String, java.util.TimeZone)
 	 * @see java.util.TimeZone
 	 */
 	String zone() default "";
 
 	/**
-	 * Execute the annotated method with a fixed period in milliseconds between the
-	 * end of the last invocation and the start of the next.
-	 * @return the delay in milliseconds
+	 * 上一次执行完方法的时间点之后多长时间再执行
 	 */
 	long fixedDelay() default -1;
 
 	/**
-	 * Execute the annotated method with a fixed period in milliseconds between the
-	 * end of the last invocation and the start of the next.
-	 * @return the delay in milliseconds as a String value, e.g. a placeholder
-	 * or a {@link java.time.Duration#parse java.time.Duration} compliant value
-	 * @since 3.2.2
+	 * 与 {@link #fixedDelay()} 意思相同，只是使用字符串的形式。唯一不同的是支持占位符
 	 */
 	String fixedDelayString() default "";
 
 	/**
-	 * Execute the annotated method with a fixed period in milliseconds between
-	 * invocations.
-	 * @return the period in milliseconds
+	 * 上一次才开始执行方法的时间点之后多长时间再执行
 	 */
 	long fixedRate() default -1;
 
 	/**
-	 * Execute the annotated method with a fixed period in milliseconds between
-	 * invocations.
-	 * @return the period in milliseconds as a String value, e.g. a placeholder
-	 * or a {@link java.time.Duration#parse java.time.Duration} compliant value
-	 * @since 3.2.2
+	 * 与 {@link #fixedRate()} 意思相同，只是使用字符串的形式。唯一不同的是支持占位符
 	 */
 	String fixedRateString() default "";
 
 	/**
-	 * Number of milliseconds to delay before the first execution of a
-	 * {@link #fixedRate} or {@link #fixedDelay} task.
-	 * @return the initial delay in milliseconds
-	 * @since 3.2
+	 * 第一次方法延迟多久开始执行
 	 */
 	long initialDelay() default -1;
 
 	/**
-	 * Number of milliseconds to delay before the first execution of a
-	 * {@link #fixedRate} or {@link #fixedDelay} task.
-	 * @return the initial delay in milliseconds as a String value, e.g. a placeholder
-	 * or a {@link java.time.Duration#parse java.time.Duration} compliant value
-	 * @since 3.2.2
+	 * 与 {@link #initialDelay()} 意思相同，只是使用字符串的形式。唯一不同的是支持占位符
 	 */
 	String initialDelayString() default "";
 
