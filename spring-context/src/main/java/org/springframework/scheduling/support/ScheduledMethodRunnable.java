@@ -23,18 +23,19 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Variant of {@link MethodInvokingRunnable} meant to be used for processing
- * of no-arg scheduled methods. Propagates user exceptions to the caller,
- * assuming that an error strategy for Runnables is in place.
- *
- * @author Juergen Hoeller
- * @since 3.0.6
+ * 执行无参调度方法的 {@link Runnable}
  * @see org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor
  */
 public class ScheduledMethodRunnable implements Runnable {
 
+	/**
+	 * 实例
+	 */
 	private final Object target;
 
+	/**
+	 * 实例中的无参调度方法
+	 */
 	private final Method method;
 
 
@@ -80,7 +81,9 @@ public class ScheduledMethodRunnable implements Runnable {
 	@Override
 	public void run() {
 		try {
+			// 暴力反射
 			ReflectionUtils.makeAccessible(this.method);
+			// 执行目标方法
 			this.method.invoke(this.target);
 		}
 		catch (InvocationTargetException ex) {

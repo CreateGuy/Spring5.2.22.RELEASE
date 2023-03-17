@@ -19,7 +19,8 @@ package org.springframework.scheduling.annotation;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 /**
- * Optional interface to be implemented by @{@link
+ * {@link ScheduledTaskRegistrar} 对应的配置类，在 {@link ScheduledAnnotationBeanPostProcessor} 中会被调用
+ * <p><Optional interface to be implemented by @{@link
  * org.springframework.context.annotation.Configuration Configuration} classes annotated
  * with @{@link EnableScheduling}. Typically used for setting a specific
  * {@link org.springframework.scheduling.TaskScheduler TaskScheduler} bean to be used when

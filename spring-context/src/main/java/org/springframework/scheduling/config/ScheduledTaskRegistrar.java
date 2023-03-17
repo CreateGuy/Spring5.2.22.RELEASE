@@ -32,25 +32,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Helper bean for registering tasks with a {@link TaskScheduler}, typically using cron
- * expressions.
- *
- * <p>As of Spring 3.1, {@code ScheduledTaskRegistrar} has a more prominent user-facing
- * role when used in conjunction with the {@link
- * org.springframework.scheduling.annotation.EnableAsync @EnableAsync} annotation and its
- * {@link org.springframework.scheduling.annotation.SchedulingConfigurer
- * SchedulingConfigurer} callback interface.
- *
- * @author Juergen Hoeller
- * @author Chris Beams
- * @author Tobias Montagna-Hay
- * @author Sam Brannen
+ * 用于注册调度任务并将调度任务注册到线程池中
+ * <li>从Spring 3.1开始，是由 {@link org.springframework.scheduling.annotation.EnableAsync @EnableAsync} 触发的</li>
  * @since 3.0
  * @see org.springframework.scheduling.annotation.EnableAsync
  * @see org.springframework.scheduling.annotation.SchedulingConfigurer
@@ -58,7 +48,7 @@ import org.springframework.util.CollectionUtils;
 public class ScheduledTaskRegistrar implements ScheduledTaskHolder, InitializingBean, DisposableBean {
 
 	/**
-	 * A special cron expression value that indicates a disabled trigger: {@value}.
+	 * 表示禁用触发器的特殊cron表达式值
 	 * <p>This is primarily meant for use with {@link #addCronTask(Runnable, String)}
 	 * when the value for the supplied {@code expression} is retrieved from an
 	 * external source &mdash; for example, from a property in the
@@ -68,27 +58,50 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 	 */
 	public static final String CRON_DISABLED = "-";
 
-
+	/**
+	 * 执行调度任务所需的线程池
+	 */
 	@Nullable
 	private TaskScheduler taskScheduler;
 
+	/**
+	 * 当 {@link #taskScheduler} 不存在才会使用的线程池
+	 */
 	@Nullable
 	private ScheduledExecutorService localExecutor;
 
+	/**
+	 * {@link org.springframework.scheduling.annotation.Scheduled @Scheduled} 中不会注册这种任务
+	 */
 	@Nullable
 	private List<TriggerTask> triggerTasks;
 
+	/**
+	 * 使用Cron注册的任务
+	 */
 	@Nullable
 	private List<CronTask> cronTasks;
 
+	/**
+	 * 使用fixedRate注册的任务
+	 */
 	@Nullable
 	private List<IntervalTask> fixedRateTasks;
 
+	/**
+	 * 使用fixedDelay注册的任务
+	 */
 	@Nullable
 	private List<IntervalTask> fixedDelayTasks;
 
+	/**
+	 * 由于线程池不存在导致无法处理的任务
+	 */
 	private final Map<Task, ScheduledTask> unresolvedTasks = new HashMap<>(16);
 
+	/**
+	 * 最终在线程池中的调度任务
+	 */
 	private final Set<ScheduledTask> scheduledTasks = new LinkedHashSet<>(16);
 
 
@@ -330,8 +343,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 
 
 	/**
-	 * Return whether this {@code ScheduledTaskRegistrar} has any tasks registered.
-	 * @since 3.2
+	 * 返回当前注册中心是否注册了任何任务
 	 */
 	public boolean hasTasks() {
 		return (!CollectionUtils.isEmpty(this.triggerTasks) ||
@@ -342,7 +354,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 
 
 	/**
-	 * Calls {@link #scheduleTasks()} at bean construction time.
+	 * 注意：当前实例并不是注册到Spring容器的，所以这个方法不会自动执行，而是在 {@link ScheduledAnnotationBeanPostProcessor#finishRegistration()} 中执行的
 	 */
 	@Override
 	public void afterPropertiesSet() {
@@ -350,15 +362,17 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 	}
 
 	/**
-	 * Schedule all registered tasks against the underlying
-	 * {@linkplain #setTaskScheduler(TaskScheduler) task scheduler}.
+	 * 将调度任务注册到线程池中
 	 */
 	@SuppressWarnings("deprecation")
 	protected void scheduleTasks() {
+		// 先获取线程池
 		if (this.taskScheduler == null) {
 			this.localExecutor = Executors.newSingleThreadScheduledExecutor();
 			this.taskScheduler = new ConcurrentTaskScheduler(this.localExecutor);
 		}
+
+		// 四个for允许都是注册任务
 		if (this.triggerTasks != null) {
 			for (TriggerTask task : this.triggerTasks) {
 				addScheduledTask(scheduleTriggerTask(task));
@@ -389,10 +403,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 
 
 	/**
-	 * Schedule the specified trigger task, either right away if possible
-	 * or on initialization of the scheduler.
-	 * @return a handle to the scheduled task, allowing to cancel it
-	 * @since 4.3
+	 * 将 {@link TriggerTask} 交由线程池处理
 	 */
 	@Nullable
 	public ScheduledTask scheduleTriggerTask(TriggerTask task) {
@@ -413,11 +424,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 	}
 
 	/**
-	 * Schedule the specified cron task, either right away if possible
-	 * or on initialization of the scheduler.
-	 * @return a handle to the scheduled task, allowing to cancel it
-	 * (or {@code null} if processing a previously registered task)
-	 * @since 4.3
+	 * 将 {@link CronTask} 交由线程池处理
 	 */
 	@Nullable
 	public ScheduledTask scheduleCronTask(CronTask task) {
@@ -454,11 +461,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 	}
 
 	/**
-	 * Schedule the specified fixed-rate task, either right away if possible
-	 * or on initialization of the scheduler.
-	 * @return a handle to the scheduled task, allowing to cancel it
-	 * (or {@code null} if processing a previously registered task)
-	 * @since 5.0.2
+	 * 将 {@link FixedRateTask} 交由线程池处理
 	 */
 	@Nullable
 	public ScheduledTask scheduleFixedRateTask(FixedRateTask task) {
@@ -469,6 +472,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 			newTask = true;
 		}
 		if (this.taskScheduler != null) {
+			// 如果设置了延时时间，计算最终的执行时间
 			if (task.getInitialDelay() > 0) {
 				Date startTime = new Date(System.currentTimeMillis() + task.getInitialDelay());
 				scheduledTask.future =
@@ -503,11 +507,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 	}
 
 	/**
-	 * Schedule the specified fixed-delay task, either right away if possible
-	 * or on initialization of the scheduler.
-	 * @return a handle to the scheduled task, allowing to cancel it
-	 * (or {@code null} if processing a previously registered task)
-	 * @since 5.0.2
+	 * 将 {@link FixedDelayTask} 交由线程池处理
 	 */
 	@Nullable
 	public ScheduledTask scheduleFixedDelayTask(FixedDelayTask task) {
@@ -518,6 +518,7 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 			newTask = true;
 		}
 		if (this.taskScheduler != null) {
+			// 如果设置了延时时间，计算最终的执行时间
 			if (task.getInitialDelay() > 0) {
 				Date startTime = new Date(System.currentTimeMillis() + task.getInitialDelay());
 				scheduledTask.future =
@@ -549,6 +550,9 @@ public class ScheduledTaskRegistrar implements ScheduledTaskHolder, Initializing
 		return Collections.unmodifiableSet(this.scheduledTasks);
 	}
 
+	/**
+	 * Bean马上准备销毁了，关闭调度任务，关闭线程池
+	 */
 	@Override
 	public void destroy() {
 		for (ScheduledTask task : this.scheduledTasks) {

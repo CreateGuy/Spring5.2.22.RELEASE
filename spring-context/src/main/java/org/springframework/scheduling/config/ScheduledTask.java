@@ -32,6 +32,9 @@ import org.springframework.lang.Nullable;
  */
 public final class ScheduledTask {
 
+	/**
+	 * 包含真正需要执行的 {@link Runnable}
+	 */
 	private final Task task;
 
 	@Nullable

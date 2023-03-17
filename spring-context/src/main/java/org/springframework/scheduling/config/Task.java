@@ -28,6 +28,9 @@ import org.springframework.util.Assert;
  */
 public class Task {
 
+	/**
+	 * 真正需要执行的
+	 */
 	private final Runnable runnable;
 
 

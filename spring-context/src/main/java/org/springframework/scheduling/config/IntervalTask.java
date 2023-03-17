@@ -28,8 +28,19 @@ package org.springframework.scheduling.config;
  */
 public class IntervalTask extends Task {
 
+	/**
+	 * 此类有两个实现，所以这里有两个含义：
+	 * <ul>
+	 *     <li>{@link FixedDelayTask}：距离上一次任务执行完毕多久开始执行下一次任务</li>
+	 *     <li>{@link FixedRateTask}：距离上一次任务才开始执行多久就执行下一次任务</li>
+	 * </ul>
+	 *
+	 */
 	private final long interval;
 
+	/**
+	 * 第一次执行的延时时间
+	 */
 	private final long initialDelay;
 
 

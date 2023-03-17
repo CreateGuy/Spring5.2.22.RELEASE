@@ -20,8 +20,7 @@ import org.springframework.scheduling.Trigger;
 import org.springframework.util.Assert;
 
 /**
- * {@link Task} implementation defining a {@code Runnable} to be executed
- * according to a given {@link Trigger}.
+ * {@link Task} 的实现，定义一个 {@link Runnable}，根据给定的触发器执行
  *
  * @author Chris Beams
  * @since 3.2
