@@ -84,11 +84,11 @@ public class CorsFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
 
-		//获得Cors配置规则
+		// 获得Cors配置规则
 		CorsConfiguration corsConfiguration = this.configSource.getCorsConfiguration(request);
-		//没懂
+		// 校验Cors规则
 		boolean isValid = this.processor.processRequest(corsConfiguration, request, response);
-		//检查是否是CORS预检请求
+		// 检查是否是CORS预检请求
 		if (!isValid || CorsUtils.isPreFlightRequest(request)) {
 			return;
 		}

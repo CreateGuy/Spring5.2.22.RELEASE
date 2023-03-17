@@ -65,7 +65,6 @@ public class CorsConfiguration {
 	 */
 	private static final List<String> DEFAULT_PERMIT_ALL = Collections.singletonList(ALL);
 
-
 	/**
 	 * 允许的来源
 	 */

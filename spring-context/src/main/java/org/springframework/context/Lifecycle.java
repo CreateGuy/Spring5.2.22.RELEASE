@@ -17,11 +17,7 @@
 package org.springframework.context;
 
 /**
- * A common interface defining methods for start/stop lifecycle control.
- * The typical use case for this is to control asynchronous processing.
- * <b>NOTE: This interface does not imply specific auto-startup semantics.
- * Consider implementing {@link SmartLifecycle} for that purpose.</b>
- *
+ * 启动或者停止上下文的时候的回调类
  * <p>Can be implemented by both components (typically a Spring bean defined in a
  * Spring context) and containers  (typically a Spring {@link ApplicationContext}
  * itself). Containers will propagate start/stop signals to all components that
@@ -50,7 +46,7 @@ package org.springframework.context;
 public interface Lifecycle {
 
 	/**
-	 * Start this component.
+	 * 启动该组件
 	 * <p>Should not throw an exception if the component is already running.
 	 * <p>In the case of a container, this will propagate the start signal to all
 	 * components that apply.

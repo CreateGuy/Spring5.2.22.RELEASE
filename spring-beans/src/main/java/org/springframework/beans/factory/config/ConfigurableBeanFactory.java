@@ -327,7 +327,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	BeanDefinition getMergedBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 
 	/**
-	 * Determine whether the bean with the given name is a FactoryBean.
+	 * 检测传入的Bean名称是否是一个 {@link org.springframework.beans.factory.FactoryBean FactoryBean}
 	 * @param name the name of the bean to check
 	 * @return whether the bean is a FactoryBean
 	 * ({@code false} means the bean exists but is not a FactoryBean)
@@ -371,7 +371,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	String[] getDependentBeans(String beanName);
 
 	/**
-	 * Return the names of all beans that the specified bean depends on, if any.
+	 * 返回指定bean所依赖的所有bean的名称
 	 * @param beanName the name of the bean
 	 * @return the array of names of beans which the bean depends on,
 	 * or an empty array if none

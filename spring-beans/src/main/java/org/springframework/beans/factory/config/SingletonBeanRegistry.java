@@ -74,7 +74,7 @@ public interface SingletonBeanRegistry {
 	Object getSingleton(String beanName);
 
 	/**
-	 * Check if this registry contains a singleton instance with the given name.
+	 * 检查是否有指定的单例Bean
 	 * <p>Only checks already instantiated singletons; does not return {@code true}
 	 * for singleton bean definitions which have not been instantiated yet.
 	 * <p>The main purpose of this method is to check manually registered singletons

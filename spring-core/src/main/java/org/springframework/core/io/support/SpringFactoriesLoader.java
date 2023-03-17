@@ -92,7 +92,7 @@ public final class SpringFactoriesLoader {
 	}
 
 	/**
-	 * 从spring.factories中加载factoryType类型bean
+	 * 从spring.factories中加载factoryType类型bean,然后获取指定类型的类型
 	 * @param factoryType 比如是org.springframework.boot.autoconfigure.EnableAutoConfiguration
 	 * @param classLoader
 	 * @return
