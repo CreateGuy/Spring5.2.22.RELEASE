@@ -176,7 +176,7 @@ public @interface PropertySource {
 	String name() default "";
 
 	/**
-	 * Indicate the resource location(s) of the properties file to be loaded.
+	 * 指示要加载的属性文件的资源位置
 	 * <p>Both traditional and XML-based properties file formats are supported
 	 * &mdash; for example, {@code "classpath:/com/myco/app.properties"}
 	 * or {@code "file:/path/to/file.xml"}.
@@ -191,8 +191,7 @@ public @interface PropertySource {
 	String[] value();
 
 	/**
-	 * Indicate if failure to find the a {@link #value() property resource} should be
-	 * ignored.
+	 * 指示是否应该忽略查找属性资源失败
 	 * <p>{@code true} is appropriate if the properties file is completely optional.
 	 * Default is {@code false}.
 	 * @since 4.0
@@ -200,7 +199,7 @@ public @interface PropertySource {
 	boolean ignoreResourceNotFound() default false;
 
 	/**
-	 * A specific character encoding for the given resources, e.g. "UTF-8".
+	 * 编码格式，例如：UTF-8
 	 * @since 4.3
 	 */
 	String encoding() default "";

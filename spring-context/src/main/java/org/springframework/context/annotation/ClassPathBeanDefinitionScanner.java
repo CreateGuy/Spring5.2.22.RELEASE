@@ -311,6 +311,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 *  对bean定义应用进一步的设置
 	 */
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
+		// 设置默认值
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		//看不支持依赖注入候选者的规则是否为空
 		if (this.autowireCandidatePatterns != null) {

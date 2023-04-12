@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Container annotation that aggregates several {@link PropertySource} annotations.
+ * 聚合了多个 {@link PropertySource @PropertySource}
  *
  * <p>Can be used natively, declaring several nested {@link PropertySource} annotations.
  * Can also be used in conjunction with Java 8's support for <em>repeatable annotations</em>,

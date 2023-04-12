@@ -230,6 +230,10 @@ public abstract class AnnotationConfigUtils {
 		}
 	}
 
+	/**
+	 * 获得特定注解上的值，设置到BeanDefinition的属性中
+	 * @param abd
+	 */
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}

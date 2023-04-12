@@ -110,6 +110,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	@Nullable
 	private MetadataReaderFactory metadataReaderFactory;
 
+	/**
+	 * componentsIndex不为空说明项目中有spring.component文件
+	 */
 	@Nullable
 	private CandidateComponentsIndex componentsIndex;
 

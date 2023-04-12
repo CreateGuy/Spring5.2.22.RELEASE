@@ -146,7 +146,8 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
-		//如果当前配置类是被类导入进来的
+		// 如果当前配置类是被类导入进来的
+		// 如果是扫描是在ClassPathBeanDefinitionScanner的doScan方法中注册BeanDefinition的
 		if (configClass.isImported()) {
 			//往bean工厂中注册一个BeanDefinition
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
@@ -226,6 +227,7 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		// Has this effectively been overridden before (e.g. via XML)?
+		// 判断是否允许被现有定义覆盖
 		if (isOverriddenByExistingDefinition(beanMethod, beanName)) {
 			if (beanName.equals(beanMethod.getConfigurationClass().getBeanName())) {
 				throw new BeanDefinitionStoreException(beanMethod.getConfigurationClass().getResource().getDescription(),
