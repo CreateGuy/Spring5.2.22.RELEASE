@@ -78,7 +78,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	int AUTOWIRE_BY_TYPE = 2;
 
 	/**
-	 * 按照贪婪策略匹配出的最符合的构造方法来自动装配的常量
+	 * 按照贪婪策略匹配出最优的构造方法来自动装配的常量
 	 */
 	int AUTOWIRE_CONSTRUCTOR = 3;
 

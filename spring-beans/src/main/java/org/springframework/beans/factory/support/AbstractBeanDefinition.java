@@ -228,6 +228,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean enforceDestroyMethod = true;
 
+	/**
+	 * 当前BeanDefinition对应的Bean是否是一个合成的
+	 */
 	private boolean synthetic = false;
 
 	//bean的角色信息分类，由@Role注解获得
@@ -808,7 +811,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether to allow access to non-public constructors and methods.
+	 * 返回是否允许访问非公共构造方法和方法
 	 */
 	public boolean isNonPublicAccessAllowed() {
 		return this.nonPublicAccessAllowed;
@@ -1150,7 +1153,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * 检查是否存在具有@Lookup的方法，并准备为这些方法进行重写，
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		//检查查找方法是否存在，并确定它们的重载状态。
+		// 检查查找方法是否存在，并确定它们的重载状态。
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}

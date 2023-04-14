@@ -65,6 +65,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	boolean allowCaching = true;
 
+	/**
+	 * 是否已经指定引用非重载方法的工厂方法名
+	 */
 	boolean isFactoryMethodUnique;
 
 	@Nullable
@@ -117,7 +120,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** 是否已经调用后置处理器对beanDefinition进行修改了。 */
 	boolean postProcessed = false;
 
-	/** 是否开启实例化前 后置处理器的的处理 */
+	/** 实例是否是在实例化之前，就通过后置处理器的生成的 */
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;
 
