@@ -186,6 +186,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/** 是否不允许访问非公共构造方法*/
 	private boolean nonPublicAccessAllowed = true;
 
+	/**
+	 * True：以严格模式解析构造方法，False：以宽松模式解析构造方法
+	 */
 	private boolean lenientConstructorResolution = true;
 
 	//工厂bean名称：声明类(是谁包含了@Bean这个方法)

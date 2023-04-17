@@ -553,7 +553,7 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * 确定给定类型是否可从给定值赋值，假设通过反射设置。
+	 * 确定给定的值是否可以给给定的类型赋值，假设通过反射设置。
 	 * @param type the target type
 	 * @param value the value that should be assigned to the type
 	 * @return if the type is assignable from the value

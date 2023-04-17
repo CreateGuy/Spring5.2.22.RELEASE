@@ -160,7 +160,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/** Map from dependency type to corresponding autowired value. */
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
-	/** Map of bean definition objects, keyed by bean name. */
+	/**
+	 * 键：Bean名称，值：
+	 */
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
 	/** Map from bean name to merged BeanDefinitionHolder. */
@@ -765,8 +767,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine whether the specified bean definition qualifies as an autowire candidate,
-	 * to be injected into other beans which declare a dependency of matching type.
+	 * 确定指定的bean的定义是否有资格作为自动装配候选Bean
 	 * @param beanName the name of the bean definition to check
 	 * @param descriptor the descriptor of the dependency to resolve
 	 * @param resolver the AutowireCandidateResolver to use for the actual resolution algorithm
@@ -1275,6 +1276,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
+	/**
+	 * 准备解析依赖
+	 * @param descriptor
+	 * @param beanName 被依赖的Bean
+	 * @param autowiredBeanNames
+	 * @param typeConverter
+	 * @return
+	 * @throws BeansException
+	 */
 	@Nullable
 	public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
@@ -1326,7 +1336,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			String autowiredBeanName;
 			Object instanceCandidate;
 
+			// 当满足条件的Bean超过一个的时候，需要精确定位到一个
 			if (matchingBeans.size() > 1) {
+				// 获取自动注入中最合适注入的那个Bean的名称
 				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
 				if (autowiredBeanName == null) {
 					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {
@@ -1620,8 +1632,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine the autowire candidate in the given set of beans.
-	 * <p>Looks for {@code @Primary} and {@code @Priority} (in that order).
+	 * 获取自动注入中最合适注入的那个Bean的名称，该名称的查找规则是
+	 * <ul>
+	 *     <li>标注了 {@link org.codehaus.groovy.control.CompilationUnit.PrimaryClassNodeOperation @Primary } 的类</li>
+	 *     <li>实现 {@link org.springframework.core.Ordered Ordered} 接口中优先级最高的那个</li>
+	 *     <li>字段名称或者方法名称跟bean名称相同的那个</li>
+	 * </ul>
 	 * @param candidates a Map of candidate names and candidate instances
 	 * that match the required type, as returned by {@link #findAutowireCandidates}
 	 * @param descriptor the target dependency to match against
@@ -1630,15 +1646,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
 		Class<?> requiredType = descriptor.getDependencyType();
+		// 1、根据确定@Primary确定主要候选对象
 		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
 		if (primaryCandidate != null) {
 			return primaryCandidate;
 		}
+		// 2、根据确定Ordered确定主要候选对象
 		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);
 		if (priorityCandidate != null) {
 			return priorityCandidate;
 		}
-		// Fallback
+		// 3、字段名称或者方法名称跟bean名称相同的那个
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
 			String candidateName = entry.getKey();
 			Object beanInstance = entry.getValue();
@@ -1651,7 +1669,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine the primary candidate in the given set of beans.
+	 * 确定给定bean集合中的主要候选对象
 	 * @param candidates a Map of candidate names and candidate instances
 	 * (or candidate classes if not created yet) that match the required type
 	 * @param requiredType the target dependency type to match against
@@ -1664,6 +1682,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		for (Map.Entry<String, Object> entry : candidates.entrySet()) {
 			String candidateBeanName = entry.getKey();
 			Object beanInstance = entry.getValue();
+			// 给定的Bean是否使用了 @Primary
 			if (isPrimary(candidateBeanName, beanInstance)) {
 				if (primaryBeanName != null) {
 					boolean candidateLocal = containsBeanDefinition(candidateBeanName);
@@ -1685,10 +1704,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Determine the candidate with the highest priority in the given set of beans.
-	 * <p>Based on {@code @javax.annotation.Priority}. As defined by the related
-	 * {@link org.springframework.core.Ordered} interface, the lowest value has
-	 * the highest priority.
+	 * 基于  {@link Priority @Priority} 和 {@link org.springframework.core.Ordered} 确定最高优先级的候选Bean
 	 * @param candidates a Map of candidate names and candidate instances
 	 * (or candidate classes if not created yet) that match the required type
 	 * @param requiredType the target dependency type to match against
@@ -1728,8 +1744,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Return whether the bean definition for the given bean name has been
-	 * marked as a primary bean.
+	 * 给定的Bean是否使用了 {@link Primary @Primary}
 	 * @param beanName the name of the bean
 	 * @param beanInstance the corresponding bean instance (can be null)
 	 * @return whether the given bean qualifies as primary

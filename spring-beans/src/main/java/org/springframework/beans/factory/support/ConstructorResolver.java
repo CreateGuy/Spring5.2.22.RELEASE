@@ -234,6 +234,7 @@ class ConstructorResolver {
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
+						// 返回给定构造方法的参数数组
 						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
 								getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
 					}
@@ -586,9 +587,10 @@ class ConstructorResolver {
 						}
 					}
 
+					// 采用严格还是宽松模式解析匹配度
 					int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 							argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
-					// Choose this factory method if it represents the closest match.
+					// 当前构造函数中的参数匹配度小于上一个构造函数，则进行构造函数更换
 					if (typeDiffWeight < minTypeDiffWeight) {
 						factoryMethodToUse = candidate;
 						argsHolderToUse = argsHolder;
@@ -596,11 +598,11 @@ class ConstructorResolver {
 						minTypeDiffWeight = typeDiffWeight;
 						ambiguousFactoryMethods = null;
 					}
-					// Find out about ambiguity: In case of the same type difference weight
-					// for methods with the same number of parameters, collect such candidates
-					// and eventually raise an ambiguity exception.
-					// However, only perform that check in non-lenient constructor resolution mode,
-					// and explicitly ignore overridden methods (with the same parameter signature).
+					/*
+						找出歧义:
+							1、对于具有相同参数数量的方法，如果具有相同类型差异权重，则收集此类候选，并最终引发歧义异常
+							2、但是，只在非宽松构造函数解析模式下执行该检查，并且显式忽略被覆盖的方法(具有相同的参数签名)
+					 */
 					else if (factoryMethodToUse != null && typeDiffWeight == minTypeDiffWeight &&
 							!mbd.isLenientConstructorResolution() &&
 							paramTypes.length == factoryMethodToUse.getParameterCount() &&
@@ -614,6 +616,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// 无工厂方法或者无参数
 			if (factoryMethodToUse == null || argsToUse == null) {
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
@@ -1002,6 +1005,9 @@ class ConstructorResolver {
 	 */
 	private static class ArgumentsHolder {
 
+		/**
+		 * 可能和 {@link #arguments} 是一样的值，也有可能是转换后的值，然后 {@link #arguments} 是原值
+		 */
 		public final Object[] rawArguments;
 
 		/**
@@ -1025,6 +1031,11 @@ class ConstructorResolver {
 			this.preparedArguments = args;
 		}
 
+		/**
+		 * 严格模式的获得当前构造方法和解析出来的参数值的匹配程
+		 * @param paramTypes
+		 * @return
+		 */
 		public int getTypeDifferenceWeight(Class<?>[] paramTypes) {
 			// If valid arguments found, determine type difference weight.
 			// Try type difference weight on both the converted arguments and
@@ -1035,6 +1046,12 @@ class ConstructorResolver {
 			return Math.min(rawTypeDiffWeight, typeDiffWeight);
 		}
 
+		/**
+		 * 宽松模式的获得当前构造方法和解析出来的参数值的匹配程度
+		 * <li>越高越不匹配</li>
+		 * @param paramTypes
+		 * @return
+		 */
 		public int getAssignabilityWeight(Class<?>[] paramTypes) {
 			for (int i = 0; i < paramTypes.length; i++) {
 				if (!ClassUtils.isAssignableValue(paramTypes[i], this.arguments[i])) {
