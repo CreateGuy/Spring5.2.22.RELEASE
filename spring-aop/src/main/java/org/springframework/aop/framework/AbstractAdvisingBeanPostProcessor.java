@@ -103,7 +103,7 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 			return proxyFactory.getProxy(getProxyClassLoader());
 		}
 
-		// No proxy needed.
+		// 不需要被代理
 		return bean;
 	}
 

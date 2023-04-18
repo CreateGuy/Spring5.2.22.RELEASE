@@ -1786,12 +1786,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Remove the singleton instance (if any) for the given bean name,
-	 * but only if it hasn't been used for other purposes than type checking.
+	 * 删除给定bean名称的单例实例(如果有的话)，但前提是它没有用于类型检查以外的其他目的
 	 * @param beanName the name of the bean
 	 * @return {@code true} if actually removed, {@code false} otherwise
 	 */
 	protected boolean removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
+		// 如果还没有创建了，那就返回True
 		if (!this.alreadyCreated.contains(beanName)) {
 			removeSingleton(beanName);
 			return true;
@@ -1904,8 +1904,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
-		//1：不是原型模式
-		//2：确定给定的bean在关闭时是否需要执行销毁前的回调方法
+		// 1：不是原型模式
+		// 2：确定给定的bean在关闭时是否需要执行销毁前的回调方法
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
 			//是单例模式
 			if (mbd.isSingleton()) {

@@ -134,8 +134,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private boolean allowCircularReferences = true;
 
 	/**
-	 * Whether to resort to injecting a raw bean instance in case of circular reference,
-	 * even if the injected bean eventually got wrapped.
+	 * 是否允许此Bean的原始类型被注入到其它Bean里面，即使后面此bean最终会被包装（代理）
 	 */
 	private boolean allowRawInjectionDespiteWrapping = false;
 
@@ -643,14 +642,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
+			// 早期bean存在，也就是出现了循环依赖
 			if (earlySingletonReference != null) {
+				// 如果两个相同也就是initializeBean方法中没有修改指向的地址，JAVA是基于地址传递的
+				// 就有可能会出现 exposedObject  bean earlySingletonReference 都是相同地址，那还有说明意义呢
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
+				// 如果说早期Bean和最终的Bean不一样，那么就存在早期Bean被其他Bean依赖的可能
+				// 1、是否允许此情况，2、此Bean是否被依赖
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+					// 获得此Bean被哪写Bean依赖了
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
 					for (String dependentBean : dependentBeans) {
+						// 删除此Bean的依赖者，如果删除失败就说明依赖者已经创建
+						// 那就有问题了，后面就会抛出异常了
 						if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
 							actualDependentBeans.add(dependentBean);
 						}
@@ -669,7 +676,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			//确定bean是否需要执行销毁前的回调方法，如果需要将其注册到特定集合中
+			// 确定bean是否需要执行销毁前的回调方法，如果需要将其注册到特定集合中
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -1856,19 +1863,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
-			//执行相关Aware方法
+			// 执行相关Aware方法
 			invokeAwareMethods(beanName, bean);
 		}
 
 		Object wrappedBean = bean;
-		//要么为空，要么不是合成的
+		// 要么为空，要么不是合成的
 		if (mbd == null || !mbd.isSynthetic()) {
 			//执行初始化前的回调方法
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
-			//执行初始化方法
+			// 执行初始化方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1914,8 +1921,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws Throwable {
 
 		boolean isInitializingBean = (bean instanceof InitializingBean);
-		//如果bean是一个InitializingBean，而且InitializingBean接口的初始化方法(afterPropertiesSet)不在外部管理的初始化方法中
-		//第二个条件比如说：标注了@PostConstruct方法的名称叫afterPropertiesSet，那么即使实现了InitializingBean接口也就会失效
+		// 如果bean是一个InitializingBean，而且InitializingBean接口的初始化方法(afterPropertiesSet)不在外部管理的初始化方法中
+		// 第二个条件比如说：标注了@PostConstruct方法的名称叫afterPropertiesSet，那么即使实现了InitializingBean接口也就会失效
 		if (isInitializingBean && (mbd == null || !mbd.isExternallyManagedInitMethod("afterPropertiesSet"))) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Invoking afterPropertiesSet() on bean with name '" + beanName + "'");
@@ -1932,20 +1939,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
-				//执行目标方法
+				// 执行目标方法
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
 
-		//执行通过@Bean设置的初始化方法
+		// 执行通过@Bean设置的初始化方法
 		if (mbd != null && bean.getClass() != NullBean.class) {
 			String initMethodName = mbd.getInitMethodName();
 			if (StringUtils.hasLength(initMethodName) &&
-					//很明显不能和InitializingBean初始化方法一样
+					// 很明显不能和InitializingBean初始化方法一样
 					!(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
-					//还不能是外部设置的初始化方法
+					// 还不能是外部设置的初始化方法
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
-				//执行自定义初始化方法
+				// 执行自定义初始化方法
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}
@@ -1987,7 +1994,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (logger.isTraceEnabled()) {
 			logger.trace("Invoking init method  '" + initMethodName + "' on bean with name '" + beanName + "'");
 		}
-		//我猜测：initMethod是一个接口的实现方法，这是为了获取接口方法，而不是实现方法
+		// 我猜测：initMethod是一个接口的实现方法，这是为了获取接口方法，而不是实现方法
 		Method methodToInvoke = ClassUtils.getInterfaceMethodIfPossible(initMethod);
 
 		if (System.getSecurityManager() != null) {
