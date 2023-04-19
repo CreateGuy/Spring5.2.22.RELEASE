@@ -215,12 +215,16 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/** 使用了 {@link org.springframework.beans.factory.annotation.Lookup @Lookup}的方法 的集合*/
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
-	//初始方法
-	//是通过@Bean(initMethod = "init")设置出来的，下同
+	/**
+	 * 初始方法
+	 * <li>是通过@Bean(initMethod = "init")设置出来的，下同</li>
+	 */
 	@Nullable
 	private String initMethodName;
 
-	//销毁方法
+	/**
+	 * 销毁方法
+	 */
 	@Nullable
 	private String destroyMethodName;
 

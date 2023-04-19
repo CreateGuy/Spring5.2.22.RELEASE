@@ -157,7 +157,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			this.singletonObjects.put(beanName, singletonObject);
 			this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
-			//表明beanName已经创建
+			// 表明beanName已经创建
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -279,7 +279,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					throw ex;
 				}
 				finally {
-					//如果执行过程没有抛出异常
+					// 如果执行过程没有抛出异常
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}

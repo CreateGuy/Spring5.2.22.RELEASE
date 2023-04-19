@@ -316,7 +316,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 
 
 	/**
-	 * 检查bean是否需要销毁或者关闭
+	 * 检查bean是否需要销毁或者关闭方法
 	 * @param bean the bean instance
 	 * @param beanDefinition the corresponding bean definition
 	 */
@@ -341,16 +341,16 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 			destroyMethodName = beanDefinition.getDestroyMethodName();
 			if (AbstractBeanDefinition.INFER_METHOD.equals(destroyMethodName) ||
 					(destroyMethodName == null && bean instanceof AutoCloseable)) {
-				//只有在bean没有实现DisposableBean接口的情况下，才会对销毁作用的方法进行查询
+				// 只有在bean没有实现DisposableBean接口的情况下，才会对销毁作用的方法进行查询
 				destroyMethodName = null;
 				if (!(bean instanceof DisposableBean)) {
 					try {
-						//查询close名称的方法，当作销毁方法
+						// 查询close名称的方法，当作销毁方法
 						destroyMethodName = bean.getClass().getMethod(CLOSE_METHOD_NAME).getName();
 					}
 					catch (NoSuchMethodException ex) {
 						try {
-							//查询shutdown名称的方法，当作销毁方法
+							// 查询shutdown名称的方法，当作销毁方法
 							destroyMethodName = bean.getClass().getMethod(SHUTDOWN_METHOD_NAME).getName();
 						}
 						catch (NoSuchMethodException ex2) {
@@ -373,7 +373,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
 		if (!CollectionUtils.isEmpty(postProcessors)) {
 			for (BeanPostProcessor processor : postProcessors) {
 				if (processor instanceof DestructionAwareBeanPostProcessor) {
-					//默认就会有一个CommonAnnotationBeanPostProcessor：就是查询是否有生命周期方法中的-@PreDestroy方法
+					// 默认就会有一个CommonAnnotationBeanPostProcessor：就是查询是否有生命周期方法中的-@PreDestroy方法
 					DestructionAwareBeanPostProcessor dabpp = (DestructionAwareBeanPostProcessor) processor;
 					if (dabpp.requiresDestruction(bean)) {
 						return true;

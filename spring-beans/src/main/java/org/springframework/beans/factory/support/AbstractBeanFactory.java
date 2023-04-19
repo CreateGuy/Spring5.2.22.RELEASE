@@ -305,12 +305,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			try {
-				//获得合并后的BeanDefinition
+				// 获得合并后的BeanDefinition
 				RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				//检查是否为抽象类
 				checkMergedBeanDefinition(mbd, beanName, args);
 
-				//确保当前bean所依赖的bean的初始化
+				// 确保当前bean所依赖的bean的初始化
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -319,7 +319,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
-						//将依赖情况保存在缓存中
+						// 将依赖情况保存在缓存中
 						registerDependentBean(dep, beanName);
 						try {
 							//先创建被依赖者的bean
@@ -332,7 +332,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
-				//创建bean单例对象
+				// 创建bean单例对象
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
@@ -345,7 +345,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
-					//获取bean实例
+					// 获取bean实例
 					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
@@ -397,10 +397,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
-		//检查所需的类型是否与实际bean实例的类型匹配。
+		// 检查所需的类型是否与实际bean实例的类型匹配
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
-				//调用类型转换器进行转换
+				// 调用类型转换器进行转换
 				T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
 				if (convertedBean == null) {
 					throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
@@ -1850,19 +1850,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			mbd.isFactoryBean = true;
 		}
 		else {
-			//尝试从缓存中获得实例
+			// 尝试从缓存中获得实例
 			object = getCachedObjectForFactoryBean(beanName);
 		}
-		//从FactoryBean获得bean实例
+		// 从FactoryBean获得bean实例
 		if (object == null) {
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
-			//获得合并后的BeanDefinition
+			// 获得合并后的BeanDefinition
 			if (mbd == null && containsBeanDefinition(beanName)) {
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
-			//是否是合成的
+			// 是否是合成的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
-			//从FactoryBean获得bean
+			// 从FactoryBean获得bean
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
 		return object;
@@ -1907,9 +1907,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 1：不是原型模式
 		// 2：确定给定的bean在关闭时是否需要执行销毁前的回调方法
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
-			//是单例模式
+			// 是单例模式
 			if (mbd.isSingleton()) {
-				//将这种需要执行销毁前回调方法的bean注册到特定的集合中
+				// 将这种需要执行销毁前回调方法的bean注册到特定的集合中
 				registerDisposableBean(beanName,
 						new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));
 			}

@@ -17,9 +17,8 @@
 package org.springframework.beans.factory;
 
 /**
- * Interface to be implemented by beans that want to release resources on destruction.
- * A {@link BeanFactory} will invoke the destroy method on individual destruction of a
- * scoped bean. An {@link org.springframework.context.ApplicationContext} is supposed
+ * 接口将由在销毁时释放资源的bean去实现，{@link BeanFactory} 将会在单例Bean要被销毁的时候执行的方法
+ * <p>An {@link org.springframework.context.ApplicationContext} is supposed
  * to dispose all of its singletons on shutdown, driven by the application lifecycle.
  *
  * <p>A Spring-managed bean may also implement Java's {@link AutoCloseable} interface
