@@ -224,7 +224,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	boolean hasEmbeddedValueResolver();
 
 	/**
-	 * Resolve the given embedded value, e.g. an annotation attribute.
+	 * 解析给定的内嵌值，例如注解属性
 	 * @param value the value to resolve
 	 * @return the resolved value (may be the original value as-is)
 	 * @since 3.0

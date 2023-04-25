@@ -51,16 +51,27 @@ public class PropertyPlaceholderHelper {
 		wellKnownSimplePrefixes.put(")", "(");
 	}
 
-
+	/**
+	 * 占位符前缀
+	 */
 	private final String placeholderPrefix;
 
+	/**
+	 * 占位符后缀
+	 */
 	private final String placeholderSuffix;
 
 	private final String simplePrefix;
 
+	/**
+	 * 键是可以带有值的默认值，比如说 ${spring.name:lzx}，valueSeparator就是冒号，后面的就是默认值
+	 */
 	@Nullable
 	private final String valueSeparator;
 
+	/**
+	 * 是否忽略无法解析的占位符
+	 */
 	private final boolean ignoreUnresolvablePlaceholders;
 
 
@@ -115,8 +126,7 @@ public class PropertyPlaceholderHelper {
 	}
 
 	/**
-	 * Replaces all placeholders of format {@code ${name}} with the value returned
-	 * from the supplied {@link PlaceholderResolver}.
+	 * 将格式 $fname} 的所有占位符替换为提供的返回值
 	 * @param value the value containing the placeholders to be replaced
 	 * @param placeholderResolver the {@code PlaceholderResolver} to use for replacement
 	 * @return the supplied value with placeholders replaced inline
@@ -126,9 +136,17 @@ public class PropertyPlaceholderHelper {
 		return parseStringValue(value, placeholderResolver, null);
 	}
 
+	/**
+	 * 解析占位符，返回具体的值
+	 * @param value
+	 * @param placeholderResolver
+	 * @param visitedPlaceholders
+	 * @return
+	 */
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, @Nullable Set<String> visitedPlaceholders) {
 
+		// 去掉前缀
 		int startIndex = value.indexOf(this.placeholderPrefix);
 		if (startIndex == -1) {
 			return value;
@@ -137,7 +155,9 @@ public class PropertyPlaceholderHelper {
 		StringBuilder result = new StringBuilder(value);
 		while (startIndex != -1) {
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
+			// 有后缀
 			if (endIndex != -1) {
+				// 去掉后缀，获得完整的键
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				String originalPlaceholder = placeholder;
 				if (visitedPlaceholders == null) {
@@ -147,24 +167,32 @@ public class PropertyPlaceholderHelper {
 					throw new IllegalArgumentException(
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
-				// Recursive invocation, parsing placeholders contained in the placeholder key.
+				// 递归调用，解析占位符键中包含的占位符
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
-				// Now obtain the value for the fully resolved key...
+
+				// 现在获取完整键的值
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
+
+				// 如果还是没有值，看键是否是 键 + 分离符 + 默认值的情况
 				if (propVal == null && this.valueSeparator != null) {
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
+						// 再次分离
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);
+						// 获得默认值
 						String defaultValue = placeholder.substring(separatorIndex + this.valueSeparator.length());
+
+						// 解析
 						propVal = placeholderResolver.resolvePlaceholder(actualPlaceholder);
+
 						if (propVal == null) {
 							propVal = defaultValue;
 						}
 					}
 				}
 				if (propVal != null) {
-					// Recursive invocation, parsing placeholders contained in the
-					// previously resolved placeholder value.
+					// 递归调用，解析先前解析的占位符值中包含的占位符
+					// 这里是解析键出来的值还是带有占位符的，所以再次递归
 					propVal = parseStringValue(propVal, placeholderResolver, visitedPlaceholders);
 					result.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal);
 					if (logger.isTraceEnabled()) {
@@ -173,7 +201,9 @@ public class PropertyPlaceholderHelper {
 					startIndex = result.indexOf(this.placeholderPrefix, startIndex + propVal.length());
 				}
 				else if (this.ignoreUnresolvablePlaceholders) {
-					// Proceed with unprocessed value.
+					// 是否忽略无法解析的占位符
+
+					// 继续使用未处理的值
 					startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
 				}
 				else {
