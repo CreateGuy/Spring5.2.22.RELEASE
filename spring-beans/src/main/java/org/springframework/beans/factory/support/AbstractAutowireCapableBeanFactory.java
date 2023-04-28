@@ -1838,7 +1838,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * <ul>
 	 *     <li>部分Aware回调</li>
 	 *     <li>初始化前回调方法</li>
-	 *     <li>初始话方法</li>
+	 *     <li>初始化方法</li>
 	 *     <li>初始化后回调方法</li>
 	 * </ul>
 	 * <p>Called from {@link #createBean} for traditionally defined beans,
