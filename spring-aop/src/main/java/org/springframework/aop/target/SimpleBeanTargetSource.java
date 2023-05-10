@@ -21,8 +21,7 @@ package org.springframework.aop.target;
  * freshly obtaining the specified target bean from its containing
  * Spring {@link org.springframework.beans.factory.BeanFactory}.
  *
- * <p>Can obtain any kind of target bean: singleton, scoped, or prototype.
- * Typically used for scoped beans.
+ * <p>可以获得任何类型的目标bean:单例bean、作用域bean或原型bean。通常用于作用域bean。
  *
  * @author Juergen Hoeller
  * @since 2.0.3

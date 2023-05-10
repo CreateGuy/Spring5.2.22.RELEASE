@@ -139,7 +139,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private volatile Object beanClass;
 
-	//是单例还是多例
+	/**
+	 * 是单例还是多例
+	 * <li>多例就是原型模式，只是原型又可以分类，比如说SpringCloud的refresh作用域对象</li>
+	 */
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
 

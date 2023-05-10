@@ -165,7 +165,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** 是否有 注册和销毁前后的后置处理器*/
 	private volatile boolean hasDestructionAwareBeanPostProcessors;
 
-	/** Map from scope identifier String to corresponding Scope. */
+	/**
+	 * 从作用域标识符字符串映射到相应的作用域
+	 * <li>比如说Spring支持的request，session，application，又比如SpringCloud的refresh</li>
+	 */
 	private final Map<String, Scope> scopes = new LinkedHashMap<>(8);
 
 	/** Security context used when running with a SecurityManager. */
@@ -350,19 +353,22 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				else if (mbd.isPrototype()) {
-					// It's a prototype -> create a new instance.
+					// 原型Bean->创建一个新的实例
 					Object prototypeInstance = null;
 					try {
+						// 执行原型创建前的回调方法
 						beforePrototypeCreation(beanName);
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						// 执行原型Bean创建后的回调方法
 						afterPrototypeCreation(beanName);
 					}
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
 
 				else {
+					// 创建其他类型的Bean
 					String scopeName = mbd.getScope();
 					if (!StringUtils.hasLength(scopeName)) {
 						throw new IllegalStateException("No scope name defined for bean '" + beanName + "'");
@@ -372,12 +378,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
 					}
 					try {
+						// 创建其他的作用域Bean
 						Object scopedInstance = scope.get(beanName, () -> {
+							// 执行原型创建前的回调方法
 							beforePrototypeCreation(beanName);
 							try {
 								return createBean(beanName, mbd, args);
 							}
 							finally {
+								// 执行原型Bean创建后的回调方法
 								afterPrototypeCreation(beanName);
 							}
 						});
@@ -1138,8 +1147,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Callback before prototype creation.
-	 * <p>The default implementation register the prototype as currently in creation.
+	 * 执行原型创建前的回调方法
+	 * <p> 默认将Bean注册为当前正在创建的原型Bean
 	 * @param beanName the name of the prototype about to be created
 	 * @see #isPrototypeCurrentlyInCreation
 	 */
@@ -1162,8 +1171,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * Callback after prototype creation.
-	 * <p>The default implementation marks the prototype as not in creation anymore.
+	 * 原型Bean创建后的回调方法
+	 * <p> 默认将原型Bean标记为不处于创建状态
 	 * @param beanName the name of the prototype that has been created
 	 * @see #isPrototypeCurrentlyInCreation
 	 */
