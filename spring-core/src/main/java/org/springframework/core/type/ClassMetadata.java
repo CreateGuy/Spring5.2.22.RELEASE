@@ -69,11 +69,7 @@ public interface ClassMetadata {
 	boolean isIndependent();
 
 	/**
-	 * Return whether the underlying class is declared within an enclosing
-	 * class (i.e. the underlying class is an inner/nested class or a
-	 * local class within a method).
-	 * <p>If this method returns {@code false}, then the underlying
-	 * class is a top-level class.
+	 * 判断给定的类是否为一个嵌套类（即内部类）以及是否包含在另一个类中
 	 */
 	default boolean hasEnclosingClass() {
 		return (getEnclosingClassName() != null);
